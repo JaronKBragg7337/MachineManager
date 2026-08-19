@@ -1,10 +1,18 @@
-﻿# Machine Manager
+# Machine Manager
 
 **Persistent autonomous system for teaching a computer how to operate itself.**
 
-Hierarchy:
+## Live control center
 
-```
+The normal GitHub repository page is the project documentation and source tree. The visual machine-status interface is the GitHub Pages dashboard:
+
+**https://jaronkbragg7337.github.io/MachineManager/**
+
+The dashboard is designed to mirror the useful operational view from the MSI machine: current objective/job state, workers, GPU/VRAM/temperature/power, event stream, manager status, and scenario/evaluation results. It only displays sanitized public telemetry. If the machine has not published a fresh snapshot recently, the dashboard marks the data **STALE** instead of presenting an old snapshot as live.
+
+## Hierarchy
+
+```text
 Jaron (human)
   ↓
 Grok (executive reasoning / CEO)
@@ -29,9 +37,9 @@ Specialist Workers
 
 - Repository initialized
 - Reference Scenario Suite started (healthy-operation + worker-death)
-- Local KeyHunt worker running under multi-signal supervision
+- Local worker supervision under multi-signal evaluation
 - Secrets layout prepared (never committed)
-- Dashboard foundation in progress
+- GitHub Pages control center deployed from `dashboard/`
 
 ## Payout address (public only)
 
