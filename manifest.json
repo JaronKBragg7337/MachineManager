@@ -1,0 +1,22 @@
+﻿{
+    "suite_version":  "0.1",
+    "created":  "2026-08-18T19:27:55.2490419-04:00",
+    "description":  "Reference Scenario Suite for Machine Manager evaluation. Grok reference performance is the initial benchmark.",
+    "notes":  "Scenarios 3-8 still pending. Do not change search targets or credentials during reliability tests.",
+    "scenarios":  [
+                      {
+                          "path":  "scenarios/healthy-operation",
+                          "pass":  true,
+                          "version":  "1.0",
+                          "id":  "healthy-operation-001",
+                          "score":  1
+                      },
+                      {
+                          "path":  "scenarios/worker-death",
+                          "pass":  true,
+                          "version":  "1.0",
+                          "id":  "worker-death-001",
+                          "score":  1
+                      }
+                  ]
+}

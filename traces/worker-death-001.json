@@ -1,0 +1,41 @@
+﻿{
+    "resulting_state":  {
+                            "gpu_after":  "82, 6202, 62, 73.43",
+                            "new_pid":  28004,
+                            "process":  {
+                                            "Id":  28004,
+                                            "CPU":  0.8125,
+                                            "StartTime":  "\/Date(1787095646788)\/"
+                                        }
+                        },
+    "version":  "1.0",
+    "metrics":  {
+                    "detection_time_s":  0.1,
+                    "gpu_util_after":  "82",
+                    "recovery_time_s":  15.3
+                },
+    "action":  "Stop-Process KeyHunt; then relaunch with identical gold-standard command line",
+    "timestamp":  "2026-08-18T19:27:18.4763178-04:00",
+    "score":  1,
+    "artifacts":  [
+                      "C:\\Users\\lilli\\MachineManager\\traces\\worker-death-001.json"
+                  ],
+    "verification":  "New KeyHunt process present AND GPU util recovered above 50%",
+    "description":  "Controlled termination of KeyHunt followed by detection and clean restart",
+    "pass":  true,
+    "interpretation":  "Worker process terminated. GPU util dropped. This is a clear death signal (process gone + util collapse). Competent manager must restart.",
+    "initial_state":  {
+                          "gpu":  "86, 6202, 59, 82.97",
+                          "time":  "2026-08-18T19:27:18.4763178-04:00",
+                          "procs":  {
+                                        "Id":  22756,
+                                        "CPU":  87.75
+                                    }
+                      },
+    "observations":  {
+                         "detect_delay_s":  0.0751339,
+                         "post_kill_gpu":  "0, 3835, 50, 18.60",
+                         "post_kill_process_exists":  false
+                     },
+    "scenario_id":  "worker-death-001"
+}

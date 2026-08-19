@@ -1,0 +1,25 @@
+﻿# Secrets & credentials - NEVER commit
+secrets/
+*.env
+.env*
+*.pem
+*.key
+*token*
+*secret*
+*wallet*
+*seed*
+*private*
+
+# Local runtime
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Large or transient
+*.log
+artifacts/raw/
+traces/raw/

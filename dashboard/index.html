@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Machine Manager Control Center</title>
+<style>
+:root { --bg:#0d1117; --card:#161b22; --text:#e6edf3; --muted:#8b949e; --green:#3fb950; --yellow:#d29922; --red:#f85149; --blue:#58a6ff; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
+header { padding:1rem 1.25rem; border-bottom:1px solid #30363d; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; }
+h1 { margin:0; font-size:1.25rem; }
+.badge { padding:.25rem .6rem; border-radius:999px; font-size:.75rem; font-weight:600; }
+.healthy { background:#238636; } .working { background:#1f6feb; } .stalled { background:#9e6a03; } .failed { background:#da3633; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.75rem; padding:1rem; }
+.card { background:var(--card); border:1px solid #30363d; border-radius:8px; padding:1rem; }
+.card h3 { margin:0 0 .5rem; font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+.card .value { font-size:1.5rem; font-weight:700; }
+.section { padding:0 1rem 1.5rem; }
+.section h2 { font-size:1rem; margin:1rem 0 .75rem; color:var(--muted); }
+table { width:100%; border-collapse:collapse; font-size:.85rem; }
+th,td { text-align:left; padding:.5rem; border-bottom:1px solid #21262d; }
+th { color:var(--muted); font-weight:500; }
+.footer { padding:1rem; text-align:center; color:var(--muted); font-size:.75rem; border-top:1px solid #30363d; }
+@media (max-width:600px) { .value { font-size:1.2rem; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Machine Manager</h1>
+  <span id="status-badge" class="badge healthy">HEALTHY</span>
+</header>
+
+<div class="grid">
+  <div class="card"><h3>GPU Util</h3><div class="value" id="gpu-util">--%</div></div>
+  <div class="card"><h3>VRAM</h3><div class="value" id="vram">--</div></div>
+  <div class="card"><h3>GPU Temp</h3><div class="value" id="temp">--°C</div></div>
+  <div class="card"><h3>Power</h3><div class="value" id="power">-- W</div></div>
+  <div class="card"><h3>Active Jobs</h3><div class="value" id="jobs">1</div></div>
+  <div class="card"><h3>Manager</h3><div class="value" id="manager">v0.1</div></div>
+</div>
+
+<div class="section">
+  <h2>Active Objective</h2>
+  <div class="card">Bitcoin Puzzle #71 continuous search (KeyHunt CUDA)</div>
+</div>
+
+<div class="section">
+  <h2>Workers</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Type</th><th>State</th><th>Model/Owner</th><th>Uptime</th></tr></thead>
+    <tbody id="workers">
+      <tr><td>kh-001</td><td>KeyHunt</td><td>RUNNING</td><td>CUDA / local</td><td>~40 min</td></tr>
+      <tr><td>mgr-001</td><td>Manager</td><td>RUNNING</td><td>qwen3.5:4b + rules</td><td>active</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Reference Scenarios</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Result</th><th>Score</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>healthy-operation-001</td><td>PASS</td><td>1.0</td><td>Grok reference</td></tr>
+      <tr><td>worker-death-001</td><td>PASS</td><td>1.0</td><td>Grok reference (15.3s recovery)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="footer">
+  Machine Manager · Sanitized view · No secrets · <a href="https://github.com/JaronKBragg7337/MachineManager" style="color:var(--blue)">GitHub</a>
+</div>
+
+<script>
+// Placeholder: later this will fetch sanitized telemetry JSON
+// For now static seed data matching current live state
+document.getElementById('gpu-util').textContent = '77%';
+document.getElementById('vram').textContent = '6.2 GB';
+document.getElementById('temp').textContent = '63°C';
+document.getElementById('power').textContent = '~80 W';
+</script>
+</body>
+</html>
