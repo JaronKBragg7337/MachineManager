@@ -1,90 +1,140 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08122b">
 <title>Machine Manager Control Center</title>
 <style>
-:root { --bg:#0d1117; --card:#161b22; --text:#e6edf3; --muted:#8b949e; --green:#3fb950; --yellow:#d29922; --red:#f85149; --blue:#58a6ff; }
-* { box-sizing:border-box; }
-body { margin:0; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; background:var(--bg); color:var(--text); }
-header { padding:1rem 1.25rem; border-bottom:1px solid #30363d; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; }
-h1 { margin:0; font-size:1.25rem; }
-.badge { padding:.25rem .6rem; border-radius:999px; font-size:.75rem; font-weight:600; }
-.healthy { background:#238636; } .working { background:#1f6feb; } .stalled { background:#9e6a03; } .failed { background:#da3633; }
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.75rem; padding:1rem; }
-.card { background:var(--card); border:1px solid #30363d; border-radius:8px; padding:1rem; }
-.card h3 { margin:0 0 .5rem; font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
-.card .value { font-size:1.5rem; font-weight:700; }
-.section { padding:0 1rem 1.5rem; }
-.section h2 { font-size:1rem; margin:1rem 0 .75rem; color:var(--muted); }
-table { width:100%; border-collapse:collapse; font-size:.85rem; }
-th,td { text-align:left; padding:.5rem; border-bottom:1px solid #21262d; }
-th { color:var(--muted); font-weight:500; }
-.footer { padding:1rem; text-align:center; color:var(--muted); font-size:.75rem; border-top:1px solid #30363d; }
-@media (max-width:600px) { .value { font-size:1.2rem; } }
+:root{
+  --bg:#071126;
+  --bg2:#0a1734;
+  --panel:#0e1f45;
+  --panel2:#102755;
+  --line:#274a87;
+  --text:#f4f8ff;
+  --muted:#9db2d6;
+  --cyan:#27e5ff;
+  --blue:#4b8dff;
+  --green:#39e58c;
+  --yellow:#ffd35a;
+  --red:#ff6472;
+  --purple:#9c7bff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 20% 0%,#102b66 0,#081735 32%,var(--bg) 72%);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.shell{max-width:1500px;margin:auto;padding:14px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(180deg,#162d63,#10224d);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 14px 45px #0008, inset 0 1px #ffffff12;position:sticky;top:8px;z-index:10}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.04em}.mark{width:29px;height:29px;border:2px solid var(--cyan);border-radius:9px;display:grid;place-items:center;color:var(--cyan);font-size:15px;box-shadow:0 0 20px #27e5ff44}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.12em;margin-top:2px}
+.statuswrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.pill{border:1px solid #ffffff1e;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.08em;background:#ffffff0b}.pill.healthy{color:var(--green)}.pill.working{color:var(--cyan)}.pill.stale,.pill.degraded{color:var(--yellow)}.pill.failed{color:var(--red)}
+button{appearance:none;border:1px solid var(--line);background:#17366f;color:var(--text);font-weight:800;border-radius:10px;padding:8px 11px;cursor:pointer}
+.layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(320px,.9fr);gap:12px;margin-top:12px}.left,.right{display:grid;gap:12px;align-content:start}
+.panel{background:linear-gradient(180deg,#102653f2,#0b1c3ef2);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 14px 35px #0005}.panelhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid #284a8277;background:#ffffff06}.panelhead h2{font-size:12px;margin:0;letter-spacing:.08em;color:#dbe8ff}.panelbody{padding:12px}
+.workerline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.mini{background:#071a3b;border:1px solid #214678;border-radius:10px;padding:10px}.label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.value{font-size:18px;font-weight:900;margin-top:5px}.value.cyan{color:var(--cyan)}.value.green{color:var(--green)}.value.yellow{color:var(--yellow)}
+.objective{font-size:18px;font-weight:900;margin-bottom:8px}.subtle{color:var(--muted);font-size:12px}.progress{height:14px;border-radius:999px;background:#07162f;border:1px solid #244879;overflow:hidden;margin:14px 0 8px}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));box-shadow:0 0 18px #27e5ff66}.scanmeta{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:#071a3b;border:1px solid #214678;border-radius:10px;padding:10px;min-height:78px}.stat .big{font-size:22px;font-weight:900;margin-top:4px}.stat .unit{font-size:11px;color:var(--muted);margin-left:3px}
+.stream{height:360px;overflow:auto;background:#06152f;border:1px solid #214678;border-radius:10px;padding:10px;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.evt{padding:5px 0;border-bottom:1px dashed #28476c66}.evt:last-child{border:0}.evt time{color:#7ea5df}.evt .actor{color:var(--cyan)}.evt.good{color:var(--green)}.evt.bad{color:var(--red)}.evt.warn{color:var(--yellow)}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:8px 7px;border-bottom:1px solid #23447066;vertical-align:top}th{color:var(--muted);font-size:10px;letter-spacing:.06em;text-transform:uppercase}.state{font-weight:900}.state.RUNNING,.state.PASS,.state.HEALTHY{color:var(--green)}.state.FAILED,.state.FAIL{color:var(--red)}.state.STALLED,.state.DEGRADED,.state.STALE{color:var(--yellow)}
+.footer{color:var(--muted);text-align:center;font-size:10px;padding:14px 4px 4px}.footer a{color:var(--cyan)}
+.notice{border:1px solid #6f5a1f;background:#3f32169c;color:#ffe69a;border-radius:10px;padding:10px 12px;font-size:12px;display:none;margin-top:12px}.notice.show{display:block}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.stream{height:260px}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.shell{padding:8px}.topbar{top:4px;padding:10px}.brand{font-size:13px}.brand small{display:none}.workerline{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.stat .big{font-size:19px}.objective{font-size:16px}.panelbody{padding:10px}th,td{padding:7px 5px;font-size:11px}.right .panel:first-child{order:-1}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Machine Manager</h1>
-  <span id="status-badge" class="badge healthy">HEALTHY</span>
-</header>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand"><div class="mark">MM</div><div>MACHINE MANAGER<small>AUTONOMOUS CONTROL CENTER</small></div></div>
+    <div class="statuswrap"><span id="liveBadge" class="pill stale">LOADING</span><span id="ageBadge" class="pill">LAST UPDATE --</span><button onclick="loadAll(true)">REFRESH</button></div>
+  </div>
 
-<div class="grid">
-  <div class="card"><h3>GPU Util</h3><div class="value" id="gpu-util">--%</div></div>
-  <div class="card"><h3>VRAM</h3><div class="value" id="vram">--</div></div>
-  <div class="card"><h3>GPU Temp</h3><div class="value" id="temp">--°C</div></div>
-  <div class="card"><h3>Power</h3><div class="value" id="power">-- W</div></div>
-  <div class="card"><h3>Active Jobs</h3><div class="value" id="jobs">1</div></div>
-  <div class="card"><h3>Manager</h3><div class="value" id="manager">v0.1</div></div>
+  <div id="staleNotice" class="notice"></div>
+
+  <div class="layout">
+    <main class="left">
+      <section class="panel">
+        <div class="panelhead"><h2>ACTIVE SYSTEM</h2><span id="managerVersion" class="pill">MANAGER --</span></div>
+        <div class="panelbody workerline">
+          <div class="mini"><div class="label">Objective</div><div id="objectiveMini" class="value cyan">Loading…</div></div>
+          <div class="mini"><div class="label">Workers</div><div id="workerCount" class="value">--</div></div>
+          <div class="mini"><div class="label">Jobs</div><div id="jobCount" class="value">--</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead"><h2>CURRENT WORK</h2><span id="jobState" class="pill">--</span></div>
+        <div class="panelbody">
+          <div id="objective" class="objective">Loading current objective…</div>
+          <div id="jobText" class="subtle">Waiting for sanitized machine telemetry.</div>
+          <div class="progress"><div id="jobBar" class="bar"></div></div>
+          <div class="scanmeta"><span id="jobId">Job: --</span><span id="objectiveId">Objective ID: --</span><span id="updatedText">Updated: --</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead"><h2>SYSTEM</h2><span class="subtle">sanitized telemetry</span></div>
+        <div class="panelbody stats">
+          <div class="stat"><div class="label">GPU</div><div class="big"><span id="gpuUtil">--</span><span class="unit">%</span></div></div>
+          <div class="stat"><div class="label">VRAM</div><div class="big"><span id="vram">--</span><span class="unit">GB</span></div></div>
+          <div class="stat"><div class="label">GPU TEMP</div><div class="big"><span id="temp">--</span><span class="unit">°C</span></div></div>
+          <div class="stat"><div class="label">POWER</div><div class="big"><span id="power">--</span><span class="unit">W</span></div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead"><h2>WORKERS</h2><span id="workerHealth" class="subtle">--</span></div>
+        <div class="panelbody" style="overflow:auto"><table><thead><tr><th>ID</th><th>Type</th><th>State</th><th>Owner / Model</th><th>PID</th></tr></thead><tbody id="workersBody"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead"><h2>REFERENCE & EVALUATION SUITE</h2><span id="scenarioScore" class="subtle">--</span></div>
+        <div class="panelbody" style="overflow:auto"><table><thead><tr><th>ID</th><th>Actor</th><th>Result</th><th>Score</th><th>Recovery</th></tr></thead><tbody id="scenariosBody"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
+      </section>
+    </main>
+
+    <aside class="right">
+      <section class="panel">
+        <div class="panelhead"><h2>LIVE EVENT STREAM</h2><span id="eventCount" class="subtle">--</span></div>
+        <div class="panelbody"><div id="eventStream" class="stream">Loading event stream…</div></div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead"><h2>STATUS SUMMARY</h2></div>
+        <div class="panelbody stats" style="grid-template-columns:repeat(2,1fr)">
+          <div class="stat"><div class="label">System State</div><div id="summaryState" class="big">--</div></div>
+          <div class="stat"><div class="label">Scenario Passes</div><div id="passCount" class="big">--</div></div>
+          <div class="stat"><div class="label">Manager</div><div id="summaryManager" class="big">--</div></div>
+          <div class="stat"><div class="label">Telemetry Age</div><div id="summaryAge" class="big">--</div></div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="footer">Machine Manager · Public sanitized view only · No secrets, private logs, tokens, keys, or seed phrases · <a href="https://github.com/JaronKBragg7337/MachineManager">Repository</a></div>
 </div>
-
-<div class="section">
-  <h2>Active Objective</h2>
-  <div class="card">Bitcoin Puzzle #71 continuous search (KeyHunt CUDA)</div>
-</div>
-
-<div class="section">
-  <h2>Workers</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Type</th><th>State</th><th>Model/Owner</th><th>Uptime</th></tr></thead>
-    <tbody id="workers">
-      <tr><td>kh-001</td><td>KeyHunt</td><td>RUNNING</td><td>CUDA / local</td><td>~40 min</td></tr>
-      <tr><td>mgr-001</td><td>Manager</td><td>RUNNING</td><td>qwen3.5:4b + rules</td><td>active</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="section">
-  <h2>Reference Scenarios</h2>
-  <table>
-    <thead><tr><th>ID</th><th>Result</th><th>Score</th><th>Notes</th></tr></thead>
-    <tbody>
-      <tr><td>healthy-operation-001</td><td>PASS</td><td>1.0</td><td>Grok reference</td></tr>
-      <tr><td>worker-death-001</td><td>PASS</td><td>1.0</td><td>Grok reference (15.3s recovery)</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="footer">
-  Machine Manager · Sanitized view · No secrets · <a href="https://github.com/JaronKBragg7337/MachineManager" style="color:var(--blue)">GitHub</a>
-</div>
-
 <script>
-async function loadDashboard() {
-  try {
-    const latest = await fetch('data/latest.json').then(r => r.json());
-    document.getElementById('gpu-util').textContent = latest.gpu.util_pct + '%';
-    document.getElementById('vram').textContent = (latest.gpu.mem_used_mib/1024).toFixed(1) + ' GB';
-    document.getElementById('temp').textContent = latest.gpu.temp_c + '°C';
-    document.getElementById('power').textContent = Math.round(latest.gpu.power_w) + ' W';
-    document.getElementById('status-badge').textContent = latest.status;
-  } catch(e) { console.warn('Data load failed', e); }
+const $=id=>document.getElementById(id);
+let latestCache=null;
+function esc(v){return String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));}
+function ago(ms){if(!Number.isFinite(ms))return '--';const s=Math.max(0,Math.floor(ms/1000));if(s<60)return s+'s';const m=Math.floor(s/60);if(m<60)return m+'m';const h=Math.floor(m/60);if(h<48)return h+'h '+(m%60)+'m';return Math.floor(h/24)+'d';}
+function statusClass(s){s=String(s||'').toUpperCase();if(['HEALTHY','PASS','RUNNING','RECOVERED'].includes(s))return 'healthy';if(['WORKING','ACTIVE'].includes(s))return 'working';if(['STALE','DEGRADED','STALLED','IDLE'].includes(s))return 'stale';if(['FAILED','FAIL','ERROR'].includes(s))return 'failed';return '';}
+function setPill(el,text){el.textContent=text;el.className='pill '+statusClass(text)}
+async function getJSON(path){const r=await fetch(path+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(path+' '+r.status);return r.json();}
+function renderLatest(latest){latestCache=latest;const updated=new Date(latest.updated);const ageMs=Date.now()-updated.getTime();const stale=ageMs>5*60*1000;const effective=stale?'STALE':(latest.status||'UNKNOWN');
+ setPill($('liveBadge'),effective);$('ageBadge').textContent='LAST UPDATE '+ago(ageMs)+' AGO';$('summaryAge').textContent=ago(ageMs);$('updatedText').textContent='Updated: '+(Number.isNaN(updated.getTime())?'--':updated.toLocaleString());
+ $('staleNotice').classList.toggle('show',stale);$('staleNotice').textContent=stale?'Telemetry is '+ago(ageMs)+' old. The dashboard is showing the last published machine snapshot, not current live state.':'';
+ $('managerVersion').textContent='MANAGER v'+(latest.manager_version||'--');$('summaryManager').textContent='v'+(latest.manager_version||'--');$('objectiveMini').textContent=latest.objective||'No objective';$('objective').textContent=latest.objective||'No active objective';
+ const workers=Array.isArray(latest.workers)?latest.workers:[];const jobs=Array.isArray(latest.jobs)?latest.jobs:[];$('workerCount').textContent=workers.length;$('jobCount').textContent=jobs.length;$('workerHealth').textContent=workers.filter(w=>String(w.state).toUpperCase()==='RUNNING').length+'/'+workers.length+' running';
+ const g=latest.gpu||{};$('gpuUtil').textContent=g.util_pct??'--';$('vram').textContent=g.mem_used_mib!=null?(g.mem_used_mib/1024).toFixed(1):'--';$('temp').textContent=g.temp_c??'--';$('power').textContent=g.power_w!=null?Math.round(g.power_w):'--';
+ const job=jobs[0]||{};setPill($('jobState'),job.state||'NO JOB');$('jobText').textContent=job.state?('Job state: '+job.state+(stale?' · last published snapshot':'')):'No active job reported';$('jobId').textContent='Job: '+(job.id||'--');$('objectiveId').textContent='Objective ID: '+(job.objective_id||'--');$('jobBar').style.width=(String(job.state).toUpperCase()==='RUNNING'&&!stale?'72%':'0%');
+ $('workersBody').innerHTML=workers.length?workers.map(w=>`<tr><td>${esc(w.id)}</td><td>${esc(w.type)}</td><td class="state ${esc(String(w.state).toUpperCase())}">${esc(w.state)}</td><td>${esc(w.owner)}</td><td>${esc(w.pid)}</td></tr>`).join(''):'<tr><td colspan="5">No workers reported</td></tr>';
+ $('summaryState').textContent=effective;$('summaryState').style.color=stale?'var(--yellow)':(String(effective).toUpperCase()==='HEALTHY'?'var(--green)':'var(--text)');
 }
-loadDashboard();
-setInterval(loadDashboard, 60000);
+function renderEvents(events){events=Array.isArray(events)?events:[];$('eventCount').textContent=events.length+' events';$('eventStream').innerHTML=events.length?events.slice().sort((a,b)=>new Date(b.ts)-new Date(a.ts)).map(e=>{const st=String(e.state||'').toUpperCase();const cls=['RECOVERED','HEALTHY','PASS'].includes(st)?'good':['FAILED','FAIL','ERROR'].includes(st)?'bad':['STALE','DEGRADED','STALLED'].includes(st)?'warn':'';return `<div class="evt ${cls}"><time>[${esc(new Date(e.ts).toLocaleTimeString())}]</time> <span class="actor">${esc(e.actor||'system')}</span> · ${esc(e.type||'event')}<br>${esc(e.message||'')}</div>`}).join(''):'No events published.';}
+function renderScenarios(data){const s=Array.isArray(data)?data:(data&&Array.isArray(data.scenarios)?data.scenarios:[]);const pass=s.filter(x=>String(x.result).toUpperCase()==='PASS').length;$('passCount').textContent=pass+'/'+s.length;$('scenarioScore').textContent=s.length?Math.round((pass/s.length)*100)+'% pass rate':'--';$('scenariosBody').innerHTML=s.length?s.map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(x.actor||'--')}</td><td class="state ${esc(String(x.result).toUpperCase())}">${esc(x.result||'--')}</td><td>${esc(x.score??'--')}</td><td>${x.recovery_s!=null?esc(x.recovery_s)+'s':'--'}</td></tr>`).join(''):'<tr><td colspan="5">No scenarios published</td></tr>';}
+async function loadAll(manual=false){if(manual)$('liveBadge').textContent='REFRESHING';try{const [latest,events,scenarios]=await Promise.all([getJSON('data/latest.json'),getJSON('data/events.json'),getJSON('data/scenarios.json')]);renderLatest(latest);renderEvents(events);renderScenarios(scenarios);}catch(e){console.error(e);setPill($('liveBadge'),'FAILED');$('staleNotice').classList.add('show');$('staleNotice').textContent='Dashboard data could not be loaded: '+e.message;}}
+loadAll();setInterval(()=>loadAll(false),60000);setInterval(()=>{if(latestCache)renderLatest(latestCache)},15000);
 </script>
 </body>
 </html>
-
