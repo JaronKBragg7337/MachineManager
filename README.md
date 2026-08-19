@@ -4,11 +4,13 @@
 
 ## Live control center
 
-The normal GitHub repository page is the project documentation and source tree. The visual machine-status interface is the GitHub Pages dashboard:
+The GitHub Pages root now forwards directly to the visual Machine Manager control center.
 
-**https://jaronkbragg7337.github.io/MachineManager/**
+Dashboard:
 
-The dashboard is designed to mirror the useful operational view from the MSI machine: current objective/job state, workers, GPU/VRAM/temperature/power, event stream, manager status, and scenario/evaluation results. It only displays sanitized public telemetry. If the machine has not published a fresh snapshot recently, the dashboard marks the data **STALE** instead of presenting an old snapshot as live.
+`https://jaronkbragg7337.github.io/MachineManager/`
+
+The repository page remains the source/documentation view. The Pages site is the operational dashboard.
 
 ## Hierarchy
 
