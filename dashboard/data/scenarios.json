@@ -1,0 +1,18 @@
+﻿{
+    "updated":  "2026-08-18T20:15:38.7005229-04:00",
+    "scenarios":  [
+                      {
+                          "actor":  "grok-reference",
+                          "result":  "PASS",
+                          "id":  "healthy-operation-001",
+                          "score":  1
+                      },
+                      {
+                          "actor":  "grok-reference",
+                          "recovery_s":  15.3,
+                          "result":  "PASS",
+                          "id":  "worker-death-001",
+                          "score":  1
+                      }
+                  ]
+}

@@ -1,0 +1,18 @@
+﻿[
+    {
+        "ts":  "2026-08-18T20:15:38.7005229-04:00",
+        "actor":  "system",
+        "type":  "status",
+        "event_id":  "evt-001",
+        "state":  "HEALTHY",
+        "message":  "Dashboard data pipeline initialized"
+    },
+    {
+        "ts":  "2026-08-18T19:35:38.7530735-04:00",
+        "actor":  "grok-reference",
+        "type":  "recovery",
+        "event_id":  "evt-002",
+        "state":  "RECOVERED",
+        "message":  "worker-death-001 recovered in 15.3s"
+    }
+]

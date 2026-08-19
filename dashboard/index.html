@@ -72,12 +72,19 @@ th { color:var(--muted); font-weight:500; }
 </div>
 
 <script>
-// Placeholder: later this will fetch sanitized telemetry JSON
-// For now static seed data matching current live state
-document.getElementById('gpu-util').textContent = '77%';
-document.getElementById('vram').textContent = '6.2 GB';
-document.getElementById('temp').textContent = '63°C';
-document.getElementById('power').textContent = '~80 W';
+async function loadDashboard() {
+  try {
+    const latest = await fetch('data/latest.json').then(r => r.json());
+    document.getElementById('gpu-util').textContent = latest.gpu.util_pct + '%';
+    document.getElementById('vram').textContent = (latest.gpu.mem_used_mib/1024).toFixed(1) + ' GB';
+    document.getElementById('temp').textContent = latest.gpu.temp_c + '°C';
+    document.getElementById('power').textContent = Math.round(latest.gpu.power_w) + ' W';
+    document.getElementById('status-badge').textContent = latest.status;
+  } catch(e) { console.warn('Data load failed', e); }
+}
+loadDashboard();
+setInterval(loadDashboard, 60000);
 </script>
 </body>
 </html>
+
