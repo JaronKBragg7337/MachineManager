@@ -1,0 +1,54 @@
+{
+  "evaluation_id": "worker-death-manager-002",
+  "reference_id": "worker-death-001",
+  "version": "1.0",
+  "started_at": "2026-08-28T16:21:36.2614635-04:00",
+  "manager_pid": 648,
+  "initial_state": {
+    "worker_pid": 18228,
+    "search_active": true,
+    "gpu": {
+      "util_pct": 77,
+      "memory_used_mib": 2376,
+      "temperature_c": 62,
+      "power_w": 80.79
+    }
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Terminate the verified KeyHunt worker process",
+    "at": "2026-08-28T16:21:36.2614635-04:00",
+    "worker_count_after": 0,
+    "gpu_after": {
+      "util_pct": 0,
+      "memory_used_mib": 10,
+      "temperature_c": 48,
+      "power_w": 13.3
+    }
+  },
+  "manager_observation": {
+    "cycle": 2,
+    "at": "2026-08-28T16:21:50.985021-04:00",
+    "search_active": false,
+    "worker_count": 0,
+    "detection_time_s": 14.72
+  },
+  "recovery": {
+    "cycle": 3,
+    "launch_started_at": "2026-08-28T16:23:06.266585-04:00",
+    "launch_confirmed_at": "2026-08-28T16:23:11-04:00",
+    "worker_pid": 16644,
+    "recovery_time_s": 94.74,
+    "confirmed_healthy_at": "2026-08-28T16:23:31.479773-04:00",
+    "confirmed_healthy_gpu": {
+      "util_pct": 78,
+      "memory_used_mib": 2376,
+      "temperature_c": 59,
+      "power_w": 80.79
+    }
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The controlled worker termination was the only injected failure. The local manager performed detection and recovery autonomously using the unchanged Puzzle #71 launch parameters."
+}

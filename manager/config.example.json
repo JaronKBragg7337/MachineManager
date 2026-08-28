@@ -1,0 +1,27 @@
+{
+  "actor": "local-manager",
+  "objective_id": "synthetic-reliability",
+  "job_id": "synthetic-worker-001",
+  "objective": "Synthetic worker reliability check",
+  "max_restarts": 3,
+  "poll_interval_s": 2,
+  "worker": {
+    "id": "synthetic-001",
+    "type": "SyntheticWorker",
+    "command": [
+      "python",
+      "-m",
+      "manager.synthetic_worker",
+      "--mode",
+      "run",
+      "--heartbeat-file",
+      "var/synthetic.heartbeat.json",
+      "--interval",
+      "0.2"
+    ],
+    "cwd": "..",
+    "heartbeat_file": "../var/synthetic.heartbeat.json",
+    "heartbeat_max_age_s": 1,
+    "startup_grace_s": 1
+  }
+}

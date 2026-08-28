@@ -18,5 +18,15 @@
                           "id":  "worker-death-001",
                           "score":  1
                       }
-                  ]
+                  ],
+    "evaluations":  [
+                       {
+                           "id":  "worker-death-manager-002",
+                           "reference_id":  "worker-death-001",
+                           "result":  "PASS",
+                           "ceo_intervention_count":  0,
+                           "recovery_time_s":  94.74,
+                           "path":  "evaluations/worker-death-manager-002.json"
+                       }
+                   ]
 }

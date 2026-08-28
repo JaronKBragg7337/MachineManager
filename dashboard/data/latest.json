@@ -1,37 +1,29 @@
-﻿{
-    "manager_version":  "0.1",
-    "workers":  [
-                    {
-                        "owner":  "local-cuda",
-                        "pid":  28004,
-                        "id":  "kh-001",
-                        "type":  "KeyHunt",
-                        "state":  "RUNNING"
-                    },
-                    {
-                        "owner":  "qwen3.5:4b+rules",
-                        "pid":  2732,
-                        "id":  "mgr-001",
-                        "type":  "Manager",
-                        "state":  "RUNNING"
-                    }
-                ],
-    "notes":  "Sanitized public telemetry only. No secrets.",
-    "status":  "HEALTHY",
-    "gpu":  {
-                "util_pct":  87,
-                "mem_total_mib":  8188,
-                "temp_c":  61,
-                "mem_used_mib":  6202,
-                "power_w":  82.78
-            },
-    "objective":  "Bitcoin Puzzle #71 continuous search",
-    "jobs":  [
-                 {
-                     "objective_id":  "p71",
-                     "id":  "job-p71-001",
-                     "state":  "RUNNING"
-                 }
-             ],
-    "updated":  "2026-08-18T20:15:38.7005229-04:00"
+{
+  "manager_version": "0.2",
+  "status": "HEALTHY",
+  "objective": "Bitcoin Puzzle #71 continuous search",
+  "workers": [
+    {
+      "id": "keyhunt-001",
+      "type": "KeyHunt",
+      "state": "RUNNING",
+      "owner": "local-manager"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job-p71-001",
+      "objective_id": "p71",
+      "state": "RUNNING"
+    }
+  ],
+  "gpu": {
+    "util_pct": 77,
+    "mem_used_mib": 2376.0,
+    "mem_total_mib": 8188.0,
+    "temp_c": 62.0,
+    "power_w": 81.31
+  },
+  "notes": "Sanitized public telemetry only. No secrets or raw logs.",
+  "updated": "2026-08-28T20:47:23.041Z"
 }

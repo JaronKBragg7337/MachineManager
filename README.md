@@ -12,7 +12,10 @@ The Bitcoin workload is the current proving ground, not the long-term limit of t
 
 **Current reward plan:** if the active Puzzle #71 workload succeeds, **2 BTC** is allocated to the designated service/developer payout wallet and the remaining recovered balance is directed to the configured public payout address below.
 
-> The live dashboard is the source of truth for current machine state. This section documents the active mission and intended workload, not real-time process health.
+> The dashboard displays the latest published sanitized snapshot. If the local
+> publisher is not running, it shows the last snapshot and marks it stale.
+> This section documents the active mission and intended workload, not
+> real-time process health.
 
 ## Live control center
 
@@ -47,11 +50,33 @@ Specialist Workers
 - Workers are dynamically registerable; each can have its own minimal GitHub identity
 - Grok remains the escalation and teaching layer
 
-## Current status (2026-08-19)
+## Local manager runtime
+
+The repository now includes a dependency-free Python runtime under `manager/`.
+It provides a job registry, explicit lifecycle states, multi-signal worker
+health checks, bounded retries, escalation, and an atomic public telemetry
+publisher. The synthetic worker and tests cover healthy operation, live-but-stalled
+false liveness, crashes, retry exhaustion, and the event contract.
+
+Run the local checks from the repository root:
+
+```text
+python -m unittest discover -s tests -v
+```
+
+`manager/config.example.json` is a safe synthetic example. Keep real worker
+commands, credentials, targets, and private machine paths in a local config
+outside the repository. See [`docs/LOCAL_MANAGER.md`](docs/LOCAL_MANAGER.md)
+for the configuration and telemetry contract.
+
+## Current status (2026-08-28)
 
 - Repository initialized
 - Current mission documented as Bitcoin Puzzle #71
 - Reference Scenario Suite started (healthy-operation + worker-death)
+- Reusable local supervisor runtime and synthetic reliability tests added
+- Sanitized telemetry publisher added for dashboard data files
+- `worker-death-manager-002` passed with zero CEO intervention
 - Local worker supervision under multi-signal evaluation
 - Secrets layout prepared (never committed)
 - GitHub Pages control center deployed from `dashboard/`

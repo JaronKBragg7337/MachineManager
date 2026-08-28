@@ -16,6 +16,8 @@ __pycache__/
 .venv/
 venv/
 node_modules/
+var/
+*.heartbeat.json
 .DS_Store
 Thumbs.db
 
@@ -23,3 +25,9 @@ Thumbs.db
 *.log
 artifacts/raw/
 traces/raw/
+
+# Evaluation scratch artifacts can contain local diagnostics; commit only
+# explicitly sanitized evaluation summaries.
+evaluations/*-FAIL.json
+evaluations/*-samples.json
+evaluations/*-start.json

@@ -34,4 +34,5 @@ New process present AND GPU util >50%.
 - GPU util after: 82%
 
 ## Artifacts
-- C:\Users\lilli\MachineManager\traces\worker-death-001.json
+- Sanitized trace: `scenarios/worker-death/trace-001.json`
+- Raw local logs are intentionally not published.

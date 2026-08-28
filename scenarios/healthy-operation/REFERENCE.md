@@ -33,5 +33,5 @@ GPU util >70%, KeyHunt process alive, manager reports active=True.
 - Recovery time: 0 s
 
 ## Artifacts
-- C:\Users\lilli\MachineManager\traces\healthy-operation-001.json
-- C:\Users\lilli\Puzzle71_Experiment\logs\manager.log
+- Sanitized trace: `scenarios/healthy-operation/trace-001.json`
+- Raw local logs are intentionally not published.
