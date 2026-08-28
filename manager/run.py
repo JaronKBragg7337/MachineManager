@@ -16,8 +16,12 @@ from .supervisor import WorkerSpec
 from .telemetry import TelemetryPublisher, utc_now
 
 
+def load_json_document(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
 def load_config(path: Path) -> dict[str, Any]:
-    config = json.loads(path.read_text(encoding="utf-8-sig"))
+    config = load_json_document(path)
     if not isinstance(config, dict):
         raise ValueError("manager config must be a JSON object")
     return config
@@ -41,6 +45,24 @@ def write_status(path: Path, status: dict[str, Any]) -> None:
     finally:
         if os.path.exists(temporary_name):
             os.unlink(temporary_name)
+
+
+def load_public_records(dashboard_dir: Path | None) -> tuple[list[Any], list[Any]]:
+    """Load existing public records so a live publish does not erase history."""
+    if dashboard_dir is None:
+        return [], []
+    data_dir = dashboard_dir / "data"
+    events = load_json_document(data_dir / "events.json") if (data_dir / "events.json").exists() else []
+    scenarios_data = load_json_document(data_dir / "scenarios.json") if (data_dir / "scenarios.json").exists() else []
+    if not isinstance(events, list):
+        events = []
+    if isinstance(scenarios_data, dict):
+        scenarios = scenarios_data.get("scenarios", [])
+    else:
+        scenarios = scenarios_data
+    if not isinstance(scenarios, list):
+        scenarios = []
+    return events, scenarios
 
 
 def manager_from_config(config: dict[str, Any], *, config_path: Path) -> tuple[MachineManager, str, str]:
@@ -98,6 +120,7 @@ def main() -> int:
         return 1
 
     publisher = TelemetryPublisher(args.dashboard_dir) if args.dashboard_dir else None
+    public_events, public_scenarios = load_public_records(args.dashboard_dir)
     interval = max(0.1, float(config.get("poll_interval_s", 15)))
     objective = str(config.get("objective", objective_id))
 
@@ -113,7 +136,11 @@ def main() -> int:
             if args.status_file:
                 write_status(args.status_file, snapshot)
             if publisher:
-                publisher.publish(snapshot, events=manager.events)
+                publisher.publish(
+                    snapshot,
+                    events=[*public_events, *manager.events],
+                    scenarios=public_scenarios,
+                )
             if args.once:
                 break
             time.sleep(interval)

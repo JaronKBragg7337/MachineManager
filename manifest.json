@@ -27,6 +27,14 @@
                            "ceo_intervention_count":  0,
                            "recovery_time_s":  94.74,
                            "path":  "evaluations/worker-death-manager-002.json"
+                       },
+                       {
+                           "id":  "worker-death-manager-003",
+                           "reference_id":  "worker-death-001",
+                           "result":  "PASS",
+                           "ceo_intervention_count":  0,
+                           "recovery_time_s":  16.23,
+                           "path":  "evaluations/worker-death-manager-003.json"
                        }
                    ]
 }

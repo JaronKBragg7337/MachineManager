@@ -1,0 +1,43 @@
+{
+  "evaluation_id": "worker-death-manager-003",
+  "reference_id": "worker-death-001",
+  "manager_version": "0.2",
+  "poll_interval_s": 15,
+  "started_at": "2026-08-28T16:50:42.3057385-04:00",
+  "initial_state": {
+    "worker_present": true,
+    "gpu": {
+      "util_pct": 87,
+      "memory_used_mib": 2376,
+      "temperature_c": 65,
+      "power_w": 82.11
+    }
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Terminate the verified KeyHunt worker process",
+    "at": "2026-08-28T16:50:42.3057385-04:00",
+    "worker_count_after": 0
+  },
+  "manager_observation": {
+    "at": "2026-08-28T16:50:43.44-04:00",
+    "new_state": "FAILED",
+    "detection_time_s": 1.13
+  },
+  "recovery": {
+    "restart_started_at": "2026-08-28T16:50:43.472-04:00",
+    "restart_time_s": 1.17,
+    "confirmed_healthy_at": "2026-08-28T16:50:58.537-04:00",
+    "full_recovery_time_s": 16.23,
+    "gpu": {
+      "util_pct": 75,
+      "memory_used_mib": 2376,
+      "temperature_c": 65,
+      "power_w": 81.15
+    }
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The controlled worker termination was the only injected failure. The repo-level manager detected the exit, retried once, and verified resource activity after restart."
+}

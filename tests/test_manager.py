@@ -10,6 +10,7 @@ from pathlib import Path
 
 from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor
 from manager.telemetry import TelemetryPublisher
+from manager.run import load_public_records
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -172,6 +173,19 @@ class SupervisorTests(unittest.TestCase):
 
 
 class TelemetryTests(unittest.TestCase):
+    def test_runner_reads_array_and_object_public_records(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            data_dir = dashboard / "data"
+            data_dir.mkdir(parents=True)
+            (data_dir / "events.json").write_text("[]", encoding="utf-8")
+            (data_dir / "scenarios.json").write_text(
+                json.dumps({"scenarios": [{"id": "scenario-1"}]}), encoding="utf-8"
+            )
+            events, scenarios = load_public_records(dashboard)
+            self.assertEqual(events, [])
+            self.assertEqual(scenarios, [{"id": "scenario-1"}])
+
     def test_publisher_allowlists_public_fields(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             dashboard = Path(raw) / "dashboard"
@@ -193,7 +207,7 @@ class TelemetryTests(unittest.TestCase):
                         "new_state": "RUNNING",
                         "action": "start",
                         "error": "C:\\Users\\lilli\\secret-token.txt",
-                        "metrics": {"util_pct": 80},
+                        "metrics": {"util_pct": 80, "pid": 9999},
                     }
                 ],
             )
@@ -204,6 +218,7 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("command", encoded)
             self.assertNotIn("pid", encoded)
             self.assertNotIn("C:\\", json.dumps(events))
+            self.assertNotIn("pid", json.dumps(events))
             self.assertFalse(events[0]["error"] is False)
             self.assertEqual(latest["workers"][0]["state"], "RUNNING")
 

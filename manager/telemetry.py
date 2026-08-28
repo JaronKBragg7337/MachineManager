@@ -36,10 +36,30 @@ def _number(value: Any) -> int | float | None:
         return None
 
 
+PUBLIC_METRIC_KEYS = {
+    "attempt",
+    "restart_count",
+    "max_restarts",
+    "util_pct",
+    "mem_used_mib",
+    "mem_total_mib",
+    "temp_c",
+    "power_w",
+    "process_alive",
+    "heartbeat_fresh",
+    "resource_active",
+    "healthy",
+    "detection_time_s",
+    "recovery_time_s",
+}
+
+
 def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | bool]:
     safe: dict[str, int | float | bool] = {}
     for key, value in (metrics or {}).items():
         clean_key = _text(key, max_len=40)
+        if clean_key not in PUBLIC_METRIC_KEYS:
+            continue
         if isinstance(value, bool):
             safe[clean_key] = value
         else:

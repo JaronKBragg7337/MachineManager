@@ -7,7 +7,7 @@
       "id": "keyhunt-001",
       "type": "KeyHunt",
       "state": "RUNNING",
-      "owner": "local-manager"
+      "owner": "local-manager-v2"
     }
   ],
   "jobs": [
@@ -18,12 +18,12 @@
     }
   ],
   "gpu": {
-    "util_pct": 77,
+    "util_pct": 82.0,
     "mem_used_mib": 2376.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 62.0,
-    "power_w": 81.31
+    "temp_c": 64.0,
+    "power_w": 82.17
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-28T20:47:23.041Z"
+  "updated": "2026-08-28T21:00:09.398Z"
 }

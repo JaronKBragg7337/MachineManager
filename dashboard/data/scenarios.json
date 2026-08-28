@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-28T20:47:23.041Z",
+  "updated": "2026-08-28T21:00:09.398Z",
   "scenarios": [
     {
       "id": "healthy-operation-001",
@@ -17,10 +17,17 @@
     },
     {
       "id": "worker-death-manager-002",
-      "actor": "local-manager",
+      "actor": "local-manager-v1",
       "result": "PASS",
       "score": 1,
       "recovery_s": 94.74
+    },
+    {
+      "id": "worker-death-manager-003",
+      "actor": "local-manager-v2",
+      "result": "PASS",
+      "score": 1,
+      "recovery_s": 16.23
     }
   ]
 }

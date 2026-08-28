@@ -77,6 +77,7 @@ for the configuration and telemetry contract.
 - Reusable local supervisor runtime and synthetic reliability tests added
 - Sanitized telemetry publisher added for dashboard data files
 - `worker-death-manager-002` passed with zero CEO intervention
+- `worker-death-manager-003` passed with zero CEO intervention and 16.23 s full recovery
 - Local worker supervision under multi-signal evaluation
 - Secrets layout prepared (never committed)
 - GitHub Pages control center deployed from `dashboard/`
