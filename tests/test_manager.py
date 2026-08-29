@@ -361,6 +361,35 @@ class TelemetryTests(unittest.TestCase):
         )
         self.assertEqual(spec.base_url, "http://127.0.0.1:11434")
 
+    def test_async_agent_duration_excludes_manager_poll_wait(self) -> None:
+        coordinator = AgentCoordinator(
+            [
+                {
+                    "id": "test-agent",
+                    "role": "test",
+                    "provider": "ollama",
+                    "model": "test-model",
+                    "enabled": True,
+                    "interval_s": 60,
+                }
+            ]
+        )
+
+        def slow_but_successful_ask(*_args):
+            time.sleep(0.03)
+            return parse_agent_response('{"action":"continue","reason":"healthy"}')
+
+        snapshot = {"status": "HEALTHY", "objective": "synthetic", "workers": [], "jobs": []}
+        try:
+            with patch.object(LocalOllamaAgent, "ask", side_effect=slow_but_successful_ask):
+                self.assertEqual(coordinator.tick(snapshot), [])
+                time.sleep(0.2)
+                decisions = coordinator.tick(snapshot)
+            self.assertEqual(decisions[0].action, "continue")
+            self.assertLess(coordinator.snapshot()[0]["last_duration_s"], 0.15)
+        finally:
+            coordinator.close()
+
     def test_noop_agent_records_bounded_work(self) -> None:
         coordinator = AgentCoordinator(
             [

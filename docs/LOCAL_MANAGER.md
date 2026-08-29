@@ -91,12 +91,13 @@ The runner stores local operational state in SQLite:
   it is separate from the sanitized public telemetry files.
 
 The agents array provides bounded specialist slots. The Ollama adapter sends
-only a sanitized status context, requests strict JSON, disables GPU layers by
-default, and falls back to continue for empty, malformed, unavailable, or
-unsupported responses. The public agent timeline records the bounded action,
-short reason, and duration; it does not publish private prompts or hidden
-reasoning. Agent output is advisory; the supervisor still owns process control,
-retry limits, escalation, and secrets.
+only a sanitized status context, requests bounded non-thinking JSON, disables
+GPU layers by default, and falls back to continue for empty, malformed,
+unavailable, or unsupported responses. The public agent timeline records the
+bounded action, short reason, and model runtime (separate from manager poll
+latency); it does not publish private prompts or hidden reasoning. Agent output
+is advisory; the supervisor still owns process control, retry limits,
+escalation, and secrets.
 
 ## Public telemetry upload
 

@@ -201,7 +201,7 @@ class AgentCoordinator:
             for spec in self.specs
         }
         self.events: list[dict[str, Any]] = []
-        self._pending: dict[str, concurrent.futures.Future[AgentDecision]] = {}
+        self._pending: dict[str, concurrent.futures.Future[tuple[AgentDecision, str | None, float]]] = {}
         self._pending_snapshots: dict[str, dict[str, Any]] = {}
         self._pending_started: dict[str, float] = {}
         self._executor = concurrent.futures.ThreadPoolExecutor(
@@ -228,6 +228,27 @@ class AgentCoordinator:
                 return AgentDecision("continue", "agent model is not configured", True)
             return LocalOllamaAgent(spec).ask(snapshot, events)
         return AgentDecision("continue", "agent provider is unavailable", True)
+
+    def _run_async(
+        self,
+        spec: AgentSpec,
+        snapshot: Mapping[str, Any],
+        events: Iterable[Mapping[str, Any]],
+    ) -> tuple[AgentDecision, str | None, float]:
+        """Run an asynchronous agent and measure the agent itself, not poll latency."""
+        started = time.monotonic()
+        try:
+            decision = self._ask(spec, snapshot, events)
+            error_name = None
+        except Exception as exc:
+            decision = AgentDecision(
+                "continue",
+                "agent unavailable; continue under manager control",
+                True,
+            )
+            error_name = type(exc).__name__
+        duration_s = round(max(0.0, time.monotonic() - started), 3)
+        return decision, error_name, duration_s
 
     def _record(
         self,
@@ -279,8 +300,7 @@ class AgentCoordinator:
             spec = next(item for item in self.specs if item.agent_id == agent_id)
             snapshot = self._pending_snapshots.get(agent_id, {})
             try:
-                decision = future.result()
-                error_name = None
+                decision, error_name, duration_s = future.result()
             except Exception as exc:
                 decision = AgentDecision(
                     "continue",
@@ -288,8 +308,9 @@ class AgentCoordinator:
                     True,
                 )
                 error_name = type(exc).__name__
-            started = self._pending_started.pop(agent_id, None)
-            duration_s = None if started is None else round(max(0.0, time.monotonic() - started), 3)
+                started = self._pending_started.get(agent_id)
+                duration_s = None if started is None else round(max(0.0, time.monotonic() - started), 3)
+            self._pending_started.pop(agent_id, None)
             decisions.append(self._record(spec, snapshot, decision, error_name, duration_s))
             del self._pending[agent_id]
             self._pending_snapshots.pop(agent_id, None)
@@ -319,7 +340,7 @@ class AgentCoordinator:
             status["state"] = "WORKING"
             self._last_run[spec.agent_id] = now
             if spec.provider == "ollama":
-                future = self._executor.submit(self._ask, spec, dict(snapshot), event_list)
+                future = self._executor.submit(self._run_async, spec, dict(snapshot), event_list)
                 self._pending[spec.agent_id] = future
                 self._pending_snapshots[spec.agent_id] = dict(snapshot)
                 self._pending_started[spec.agent_id] = time.monotonic()
