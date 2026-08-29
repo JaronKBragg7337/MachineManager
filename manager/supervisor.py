@@ -200,7 +200,10 @@ def _expected_image_name(command: Sequence[str]) -> str:
         import ntpath
 
         return ntpath.basename(executable).casefold()
-    return os.path.basename(executable).casefold()
+    # Linux launchers such as ``python`` are often symlinks to a versioned
+    # interpreter. ``/proc/<pid>/exe`` reports the resolved target, so resolve
+    # our expected path too before comparing process identities.
+    return os.path.basename(os.path.realpath(executable)).casefold()
 
 
 class _AdoptedProcess:

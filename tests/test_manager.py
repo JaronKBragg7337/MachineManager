@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 
-from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor
+from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor, _expected_image_name
 from manager.telemetry import TelemetryPublisher
 from manager.run import load_public_records, merge_public_events
 from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_agent_response
@@ -47,6 +47,15 @@ def synthetic_spec(directory: Path, mode: str, *, max_age: float = 0.12) -> Work
 
 
 class SupervisorTests(unittest.TestCase):
+    def test_expected_image_name_resolves_posix_symlink_target(self) -> None:
+        with patch("manager.supervisor.os.name", "posix"):
+            with patch("manager.supervisor.shutil.which", return_value="/opt/python/bin/python"):
+                with patch(
+                    "manager.supervisor.os.path.realpath",
+                    return_value="/opt/python/bin/python3.12",
+                ):
+                    self.assertEqual(_expected_image_name(("python",)), "python3.12")
+
     def test_healthy_worker_requires_multiple_signals(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             directory = Path(raw)
