@@ -30,10 +30,16 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p _site/dashboard
+          cp index.html _site/index.html
+          cp -R dashboard/. _site/dashboard/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dashboard
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
