@@ -493,6 +493,52 @@
     .truth-note { margin-top: 15px; padding: 11px 12px; border-left: 2px solid var(--cyan); color: var(--muted); background: rgba(55, 222, 235, .05); font-size: 10px; line-height: 1.5; }
     .truth-note strong { color: var(--text); }
 
+    /* Telemetry Motion Deck: a functional, depth-based view of public work evidence. */
+    .motion-deck { position: relative; overflow: hidden; margin-top: 16px; border: 1px solid rgba(55, 222, 235, .34); border-radius: var(--radius); background: linear-gradient(145deg, rgba(10, 35, 59, .98), rgba(4, 16, 30, .99)); box-shadow: var(--shadow); }
+    .motion-deck::before { position: absolute; inset: 0; z-index: 0; background: radial-gradient(circle at 78% 16%, rgba(164, 138, 255, .13), transparent 26rem), radial-gradient(circle at 24% 74%, rgba(55, 222, 235, .11), transparent 24rem); content: ""; pointer-events: none; }
+    .motion-deck > * { position: relative; z-index: 1; }
+    .motion-deck-stage { position: relative; min-height: 390px; padding: 20px; isolation: isolate; overflow: hidden; }
+    .motion-deck-stage::before { position: absolute; right: -8%; bottom: -43%; left: -8%; z-index: -1; height: 72%; border: 1px solid rgba(68, 158, 214, .16); background-image: linear-gradient(rgba(89, 181, 235, .11) 1px, transparent 1px), linear-gradient(90deg, rgba(89, 181, 235, .11) 1px, transparent 1px); background-size: 28px 28px; box-shadow: 0 0 58px rgba(55, 222, 235, .05); content: ""; transform: perspective(840px) rotateX(61deg) translateY(7px) scale(1.25); transform-origin: center bottom; }
+    .motion-deck-stage::after { position: absolute; top: 0; right: 12%; width: 38%; height: 100%; z-index: -1; background: linear-gradient(90deg, transparent, rgba(55, 222, 235, .045), transparent); content: ""; transform: skewX(-22deg); }
+    .motion-deck-grid { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 58px; min-height: 350px; }
+    .motion-node { position: relative; display: flex; min-width: 0; min-height: 145px; flex-direction: column; justify-content: space-between; padding: 14px; border: 1px solid rgba(61, 119, 168, .68); border-radius: 13px; background: linear-gradient(145deg, rgba(17, 50, 79, .95), rgba(6, 22, 40, .97)); box-shadow: inset 0 1px rgba(255,255,255,.065), 0 16px 28px rgba(0,0,0,.19); transform: translateZ(0); }
+    .motion-node::after { position: absolute; inset: 8px; border: 1px solid rgba(255,255,255,.035); border-radius: 9px; content: ""; pointer-events: none; }
+    .motion-node.is-live { border-color: rgba(55, 222, 235, .64); box-shadow: inset 0 1px rgba(255,255,255,.09), 0 0 0 1px rgba(55, 222, 235, .08), 0 0 27px rgba(55, 222, 235, .12), 0 16px 28px rgba(0,0,0,.19); animation: node-breathe var(--pulse-speed, 1.9s) ease-in-out infinite; }
+    .motion-node.is-watch { border-color: rgba(164, 138, 255, .53); }
+    .motion-node.is-result { border-color: rgba(77, 228, 155, .46); }
+    @keyframes node-breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+    .motion-node-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 9px; }
+    .motion-node-kicker { margin: 8px 0 0; color: var(--muted-2); font-size: 8px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .motion-node h3 { margin: 4px 0 0; color: var(--text); font-size: 14px; letter-spacing: -.025em; }
+    .motion-node-copy { margin: 6px 0 0; color: var(--muted); font-size: 10px; line-height: 1.42; }
+    .motion-node-data { display: flex; align-items: end; justify-content: space-between; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(56, 104, 148, .43); }
+    .motion-node-data span { display: block; color: var(--muted-2); font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .motion-node-data strong { display: block; margin-top: 4px; color: var(--cyan); font: 700 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align: right; overflow-wrap: anywhere; }
+    .motion-node.is-watch .motion-node-data strong { color: #c8bcff; }
+    .motion-node.is-result .motion-node-data strong { color: var(--green); }
+    .motion-lane { position: absolute; z-index: 1; overflow: hidden; height: 9px; border-top: 1px solid rgba(92, 160, 207, .36); border-bottom: 1px solid rgba(92, 160, 207, .12); background: linear-gradient(90deg, transparent, rgba(55, 222, 235, .14), transparent); }
+    .motion-lane--upper { top: 25.5%; right: 45.3%; left: 45.3%; }
+    .motion-lane--lower { top: 74.6%; right: 45.3%; left: 45.3%; }
+    .motion-lane--vertical { top: 44.5%; right: 23.6%; width: 9px; height: 13%; border-top: 0; border-right: 1px solid rgba(92, 160, 207, .36); border-bottom: 0; border-left: 1px solid rgba(92, 160, 207, .12); background: linear-gradient(180deg, transparent, rgba(55, 222, 235, .14), transparent); }
+    .motion-packet { position: absolute; top: 1px; width: 18px; height: 5px; border-radius: 999px; background: linear-gradient(90deg, rgba(55, 222, 235, .12), var(--cyan), rgba(55, 222, 235, .08)); box-shadow: 0 0 10px rgba(55, 222, 235, .78); animation: packet-glide var(--flow-speed, 1.8s) linear infinite; animation-delay: var(--packet-delay, 0s); }
+    .motion-lane--vertical .motion-packet { top: auto; right: 1px; bottom: auto; width: 5px; height: 18px; background: linear-gradient(180deg, rgba(55, 222, 235, .12), var(--cyan), rgba(55, 222, 235, .08)); animation-name: packet-drop; }
+    @keyframes packet-glide { from { transform: translateX(-150%); opacity: 0; } 14% { opacity: 1; } 86% { opacity: 1; } to { transform: translateX(480%); opacity: 0; } }
+    @keyframes packet-drop { from { transform: translateY(-150%); opacity: 0; } 14% { opacity: 1; } 86% { opacity: 1; } to { transform: translateY(410%); opacity: 0; } }
+    .motion-deck.is-paused .motion-node.is-live { animation: none; }
+    .motion-deck.is-paused .motion-packet { display: none; }
+    .gpu-matrix { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; width: 74px; padding: 5px; border: 1px solid rgba(55, 222, 235, .19); border-radius: 8px; background: rgba(3, 15, 29, .58); }
+    .gpu-matrix span { display: block; height: 4px; border-radius: 2px; background: rgba(76, 118, 151, .35); }
+    .gpu-matrix span.active { background: var(--cyan); box-shadow: 0 0 6px rgba(55, 222, 235, .72); animation: matrix-flicker var(--pulse-speed, 1.9s) ease-in-out infinite; animation-delay: var(--cell-delay, 0s); }
+    @keyframes matrix-flicker { 0%, 100% { opacity: .42; } 50% { opacity: 1; } }
+    .motion-deck-footer { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(190px, .8fr); gap: 12px; padding: 0 20px 19px; }
+    .motion-explainer, .motion-source { padding: 11px 12px; border: 1px solid var(--line-soft); border-radius: 10px; background: rgba(4, 17, 33, .48); color: var(--muted); font-size: 10px; line-height: 1.48; }
+    .motion-explainer strong, .motion-source strong { color: var(--text); }
+    .motion-source { color: var(--muted-2); }
+    @media (prefers-reduced-motion: reduce) {
+      .motion-node.is-live, .gpu-matrix span.active { animation: none; }
+      .motion-packet { display: none; }
+    }
+
     .error-state, .loading-state { padding: 54px 22px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--muted); background: rgba(8, 24, 43, .78); text-align: center; }
     .error-state h2, .loading-state h2 { margin: 0 0 8px; color: var(--text); font-size: 20px; }
     .error-state p, .loading-state p { max-width: 520px; margin: 0 auto 18px; font-size: 12px; line-height: 1.5; }
@@ -554,6 +600,9 @@
       .mission-layout { grid-template-columns: 1fr; }
       .mission-map { grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 0; }
       .mission-wiring { display: none; }
+      .motion-deck-grid { gap: 24px 42px; }
+      .motion-lane--upper, .motion-lane--lower { right: 45%; left: 45%; }
+      .motion-lane--vertical { right: 23.4%; }
       .jobs-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .worker-cards, .agent-cards, .blueprint-grid { grid-template-columns: 1fr; }
       .evaluation-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -571,6 +620,12 @@
       .kpi-value { font-size: 21px; }
       .mission-map { grid-template-columns: 1fr; padding: 14px; }
       .system-station { min-height: 0; }
+      .motion-deck-stage { min-height: 0; padding: 14px; }
+      .motion-deck-grid { grid-template-columns: 1fr; min-height: 0; gap: 10px; }
+      .motion-node { min-height: 0; }
+      .motion-lane { display: none; }
+      .motion-deck-footer { grid-template-columns: 1fr; padding: 0 14px 14px; }
+      .gpu-matrix { width: 66px; }
       .result-path { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .result-step:nth-child(2)::after { display: none; }
       .jobs-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -984,6 +1039,68 @@
       return mkeys === null ? "Not reported" : compactNumber(mkeys) + " MKey/s";
     }
 
+    function clampNumber(value, minimum, maximum) {
+      return Math.min(maximum, Math.max(minimum, value));
+    }
+
+    function telemetryMotionProfile(latest, worker, progress) {
+      const gpu = latest.gpu || {};
+      const reportedUtil = numberValue(gpu.util_pct);
+      const activeEvidence = progress.active === true || upper(worker.state) === "RUNNING";
+      const current = freshness();
+      const live = activeEvidence && current.key === "fresh";
+      const util = reportedUtil === null ? (live ? 45 : 0) : clampNumber(reportedUtil, 0, 100);
+      return {
+        live: live,
+        util: util,
+        packetCount: live ? Math.round(clampNumber(3 + util / 16, 3, 8)) : 0,
+        flowSpeed: clampNumber(3.05 - util / 47, .85, 2.8).toFixed(2),
+        pulseSpeed: clampNumber(2.75 - util / 58, 1.05, 2.75).toFixed(2),
+        freshness: current
+      };
+    }
+
+    function renderFlowPackets(profile, count) {
+      if (!profile.live || !count) return "";
+      return Array.from({ length: count }, function (_, index) {
+        const delay = -(index * Number(profile.flowSpeed) / count).toFixed(2);
+        return '<span class="motion-packet" aria-hidden="true" style="--packet-delay:' + delay + 's"></span>';
+      }).join("");
+    }
+
+    function renderGpuMatrix(profile) {
+      const activeCells = profile.live ? Math.round(clampNumber(profile.util / 5, 2, 20)) : 0;
+      return '<div class="gpu-matrix" aria-label="GPU activity pattern based on reported utilization">' + Array.from({ length: 20 }, function (_, index) {
+        const active = index < activeCells;
+        const delay = -(index % 8) * .13;
+        return '<span class="' + (active ? "active" : "") + '" style="--cell-delay:' + delay.toFixed(2) + 's"></span>';
+      }).join("") + '</div>';
+    }
+
+    function motionNode(config) {
+      const toneClass = config.tone === "live" ? "is-live" : config.tone === "result" ? "is-result" : "is-watch";
+      return '<article class="motion-node ' + toneClass + '"><div><div class="motion-node-top"><div><p class="motion-node-kicker">' + escapeHtml(config.kicker) + '</p><h3>' + escapeHtml(config.title) + '</h3></div>' + badge(config.state, config.badgeLabel) + '</div><p class="motion-node-copy">' + escapeHtml(config.copy) + '</p></div><div class="motion-node-data"><div><span>' + escapeHtml(config.label) + '</span><strong>' + escapeHtml(config.value) + '</strong></div>' + (config.visual || "") + '</div></article>';
+    }
+
+    function renderMotionDeck(latest, sets, worker, progress) {
+      const profile = telemetryMotionProfile(latest, worker, progress);
+      const keys = numberValue(progress.keys_tested);
+      const batch = numberValue(progress.batch_number);
+      const matches = numberValue(progress.matches_found);
+      const healthRecords = sets.events.filter(function (event) { return String(event.type || "").toLowerCase().includes("health"); }).length;
+      const recent = recentEvents(1, "work")[0] || recentEvents(1)[0] || {};
+      const resultSignal = matches === null ? "Awaiting report" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "No match reported";
+      const packetRate = profile.live ? profile.packetCount + " active lanes" : "Paused";
+      const sourceLabel = recent.type ? String(recent.type).replace(/_/g, " ") : "snapshot update";
+      const style = '--flow-speed:' + profile.flowSpeed + 's;--pulse-speed:' + profile.pulseSpeed + 's';
+      return '<section class="motion-deck ' + (profile.live ? "is-live" : "is-paused") + '" style="' + style + '"><div class="panel-head"><h2>LIVE WORKFLOW MOTION</h2><span class="subhead">' + (profile.live ? "Telemetry-driven stream" : "Paused until fresh work evidence") + '</span></div><div class="motion-deck-stage"><div class="motion-lane motion-lane--upper">' + renderFlowPackets(profile, profile.packetCount) + '</div><div class="motion-lane motion-lane--lower">' + renderFlowPackets(profile, Math.max(2, profile.packetCount - 2)) + '</div><div class="motion-lane motion-lane--vertical">' + renderFlowPackets(profile, Math.max(2, profile.packetCount - 3)) + '</div><div class="motion-deck-grid">' +
+        motionNode({ kicker: "01 · observe", title: "Supervisor Gate", state: latest.status || "UNKNOWN", copy: "Confirms process, heartbeat, resource activity, and a current report before work is shown as live.", label: "Health records", value: String(healthRecords) + " published", tone: profile.live && upper(latest.status) === "HEALTHY" ? "live" : "watch" }) +
+        motionNode({ kicker: "02 · compute", title: worker.id || "GPU batch engine", state: profile.live ? "STREAMING" : worker.state || "WAITING", badgeLabel: profile.live ? "STREAMING" : undefined, copy: "Aggregate batch packets move only when the worker has fresh published activity evidence.", label: "Reported rate", value: missionRate(progress), visual: renderGpuMatrix(profile), tone: profile.live ? "live" : "watch" }) +
+        motionNode({ kicker: "03 · compare", title: "Address Comparator", state: profile.live ? "CHECKING" : "WATCHING", badgeLabel: profile.live ? "CHECKING" : "WATCHING", copy: "The public view counts aggregate candidate checks. It never shows individual private candidates or keys.", label: "Candidate checks", value: keys === null ? "Not reported" : compactNumber(keys), tone: profile.live ? "live" : "watch" }) +
+        motionNode({ kicker: "04 · verify", title: "Result Gate", state: matches !== null && matches > 0 ? "VERIFYING" : "WATCHING", badgeLabel: matches !== null && matches > 0 ? "VERIFYING" : "WATCHING", copy: matches !== null && matches > 0 ? "A possible signal requires independent re-derivation before it can be trusted." : "No raw result is displayed; the gate stays ready for an independently verified signal.", label: "Current result", value: resultSignal, tone: matches !== null && matches > 0 ? "result" : "watch" }) +
+        '</div></div><div class="motion-deck-footer"><div class="motion-explainer"><strong>Motion contract:</strong> ' + (profile.live ? 'this stream is moving because the current public snapshot reports active work and is fresh. Packet cadence follows the reported GPU activity (' + Math.round(profile.util) + '%), not an invented completion percent.' : 'the stream is paused because the page does not have both a fresh snapshot and active worker evidence. It will resume automatically when both return.') + '</div><div class="motion-source"><strong>Latest public signal:</strong> ' + escapeHtml(sourceLabel) + ' · ' + escapeHtml(packetRate) + (batch === null ? '' : ' · batch #' + escapeHtml(String(Math.round(batch)))) + '</div></div></section>';
+    }
+
     function missionStation(config) {
       const visualTone = config.visualTone === "active" ? "active" : config.visualTone === "watch" ? "watch" : "standby";
       return '<article class="system-station ' + visualTone + '"><div><div class="station-top"><span class="station-icon" data-icon="' + escapeHtml(config.icon || "grid") + '"></span>' + badge(config.state || "UNKNOWN", config.badgeLabel) + '</div><p class="station-kicker">' + escapeHtml(config.kicker || "System station") + '</p><h3>' + escapeHtml(config.title || "Unnamed station") + '</h3><p class="station-copy">' + escapeHtml(config.copy || "No public detail is available for this station.") + '</p></div><div class="station-signal"><span>' + escapeHtml(config.signalLabel || "Signal") + '</span><strong>' + escapeHtml(config.signal || "--") + '</strong></div></article>';
@@ -1053,6 +1170,7 @@
       const vramPercent = vramTotal ? vramUsed / vramTotal * 100 : null;
       return pageHeading("Mission Control", "Watch the real work move through the machine", "A spatial, public-safe view of the supervisor, GPU worker, verification gate, AI support, and the evidence this system publishes.", '<a class="btn" href="#/search">Inspect search evidence <span>→</span></a>') + snapshotStrip() +
         '<div class="mission-layout"><div>' + renderMissionMap(latest, sets, worker, progress) + '</div><aside class="mission-side"><section class="mission-summary"><p class="eyebrow">Current work</p><h2>' + escapeHtml(latest.objective || "No active objective") + '</h2><p>' + escapeHtml(active ? "The GPU worker is publishing reported work evidence. This is a bounded numeric search, not a phrase-guessing task." : "The dashboard is waiting for current worker activity evidence.") + '</p><div class="live-readings">' + missionReading("Reported rate", missionRate(progress), "accent") + missionReading("Candidate checks", keys === null ? "Not reported" : compactNumber(keys), "accent") + missionReading("Current batch", batch === null ? "Not reported" : "#" + Math.round(batch), "") + missionReading("Result signal", matches === null ? "Awaiting report" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "No match", matches === 0 ? "success" : "") + '</div></section><section class="mission-summary"><p class="eyebrow">Live machine signal</p><h2>' + escapeHtml(upper(latest.status || "UNKNOWN")) + '</h2><p>The manager has a fresh record of the operating state. Resource readings below are machine-level evidence, not a claimed probability of success.</p><div class="live-readings">' + missionReading("GPU activity", numberValue(gpu.util_pct) === null ? "--" : Math.round(gpu.util_pct) + "%", "success") + missionReading("Temperature", numberValue(gpu.temp_c) === null ? "--" : Math.round(gpu.temp_c) + "°C", "") + missionReading("VRAM", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1) + " GB", "") + missionReading("Public age", relative(latest.updated), "") + '</div></section></aside></div>' +
+        renderMotionDeck(latest, sets, worker, progress) +
         renderResultPath(progress, active) +
         '<div class="section-grid"><div>' + renderWorkJournal(latest, sets, worker, progress) + '</div><section class="panel resource-panel"><div class="panel-head"><h2>MACHINE EVIDENCE</h2><span class="subhead">sanitized telemetry</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", numberValue(gpu.util_pct) === null ? "--" : String(Math.round(gpu.util_pct)), "%", "Current accelerator activity", numberValue(gpu.util_pct), "green") + resourceCard("VRAM used", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1), "GB", vramTotal === null ? "Capacity unknown" : "of " + (vramTotal / 1024).toFixed(1) + " GB", vramPercent, "") + resourceCard("GPU temperature", numberValue(gpu.temp_c) === null ? "--" : String(Math.round(gpu.temp_c)), "°C", "Thermal signal", numberValue(gpu.temp_c) === null ? null : Math.min(gpu.temp_c / 90 * 100, 100), numberValue(gpu.temp_c) !== null && gpu.temp_c >= 80 ? "amber" : "green") + resourceCard("Power draw", numberValue(gpu.power_w) === null ? "--" : String(Math.round(gpu.power_w)), "W", "Current board draw", numberValue(gpu.power_w) === null ? null : Math.min(gpu.power_w / 140 * 100, 100), "") + '</div></div></section></div>';
     }
