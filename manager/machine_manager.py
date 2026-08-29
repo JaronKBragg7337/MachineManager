@@ -31,6 +31,8 @@ class MachineManager:
         objective_id: str,
         job_id: str,
         max_restarts: int = 3,
+        initial_attempt: int = 0,
+        initial_restart_count: int = 0,
     ) -> ManagedJob:
         if job_id in self.jobs:
             raise ValueError(f"job already registered: {job_id}")
@@ -43,13 +45,22 @@ class MachineManager:
                 job_id=job_id,
                 actor=self.actor,
                 max_restarts=max_restarts,
+                initial_attempt=initial_attempt,
+                initial_restart_count=initial_restart_count,
             ),
         )
         self.jobs[job_id] = job
         return job
 
+    @property
+    def job_ids(self) -> list[str]:
+        return list(self.jobs)
+
     def start_job(self, job_id: str) -> bool:
         return self.jobs[job_id].supervisor.start()
+
+    def start_all(self) -> dict[str, bool]:
+        return {job_id: self.start_job(job_id) for job_id in self.jobs}
 
     def tick_job(self, job_id: str, *, auto_recover: bool = True) -> dict[str, Any]:
         supervisor = self.jobs[job_id].supervisor
@@ -71,6 +82,10 @@ class MachineManager:
 
     def cancel_job(self, job_id: str) -> None:
         self.jobs[job_id].supervisor.cancel()
+
+    def cancel_all(self) -> None:
+        for job_id in self.jobs:
+            self.cancel_job(job_id)
 
     @property
     def events(self) -> list[dict[str, Any]]:

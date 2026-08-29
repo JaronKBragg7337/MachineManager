@@ -1,4 +1,4 @@
-"""Run a configured local Machine Manager job."""
+"""Run the general-purpose local Machine Manager runtime."""
 
 from __future__ import annotations
 
@@ -7,11 +7,18 @@ import json
 import os
 import tempfile
 import time
+import traceback
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
+from .agents import AgentCoordinator
+from .capabilities import CapabilityRegistry
+from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
 from .probes import gpu_resource_ok, nvidia_smi_probe
+from .public_upload import GitHubPagesPublisher, PublicUploadError
+from .scheduler import WorkScheduler
+from .state_store import StateStore
 from .supervisor import WorkerSpec
 from .telemetry import TelemetryPublisher, utc_now
 
@@ -27,6 +34,27 @@ def load_config(path: Path) -> dict[str, Any]:
     return config
 
 
+def load_env_file(path: Path | None) -> None:
+    """Load a simple local-only KEY=VALUE file without printing its values."""
+    if path is None or not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not (
+            key.startswith("MACHINE_MANAGER_")
+            or key.startswith("GITHUB_")
+        ):
+            continue
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+            value = value[1:-1]
+        os.environ.setdefault(key, value)
+
+
 def resolve_path(value: str | None, *, base: Path) -> Path | None:
     if value is None:
         return None
@@ -36,7 +64,11 @@ def resolve_path(value: str | None, *, base: Path) -> Path | None:
 
 def write_status(path: Path, status: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=path.parent)
+    fd, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+        dir=path.parent,
+    )
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
             json.dump(status, handle, indent=2, ensure_ascii=True)
@@ -53,7 +85,13 @@ def load_public_records(dashboard_dir: Path | None) -> tuple[list[Any], list[Any
         return [], []
     data_dir = dashboard_dir / "data"
     events = load_json_document(data_dir / "events.json") if (data_dir / "events.json").exists() else []
-    scenarios_data = load_json_document(data_dir / "scenarios.json") if (data_dir / "scenarios.json").exists() else []
+    scenarios_data = (
+        load_json_document(data_dir / "scenarios.json")
+        if (data_dir / "scenarios.json").exists()
+        else []
+    )
+    if isinstance(events, dict):
+        events = events.get("events", [])
     if not isinstance(events, list):
         events = []
     if isinstance(scenarios_data, dict):
@@ -65,14 +103,72 @@ def load_public_records(dashboard_dir: Path | None) -> tuple[list[Any], list[Any
     return events, scenarios
 
 
-def manager_from_config(config: dict[str, Any], *, config_path: Path) -> tuple[MachineManager, str, str]:
+def merge_public_events(
+    existing: list[Any],
+    current: list[Mapping[str, Any]],
+    *,
+    limit: int,
+) -> list[Mapping[str, Any]]:
+    """Keep a bounded chronological public event window without duplicates."""
+    merged: list[Mapping[str, Any]] = []
+    seen_ids: set[str] = set()
+    for candidate in [*existing, *current]:
+        if not isinstance(candidate, Mapping):
+            continue
+        event_id = str(candidate.get("event_id", "")).strip()
+        if event_id and event_id in seen_ids:
+            continue
+        if event_id:
+            seen_ids.add(event_id)
+        merged.append(candidate)
+    return merged[-max(1, int(limit)) :]
+
+
+def _job_entries(config: Mapping[str, Any]) -> list[dict[str, Any]]:
+    raw_jobs = config.get("jobs")
+    if raw_jobs is None:
+        worker = config.get("worker")
+        if not isinstance(worker, Mapping):
+            raise ValueError("config.worker must be an object")
+        return [
+            {
+                "job_id": str(config.get("job_id", "job-001")),
+                "objective_id": str(config.get("objective_id", "objective-001")),
+                "objective": str(config.get("objective", config.get("objective_id", "objective-001"))),
+                "max_restarts": int(config.get("max_restarts", 3)),
+                "worker": dict(worker),
+            }
+        ]
+    if not isinstance(raw_jobs, list) or not raw_jobs:
+        raise ValueError("config.jobs must be a non-empty array")
+    entries: list[dict[str, Any]] = []
+    for raw_job in raw_jobs:
+        if not isinstance(raw_job, Mapping):
+            raise ValueError("each config.jobs item must be an object")
+        worker = raw_job.get("worker")
+        if not isinstance(worker, Mapping):
+            raise ValueError("each job must contain a worker object")
+        job_id = str(raw_job.get("job_id", raw_job.get("id", ""))).strip()
+        if not job_id:
+            raise ValueError("each job requires an id")
+        objective_id = str(raw_job.get("objective_id", job_id))
+        entries.append(
+            {
+                "job_id": job_id,
+                "objective_id": objective_id,
+                "objective": str(raw_job.get("objective", objective_id)),
+                "max_restarts": int(raw_job.get("max_restarts", config.get("max_restarts", 3))),
+                "worker": dict(worker),
+            }
+        )
+    return entries
+
+
+def _worker_spec(worker: Mapping[str, Any], *, config_path: Path) -> WorkerSpec:
     base = config_path.parent
-    worker = config.get("worker")
-    if not isinstance(worker, dict):
-        raise ValueError("config.worker must be an object")
     command = worker.get("command")
     if not isinstance(command, list) or not command or not all(isinstance(item, str) for item in command):
-        raise ValueError("config.worker.command must be a non-empty string array")
+        raise ValueError("worker.command must be a non-empty string array")
 
     resource_probe = None
     resource_ok = None
@@ -80,7 +176,7 @@ def manager_from_config(config: dict[str, Any], *, config_path: Path) -> tuple[M
         resource_probe = nvidia_smi_probe
         resource_ok = gpu_resource_ok
 
-    spec = WorkerSpec(
+    return WorkerSpec(
         worker_id=str(worker["id"]),
         worker_type=str(worker.get("type", "SpecialistWorker")),
         command=tuple(command),
@@ -91,19 +187,72 @@ def manager_from_config(config: dict[str, Any], *, config_path: Path) -> tuple[M
         startup_grace_s=float(worker.get("startup_grace_s", 5)),
         resource_probe=resource_probe,
         resource_ok=resource_ok,
+        pid_file=resolve_path(worker.get("pid_file"), base=base),
         stdout_file=resolve_path(worker.get("stdout_file"), base=base),
         stderr_file=resolve_path(worker.get("stderr_file"), base=base),
     )
+
+
+def manager_from_config(
+    config: Mapping[str, Any],
+    *,
+    config_path: Path,
+    state_store: StateStore | None = None,
+) -> tuple[MachineManager, str, str]:
+    entries = _job_entries(config)
     manager = MachineManager(actor=str(config.get("actor", "local-manager")))
-    objective_id = str(config.get("objective_id", "objective-001"))
-    job_id = str(config.get("job_id", "job-001"))
-    manager.register_job(
-        spec,
-        objective_id=objective_id,
-        job_id=job_id,
-        max_restarts=int(config.get("max_restarts", 3)),
-    )
-    return manager, objective_id, job_id
+    primary_objective_id = entries[0]["objective_id"]
+    primary_job_id = entries[0]["job_id"]
+    for entry in entries:
+        prior = state_store.get_job(entry["job_id"]) if state_store else None
+        manager.register_job(
+            _worker_spec(entry["worker"], config_path=config_path),
+            objective_id=entry["objective_id"],
+            job_id=entry["job_id"],
+            max_restarts=entry["max_restarts"],
+            initial_attempt=int((prior or {}).get("attempt", 0) or 0),
+            initial_restart_count=int((prior or {}).get("restart_count", 0) or 0),
+        )
+    return manager, primary_objective_id, primary_job_id
+
+
+def _persist_runtime(
+    manager: MachineManager,
+    agents: AgentCoordinator,
+    store: StateStore,
+    seen_event_ids: set[str],
+) -> None:
+    for event in [*manager.events, *agents.events]:
+        event_id = str(event.get("event_id", ""))
+        if event_id and event_id not in seen_event_ids:
+            store.append_event(event)
+            seen_event_ids.add(event_id)
+    updated = utc_now()
+    for job_id, managed_job in manager.jobs.items():
+        snapshot = managed_job.supervisor.snapshot()
+        snapshot.update(
+            {
+                "job_id": job_id,
+                "objective_id": managed_job.objective_id,
+                "updated": updated,
+            }
+        )
+        store.upsert_job(snapshot)
+    for agent in agents.snapshot():
+        store.upsert_agent(agent)
+
+
+def _print_safe(message: str) -> None:
+    print(str(message).encode("ascii", "replace").decode("ascii"), flush=True)
+
+
+def _append_manager_log(path: Path | None, message: str) -> None:
+    """Append local-only runtime diagnostics without exposing them publicly."""
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8", newline="\n") as handle:
+        handle.write(f"[{utc_now()}] {message.rstrip()}\n")
 
 
 def main() -> int:
@@ -111,44 +260,168 @@ def main() -> int:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--status-file", type=Path)
     parser.add_argument("--dashboard-dir", type=Path)
+    parser.add_argument("--state-db", type=Path)
+    parser.add_argument("--lock-file", type=Path)
+    parser.add_argument("--log-file", type=Path)
     parser.add_argument("--once", action="store_true", help="start and perform one observation")
     args = parser.parse_args()
 
-    config = load_config(args.config)
-    manager, objective_id, job_id = manager_from_config(config, config_path=args.config)
-    if not manager.start_job(job_id):
-        return 1
+    config_path = args.config.resolve()
+    config = load_config(config_path)
+    base = config_path.parent
+    load_env_file(resolve_path(config.get("env_file"), base=base))
+    manager_log_path = (
+        args.log_file
+        or resolve_path(config.get("manager_log_file"), base=base)
+        or resolve_path(config.get("log_file"), base=base)
+    )
 
-    publisher = TelemetryPublisher(args.dashboard_dir) if args.dashboard_dir else None
-    public_events, public_scenarios = load_public_records(args.dashboard_dir)
-    interval = max(0.1, float(config.get("poll_interval_s", 15)))
-    objective = str(config.get("objective", objective_id))
-
+    status_path = args.status_file or resolve_path(config.get("status_file"), base=base)
+    dashboard_dir = args.dashboard_dir or resolve_path(config.get("dashboard_dir"), base=base)
+    state_path = (
+        args.state_db
+        or resolve_path(config.get("state_db"), base=base)
+        or (base / "var" / "machine_manager.sqlite3")
+    )
+    lock_path = (
+        args.lock_file
+        or resolve_path(config.get("lock_file"), base=base)
+        or state_path.with_name("manager.lock")
+    )
+    store = StateStore(
+        state_path,
+        event_retention=int(config.get("event_retention", 5000)),
+    )
+    lock: InstanceLock | None = None
+    manager: MachineManager | None = None
+    agents: AgentCoordinator | None = None
+    scheduler: WorkScheduler | None = None
+    local_publisher: TelemetryPublisher | None = None
+    remote_publisher: GitHubPagesPublisher | None = None
+    capabilities: CapabilityRegistry | None = None
+    public_events: list[Any] = []
+    public_scenarios: list[Any] = []
+    seen_event_ids: set[str] = set()
+    primary_objective_id = ""
+    primary_job_id = ""
+    objective = ""
+    public_event_limit = 500
     try:
+        try:
+            lock = InstanceLock(lock_path).acquire()
+        except InstanceAlreadyRunning:
+            _print_safe("Machine Manager is already running.")
+            return 0
+
+        manager, primary_objective_id, primary_job_id = manager_from_config(
+            config,
+            config_path=config_path,
+            state_store=store,
+        )
+        agents_raw = config.get("agents", [])
+        if not isinstance(agents_raw, list):
+            raise ValueError("config.agents must be an array")
+        agents = AgentCoordinator(agents_raw)
+        scheduler = WorkScheduler(store)
+        public_events, public_scenarios = load_public_records(dashboard_dir)
+        local_publisher = TelemetryPublisher(dashboard_dir) if dashboard_dir else None
+
+        upload_config = config.get("public_upload", {})
+        if not isinstance(upload_config, Mapping):
+            raise ValueError("config.public_upload must be an object")
+        remote_publisher = (
+            GitHubPagesPublisher.from_mapping(dashboard_dir, upload_config)
+            if dashboard_dir and bool(upload_config.get("enabled", False))
+            else None
+        )
+        capabilities = CapabilityRegistry.default(
+            github_upload_enabled=bool(remote_publisher and remote_publisher.configured),
+            agents_enabled=any(
+                bool(item.get("enabled"))
+                for item in agents_raw
+                if isinstance(item, Mapping)
+            ),
+        )
+        interval = max(0.1, float(config.get("poll_interval_s", 15)))
+        objective = str(config.get("objective", primary_objective_id))
+        public_event_limit = max(20, int(config.get("public_event_limit", 500)))
+        manager.start_all()
+
         while True:
             statuses = manager.tick_all(auto_recover=True)
             snapshot = manager.snapshot(objective=objective)
+            snapshot["objective_id"] = primary_objective_id
             snapshot["updated"] = utc_now()
-            health = statuses[job_id].get("health", {})
-            metrics = health.get("metrics", {}) if isinstance(health, dict) else {}
-            if isinstance(metrics, dict) and metrics:
-                snapshot["gpu"] = metrics
-            if args.status_file:
-                write_status(args.status_file, snapshot)
-            if publisher:
-                publisher.publish(
+            for status in statuses.values():
+                health = status.get("health", {})
+                metrics = health.get("metrics", {}) if isinstance(health, Mapping) else {}
+                if isinstance(metrics, Mapping) and metrics:
+                    snapshot["gpu"] = dict(metrics)
+                    break
+            agents.tick(snapshot, events=store.recent_events(limit=20))
+            snapshot["agents"] = agents.snapshot()
+            snapshot["capabilities"] = capabilities.snapshot()
+            snapshot["queue"] = scheduler.snapshot()
+            _persist_runtime(manager, agents, store, seen_event_ids)
+            public_events = merge_public_events(
+                public_events,
+                store.recent_events(limit=public_event_limit),
+                limit=public_event_limit,
+            )
+
+            if status_path:
+                write_status(status_path, snapshot)
+            if local_publisher:
+                local_publisher.publish(
                     snapshot,
-                    events=[*public_events, *manager.events],
+                    events=public_events,
                     scenarios=public_scenarios,
                 )
+            if remote_publisher:
+                try:
+                    remote_publisher.maybe_publish()
+                except PublicUploadError as exc:
+                    _print_safe(f"Public upload deferred: {type(exc).__name__}")
+            if status_path and remote_publisher:
+                status_copy = dict(snapshot)
+                status_copy["public_upload"] = remote_publisher.status()
+                write_status(status_path, status_copy)
             if args.once:
                 break
             time.sleep(interval)
     except KeyboardInterrupt:
-        manager.cancel_job(job_id)
+        _print_safe("Machine Manager stopping.")
+        _append_manager_log(manager_log_path, "Machine Manager stopped by KeyboardInterrupt.")
+    except Exception as exc:
+        _print_safe(f"Machine Manager stopped: {type(exc).__name__}")
+        _append_manager_log(manager_log_path, traceback.format_exc())
+        raise
     finally:
-        if args.once:
-            manager.cancel_job(job_id)
+        if manager is not None and agents is not None and capabilities is not None and scheduler is not None:
+            manager.cancel_all()
+            _persist_runtime(manager, agents, store, seen_event_ids)
+            if local_publisher and scheduler is not None:
+                stopped = manager.snapshot(objective=objective)
+                stopped["objective_id"] = primary_objective_id
+                stopped["updated"] = utc_now()
+                stopped["agents"] = agents.snapshot()
+                stopped["capabilities"] = capabilities.snapshot()
+                stopped["queue"] = scheduler.snapshot()
+                public_events = merge_public_events(
+                    public_events,
+                    store.recent_events(limit=public_event_limit),
+                    limit=public_event_limit,
+                )
+                local_publisher.publish(
+                    stopped,
+                    events=public_events,
+                    scenarios=public_scenarios,
+                )
+        if agents is not None:
+            agents.close()
+        if lock is not None:
+            lock.release()
+        store.close()
     return 0
 
 

@@ -1,27 +1,61 @@
 {
-  "actor": "local-manager",
-  "objective_id": "synthetic-reliability",
-  "job_id": "synthetic-worker-001",
-  "objective": "Synthetic worker reliability check",
-  "max_restarts": 3,
+  "actor": "local-machine-manager",
+  "objective": "General autonomous worker supervision",
   "poll_interval_s": 2,
-  "worker": {
-    "id": "synthetic-001",
-    "type": "SyntheticWorker",
-    "command": [
-      "python",
-      "-m",
-      "manager.synthetic_worker",
-      "--mode",
-      "run",
-      "--heartbeat-file",
-      "var/synthetic.heartbeat.json",
-      "--interval",
-      "0.2"
-    ],
-    "cwd": "..",
-    "heartbeat_file": "../var/synthetic.heartbeat.json",
-    "heartbeat_max_age_s": 1,
-    "startup_grace_s": 1
-  }
+  "state_db": "../var/machine_manager.sqlite3",
+  "lock_file": "../var/machine_manager.lock",
+  "manager_log_file": "../var/manager.log",
+  "env_file": "../secrets/manager.env",
+  "event_retention": 5000,
+  "public_event_limit": 500,
+  "public_upload": {
+    "enabled": false,
+    "owner": "JaronKBragg7337",
+    "repository": "MachineManager",
+    "branch": "main",
+    "path_prefix": "dashboard/data",
+    "token_env": "MACHINE_MANAGER_GITHUB_TOKEN",
+    "interval_s": 300
+  },
+  "agents": [
+    {
+      "id": "local-manager-brain",
+      "role": "health-review-specialist",
+      "provider": "ollama",
+      "model": "qwen3.5:4b",
+      "base_url": "http://127.0.0.1:11434",
+      "enabled": false,
+      "interval_s": 300,
+      "timeout_s": 15,
+      "keep_gpu_free": true
+    }
+  ],
+  "jobs": [
+    {
+      "id": "synthetic-worker-001",
+      "objective_id": "synthetic-reliability",
+      "objective": "Synthetic worker reliability check",
+      "max_restarts": 3,
+      "worker": {
+        "id": "synthetic-001",
+        "type": "SyntheticWorker",
+        "command": [
+          "python",
+          "-m",
+          "manager.synthetic_worker",
+          "--mode",
+          "run",
+          "--heartbeat-file",
+          "../var/synthetic.heartbeat.json",
+          "--interval",
+          "0.2"
+        ],
+        "cwd": "..",
+        "heartbeat_file": "../var/synthetic.heartbeat.json",
+        "heartbeat_max_age_s": 1,
+        "startup_grace_s": 1,
+        "pid_file": "../var/synthetic.pid.json"
+      }
+    }
+  ]
 }

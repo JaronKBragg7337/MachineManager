@@ -51,6 +51,16 @@ PUBLIC_METRIC_KEYS = {
     "healthy",
     "detection_time_s",
     "recovery_time_s",
+    "tasks_completed",
+    "fallback",
+}
+PUBLIC_QUEUE_KEYS = {
+    "QUEUED",
+    "RUNNING",
+    "COMPLETE",
+    "FAILED",
+    "ESCALATED",
+    "CANCELLED",
 }
 
 
@@ -66,6 +76,18 @@ def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | 
             number = _number(value)
             if number is not None:
                 safe[clean_key] = number
+    return safe
+
+
+def _safe_queue(queue: Mapping[str, Any] | None) -> dict[str, int]:
+    safe: dict[str, int] = {}
+    for key, value in (queue or {}).items():
+        clean_key = _text(key, max_len=20).upper()
+        if clean_key not in PUBLIC_QUEUE_KEYS:
+            continue
+        number = _number(value)
+        if number is not None:
+            safe[clean_key] = max(0, int(number))
     return safe
 
 
@@ -108,6 +130,33 @@ class TelemetryPublisher:
                 "state": _text(job.get("state"), default="UNKNOWN").upper(),
             }
             for job in jobs
+        ]
+
+    def _agents(self, agents: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        return [
+            {
+                "id": _text(agent.get("id", "")),
+                "role": _text(agent.get("role"), default="specialist", max_len=80),
+                "provider": _text(agent.get("provider"), default="unknown", max_len=40),
+                "model": _text(agent.get("model"), max_len=80),
+                "state": _text(agent.get("state"), default="UNKNOWN", max_len=30).upper(),
+                "enabled": bool(agent.get("enabled", False)),
+                "last_action": _text(agent.get("last_action"), max_len=40),
+                "tasks_completed": _number(agent.get("tasks_completed")) or 0,
+                "last_run": _text(agent.get("last_run"), max_len=40),
+                "next_run": _text(agent.get("next_run"), max_len=40),
+            }
+            for agent in agents
+        ]
+
+    def _capabilities(self, capabilities: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        return [
+            {
+                "id": _text(item.get("id", ""), max_len=60),
+                "description": _text(item.get("description"), max_len=140),
+                "enabled": bool(item.get("enabled", False)),
+            }
+            for item in capabilities
         ]
 
     def _events(self, events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -170,8 +219,12 @@ class TelemetryPublisher:
             "manager_version": _text(snapshot.get("manager_version"), default="0.2", max_len=30),
             "status": _text(snapshot.get("status"), default="UNKNOWN", max_len=30).upper(),
             "objective": _text(snapshot.get("objective"), max_len=120),
+            "objective_id": _text(snapshot.get("objective_id"), max_len=80),
             "workers": self._workers(snapshot.get("workers", [])),
             "jobs": self._jobs(snapshot.get("jobs", [])),
+            "agents": self._agents(snapshot.get("agents", [])),
+            "capabilities": self._capabilities(snapshot.get("capabilities", [])),
+            "queue": _safe_queue(snapshot.get("queue")),
             "gpu": gpu,
             "notes": "Sanitized public telemetry only. No secrets or raw logs.",
             "updated": _text(snapshot.get("updated"), default=utc_now(), max_len=40),

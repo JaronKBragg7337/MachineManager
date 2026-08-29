@@ -23,7 +23,7 @@ The GitHub Pages root forwards directly to the visual Machine Manager control ce
 
 Dashboard:
 
-`https://jaronkbragg7337.github.io/MachineManager/`
+`https://jaronkbragg7337.github.io/MachineManager/dashboard/`
 
 The repository page remains the source/documentation view. The Pages site is the operational dashboard.
 
@@ -69,7 +69,7 @@ commands, credentials, targets, and private machine paths in a local config
 outside the repository. See [`docs/LOCAL_MANAGER.md`](docs/LOCAL_MANAGER.md)
 for the configuration and telemetry contract.
 
-## Current status (2026-08-28)
+## Current status (2026-08-29)
 
 - Repository initialized
 - Current mission documented as Bitcoin Puzzle #71
@@ -79,6 +79,10 @@ for the configuration and telemetry contract.
 - `worker-death-manager-002` passed with zero CEO intervention
 - `worker-death-manager-003` passed with zero CEO intervention and 16.23 s full recovery
 - Local worker supervision under multi-signal evaluation
+- Durable SQLite state, singleton locking, worker adoption, and a persistent work queue added
+- Multi-job configuration and bounded CPU-only Ollama agent slots added
+- User-level Windows Task Scheduler installer added for logon start and failure restart
+- Public GitHub Pages uploader added; it activates only with a dedicated local fine-grained token
 - Secrets layout prepared (never committed)
 - GitHub Pages control center deployed from `dashboard/`
 
@@ -88,6 +92,30 @@ for the configuration and telemetry contract.
 
 This is a public receiving address only. Never store private keys or seed phrases in this repository.
 
+## Full runtime and public control center
+
+The current public control center is:
+
+https://jaronkbragg7337.github.io/MachineManager/dashboard/
+
+It is a public, read-only view of sanitized telemetry. The local runtime is
+now a general manager rather than a Puzzle #71-only script: it supports a
+durable multi-job registry, bounded retries, worker adoption after manager
+restart, a persistent work queue, capability discovery, scheduled local
+agents, and a public upload boundary.
+
+The Bitcoin search is the first proving-ground job. Future research,
+breakthrough, engineering, and revenue-oriented jobs should be registered as
+separate objectives with their own worker, evidence, resource budget, and
+success criteria. Agents may recommend bounded actions, but they do not get
+unrestricted shell access or authority to bypass retry, resource, or secret
+controls.
+
+Public updates require a dedicated fine-grained GitHub token stored only in a
+local ignored env file. The Windows Task Scheduler installer can keep the
+manager running across logins and recover it after failure, but no laptop can
+provide true 24/7 operation while powered off or asleep.
+
 ## License
 
-MIT (or as decided by owner)
+No license file has been selected yet.

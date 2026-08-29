@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import os
 import subprocess
+import tempfile
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -51,6 +53,7 @@ class WorkerSpec:
     startup_grace_s: float = 5.0
     resource_probe: Callable[[], Mapping[str, Any]] | None = None
     resource_ok: Callable[[Mapping[str, Any]], bool] | None = None
+    pid_file: Path | None = None
     stdout_file: Path | None = None
     stderr_file: Path | None = None
 
@@ -61,6 +64,62 @@ class WorkerSpec:
             raise ValueError("heartbeat_max_age_s must be positive")
         if self.startup_grace_s < 0:
             raise ValueError("startup_grace_s cannot be negative")
+
+
+def _pid_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        try:
+            result = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
+            )
+            return result.returncode == 0 and str(pid) in result.stdout
+        except OSError:
+            return False
+    try:
+        os.kill(pid, 0)
+    except PermissionError:
+        return True
+    except OSError:
+        return False
+    return True
+
+
+class _AdoptedProcess:
+    """Minimal process handle for a worker that survived a manager restart."""
+
+    def __init__(self, pid: int) -> None:
+        self.pid = pid
+
+    def poll(self) -> int | None:
+        return None if _pid_alive(self.pid) else 1
+
+    def terminate(self) -> None:
+        if os.name == "nt":
+            subprocess.run(
+                ["taskkill", "/PID", str(self.pid), "/T", "/F"],
+                capture_output=True,
+                timeout=8,
+                check=False,
+            )
+        else:
+            os.kill(self.pid, 15)
+
+    def kill(self) -> None:
+        self.terminate()
+
+    def wait(self, timeout: float | None = None) -> int:
+        deadline = None if timeout is None else time.monotonic() + timeout
+        while _pid_alive(self.pid):
+            if deadline is not None and time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired("adopted-process", timeout)
+            time.sleep(0.05)
+        return 1
 
 
 @dataclass(frozen=True)
@@ -99,18 +158,22 @@ class WorkerSupervisor:
         job_id: str,
         actor: str = "local-manager",
         max_restarts: int = 3,
+        initial_attempt: int = 0,
+        initial_restart_count: int = 0,
     ) -> None:
         if max_restarts < 0:
             raise ValueError("max_restarts cannot be negative")
+        if initial_attempt < 0 or initial_restart_count < 0:
+            raise ValueError("initial counters cannot be negative")
         self.spec = spec
         self.objective_id = objective_id
         self.job_id = job_id
         self.actor = actor
         self.max_restarts = max_restarts
         self.state = JobState.QUEUED
-        self.process: subprocess.Popen[Any] | None = None
-        self.attempt = 0
-        self.restart_count = 0
+        self.process: Any = None
+        self.attempt = initial_attempt
+        self.restart_count = initial_restart_count
         self.events: list[dict[str, Any]] = []
         self.last_health: HealthSignals | None = None
         self._started_monotonic: float | None = None
@@ -188,6 +251,80 @@ class WorkerSupervisor:
         self._stream_handles.append(handle)
         return handle
 
+    def _write_pid_file(self, pid: int) -> None:
+        path = self.spec.pid_file
+        if path is None:
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fd, temporary_name = tempfile.mkstemp(
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            dir=path.parent,
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="ascii", newline="\n") as handle:
+                json.dump({"pid": int(pid), "worker_id": self.spec.worker_id}, handle)
+                handle.write("\n")
+            os.replace(temporary_name, path)
+        finally:
+            if os.path.exists(temporary_name):
+                os.unlink(temporary_name)
+
+    def _clear_pid_file(self, pid: int | None = None) -> None:
+        path = self.spec.pid_file
+        if path is None or not path.exists():
+            return
+        if pid is not None:
+            try:
+                payload = json.loads(path.read_text(encoding="ascii"))
+                if int(payload.get("pid", -1)) != int(pid):
+                    return
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                pass
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+
+    def _read_pid_file(self) -> int | None:
+        path = self.spec.pid_file
+        if path is None or not path.is_file():
+            return None
+        try:
+            payload = json.loads(path.read_text(encoding="ascii"))
+            pid = int(payload.get("pid", 0))
+            worker_id = str(payload.get("worker_id", ""))
+            if pid <= 0 or worker_id != self.spec.worker_id:
+                return None
+            return pid
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            return None
+
+    def _adopt_existing(self) -> bool:
+        pid = self._read_pid_file()
+        if pid is None:
+            return False
+        candidate = _AdoptedProcess(pid)
+        if candidate.poll() is not None:
+            self._clear_pid_file(pid)
+            return False
+        self.process = candidate
+        health = self._read_health()
+        if not health.healthy:
+            self._terminate_process()
+            self.process = None
+            return False
+        self.attempt += 1
+        self._started_monotonic = time.monotonic()
+        self._transition(
+            JobState.VERIFYING,
+            event_type="worker_adopted",
+            metrics={"attempt": self.attempt, "pid": pid},
+            action="adopt",
+            outcome="survived_manager_restart",
+        )
+        return True
+
     def _spawn(self) -> None:
         env = None
         if self.spec.env is not None:
@@ -210,6 +347,11 @@ class WorkerSupervisor:
             creationflags=creationflags,
             start_new_session=os.name != "nt",
         )
+        try:
+            self._write_pid_file(self.process.pid)
+        except Exception:
+            self._terminate_process()
+            raise
         self.attempt += 1
         self._started_monotonic = time.monotonic()
         self._transition(
@@ -226,6 +368,8 @@ class WorkerSupervisor:
             raise RuntimeError(f"cannot start worker from state {self.state.value}")
         self._transition(JobState.STARTING, action="start")
         try:
+            if self._adopt_existing():
+                return True
             self._spawn()
             return True
         except Exception as exc:  # pragma: no cover - platform-specific errors
@@ -244,8 +388,10 @@ class WorkerSupervisor:
     def _terminate_process(self) -> None:
         process = self.process
         if process is None:
+            self._clear_pid_file()
             self._close_streams()
             return
+        pid = getattr(process, "pid", None)
         if process.poll() is None:
             process.terminate()
             try:
@@ -253,6 +399,7 @@ class WorkerSupervisor:
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait(timeout=3)
+        self._clear_pid_file(pid)
         self._close_streams()
 
     def _read_health(self) -> HealthSignals:

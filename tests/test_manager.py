@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 import time
 from dataclasses import replace
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor
 from manager.telemetry import TelemetryPublisher
-from manager.run import load_public_records
+from manager.run import load_public_records, merge_public_events
+from manager.agents import AgentCoordinator, parse_agent_response
+from manager.public_upload import GitHubPagesPublisher, PublicUploadError
+from manager.state_store import StateStore
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -171,8 +176,166 @@ class SupervisorTests(unittest.TestCase):
             finally:
                 supervisor.cancel()
 
+    def test_healthy_worker_can_be_adopted_after_manager_restart(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            directory = Path(raw)
+            spec = replace(
+                synthetic_spec(directory, "run"),
+                pid_file=directory / "worker.pid.json",
+                startup_grace_s=0,
+            )
+            first = WorkerSupervisor(
+                spec,
+                objective_id="synthetic-adoption",
+                job_id="job-adoption",
+            )
+            second = WorkerSupervisor(
+                spec,
+                objective_id="synthetic-adoption",
+                job_id="job-adoption",
+            )
+            try:
+                self.assertTrue(first.start())
+                deadline = time.time() + 3
+                health = first.observe()
+                while not health.healthy and time.time() < deadline:
+                    time.sleep(0.05)
+                    health = first.observe()
+                self.assertTrue(health.healthy, health.as_dict())
+                self.assertTrue(second.start())
+                self.assertTrue(second.observe().healthy)
+                self.assertTrue(any(event["event_type"] == "worker_adopted" for event in second.events))
+            finally:
+                second.cancel()
+                first.cancel()
+
 
 class TelemetryTests(unittest.TestCase):
+    def test_state_store_persists_events_jobs_and_tasks(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            database = Path(raw) / "state.sqlite3"
+            event = {
+                "timestamp": "2026-08-28T20:00:00Z",
+                "event_id": "evt-persisted",
+                "job_id": "job-1",
+                "event_type": "state_change",
+                "new_state": "RUNNING",
+            }
+            with StateStore(database) as store:
+                store.append_event(event)
+                store.upsert_job(
+                    {
+                        "job_id": "job-1",
+                        "objective_id": "obj-1",
+                        "state": "RUNNING",
+                        "attempt": 2,
+                        "restart_count": 1,
+                        "updated": event["timestamp"],
+                    }
+                )
+                store.enqueue_task(
+                    task_id="task-1",
+                    kind="research",
+                    objective_id="obj-1",
+                    payload={"safe": True},
+                )
+                claimed = store.claim_due_tasks()
+                self.assertEqual(claimed[0]["task_id"], "task-1")
+                retry_at = time.time() + 60
+                store.finish_task("task-1", status="QUEUED", scheduled_at=retry_at)
+                self.assertEqual(store.claim_due_tasks(now=time.time()), [])
+                store.finish_task("task-1")
+            with StateStore(database) as reopened:
+                self.assertEqual(reopened.event_count(), 1)
+                self.assertEqual(reopened.recent_events()[0]["event_id"], "evt-persisted")
+                self.assertEqual(reopened.get_job("job-1")["restart_count"], 1)
+                self.assertEqual(reopened.task_counts()["COMPLETE"], 1)
+
+    def test_agent_response_falls_back_safely(self) -> None:
+        self.assertTrue(parse_agent_response("").fallback)
+        self.assertTrue(parse_agent_response("not json").fallback)
+        decision = parse_agent_response('{"action":"continue","reason":"healthy"}')
+        self.assertEqual(decision.action, "continue")
+        self.assertFalse(decision.fallback)
+
+    def test_noop_agent_records_bounded_work(self) -> None:
+        coordinator = AgentCoordinator(
+            [
+                {
+                    "id": "test-agent",
+                    "role": "test",
+                    "provider": "test",
+                    "enabled": True,
+                    "interval_s": 60,
+                }
+            ]
+        )
+        decisions = coordinator.tick(
+            {
+                "status": "HEALTHY",
+                "objective": "synthetic",
+                "workers": [],
+                "jobs": [],
+            }
+        )
+        self.assertEqual(decisions[0].action, "continue")
+        self.assertEqual(coordinator.snapshot()[0]["tasks_completed"], 1)
+        self.assertEqual(coordinator.events[0]["event_type"], "agent_decision")
+
+    def test_public_upload_rejects_pid_before_network_access(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            data = dashboard / "data"
+            data.mkdir(parents=True)
+            (data / "latest.json").write_text(
+                '{"status":"HEALTHY","pid":1234}',
+                encoding="utf-8",
+            )
+            (data / "events.json").write_text("[]", encoding="utf-8")
+            (data / "scenarios.json").write_text("[]", encoding="utf-8")
+            publisher = GitHubPagesPublisher(
+                dashboard,
+                owner="owner",
+                repository="repo",
+            )
+            with self.assertRaises(PublicUploadError):
+                publisher.publish()
+
+    def test_public_upload_builds_one_attributed_commit(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            data = dashboard / "data"
+            data.mkdir(parents=True)
+            (data / "latest.json").write_text(
+                '{"status":"HEALTHY","updated":"2026-08-29T00:00:00Z"}',
+                encoding="utf-8",
+            )
+            (data / "events.json").write_text("[]", encoding="utf-8")
+            (data / "scenarios.json").write_text("[]", encoding="utf-8")
+            publisher = GitHubPagesPublisher(
+                dashboard,
+                owner="owner",
+                repository="repo",
+            )
+            responses = iter(
+                [
+                    {"object": {"sha": "base-commit"}},
+                    {"tree": {"sha": "base-tree"}},
+                    {"sha": "blob-1"},
+                    {"sha": "blob-2"},
+                    {"sha": "blob-3"},
+                    {"sha": "new-tree"},
+                    {"sha": "new-commit"},
+                    {"ref": "refs/heads/main"},
+                ]
+            )
+            with patch.dict(os.environ, {"MACHINE_MANAGER_GITHUB_TOKEN": "test-only"}):
+                with patch.object(publisher, "_request", side_effect=lambda *args, **kwargs: next(responses)) as request:
+                    self.assertTrue(publisher.publish(force=True))
+                    calls = request.call_args_list
+            commit_payload = calls[-2].args[2]
+            self.assertIn("Co-Authored-By: Codex <noreply@openai.com>", commit_payload["message"])
+
     def test_runner_reads_array_and_object_public_records(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             dashboard = Path(raw) / "dashboard"
@@ -185,6 +348,16 @@ class TelemetryTests(unittest.TestCase):
             events, scenarios = load_public_records(dashboard)
             self.assertEqual(events, [])
             self.assertEqual(scenarios, [{"id": "scenario-1"}])
+
+    def test_runner_bounds_and_deduplicates_public_events(self) -> None:
+        existing = [{"event_id": "old-1"}, {"event_id": "old-2"}]
+        current = [
+            {"event_id": "old-2"},
+            {"event_id": "new-1"},
+            {"event_id": "new-2"},
+        ]
+        merged = merge_public_events(existing, current, limit=2)
+        self.assertEqual([event["event_id"] for event in merged], ["new-1", "new-2"])
 
     def test_publisher_allowlists_public_fields(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
