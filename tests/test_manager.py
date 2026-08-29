@@ -13,7 +13,7 @@ from pathlib import Path
 from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor
 from manager.telemetry import TelemetryPublisher
 from manager.run import load_public_records, merge_public_events
-from manager.agents import AgentCoordinator, parse_agent_response
+from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_agent_response
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
 from manager.probes import keyhunt_progress_probe
 from manager.state_store import StateStore
@@ -316,6 +316,50 @@ class TelemetryTests(unittest.TestCase):
         decision = parse_agent_response('{"action":"continue","reason":"healthy"}')
         self.assertEqual(decision.action, "continue")
         self.assertFalse(decision.fallback)
+
+    def test_ollama_agent_requests_bounded_nonthinking_json(self) -> None:
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self, _limit):
+                return json.dumps({"response": '{"action":"continue","reason":"healthy"}'}).encode("utf-8")
+
+        spec = AgentSpec.from_mapping(
+            {
+                "id": "test-agent",
+                "role": "test",
+                "provider": "ollama",
+                "model": "test-model",
+                "base_url": "http://127.0.0.1:11434",
+                "enabled": True,
+            }
+        )
+        agent = LocalOllamaAgent(spec)
+        snapshot = {"status": "HEALTHY", "objective": "synthetic", "workers": [], "jobs": []}
+        with patch("manager.agents.urllib.request.urlopen", return_value=FakeResponse()) as opener:
+            decision = agent.ask(snapshot, [])
+        request = opener.call_args.args[0]
+        body = json.loads(request.data.decode("utf-8"))
+        self.assertEqual(decision.action, "continue")
+        self.assertFalse(decision.fallback)
+        self.assertEqual(body["format"], "json")
+        self.assertFalse(body["think"])
+        self.assertEqual(body["options"]["num_predict"], 80)
+
+    def test_ollama_agent_preserves_allowed_loopback_url(self) -> None:
+        spec = AgentSpec.from_mapping(
+            {
+                "id": "test-agent",
+                "provider": "ollama",
+                "model": "test-model",
+                "base_url": "http://127.0.0.1:11434",
+            }
+        )
+        self.assertEqual(spec.base_url, "http://127.0.0.1:11434")
 
     def test_noop_agent_records_bounded_work(self) -> None:
         coordinator = AgentCoordinator(

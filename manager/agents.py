@@ -37,6 +37,14 @@ def _safe_text(value: Any, *, default: str = "", max_len: int = 160) -> str:
     return value
 
 
+def _safe_loopback_url(value: Any) -> str:
+    """Allow only the local Ollama endpoints used by the manager."""
+    candidate = str(value or "").strip().rstrip("/")
+    if candidate in {"http://127.0.0.1:11434", "http://localhost:11434"}:
+        return candidate
+    return "http://127.0.0.1:11434"
+
+
 @dataclass(frozen=True)
 class AgentDecision:
     action: str
@@ -70,7 +78,7 @@ class AgentSpec:
             role=_safe_text(value.get("role"), default="specialist", max_len=80),
             provider=_safe_text(value.get("provider"), default="disabled", max_len=40).lower(),
             model=_safe_text(value.get("model"), max_len=80),
-            base_url=_safe_text(value.get("base_url"), default="http://127.0.0.1:11434", max_len=160),
+            base_url=_safe_loopback_url(value.get("base_url")),
             enabled=bool(value.get("enabled", False)),
             interval_s=interval_s,
             timeout_s=timeout_s,
@@ -152,7 +160,9 @@ class LocalOllamaAgent:
             "model": self.spec.model,
             "prompt": self._prompt(snapshot, events),
             "stream": False,
-            "options": {"temperature": 0.1},
+            "format": "json",
+            "think": False,
+            "options": {"temperature": 0.1, "num_predict": 80},
         }
         if self.spec.keep_gpu_free:
             body["options"]["num_gpu"] = 0
