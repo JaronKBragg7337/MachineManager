@@ -2,6 +2,7 @@
   "manager_version": "0.2",
   "status": "HEALTHY",
   "objective": "Bitcoin Puzzle #71 continuous search",
+  "objective_id": "p71",
   "workers": [
     {
       "id": "keyhunt-001",
@@ -17,13 +18,65 @@
       "state": "RUNNING"
     }
   ],
+  "agents": [
+    {
+      "id": "local-manager-brain",
+      "role": "health-review-specialist",
+      "provider": "ollama",
+      "model": "qwen3.5:4b",
+      "state": "WAITING",
+      "enabled": true,
+      "last_action": "continue",
+      "tasks_completed": 1,
+      "last_run": "2026-08-29T01:25:54.266Z",
+      "next_run": "2026-08-29T01:30:54.266Z"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "github-pages-upload",
+      "description": "Upload sanitized dashboard files when a dedicated token is configured.",
+      "enabled": false
+    },
+    {
+      "id": "gpu-monitoring",
+      "description": "Read external GPU activity signals for GPU-bound workers.",
+      "enabled": true
+    },
+    {
+      "id": "local-ollama-agents",
+      "description": "Ask configured local models for bounded recommendations.",
+      "enabled": true
+    },
+    {
+      "id": "persistent-state",
+      "description": "Store local job state, event history, retry counts, and queued work.",
+      "enabled": true
+    },
+    {
+      "id": "process-supervision",
+      "description": "Start, observe, recover, and stop bounded worker processes.",
+      "enabled": true
+    },
+    {
+      "id": "public-telemetry",
+      "description": "Publish an allowlisted, sanitized dashboard snapshot.",
+      "enabled": true
+    },
+    {
+      "id": "synthetic-workers",
+      "description": "Run deterministic workers for safe reliability evaluation.",
+      "enabled": true
+    }
+  ],
+  "queue": {},
   "gpu": {
-    "util_pct": 82.0,
+    "util_pct": 74.0,
     "mem_used_mib": 2376.0,
     "mem_total_mib": 8188.0,
     "temp_c": 64.0,
-    "power_w": 82.17
+    "power_w": 81.16
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-28T21:00:09.398Z"
+  "updated": "2026-08-29T01:26:10.405Z"
 }
