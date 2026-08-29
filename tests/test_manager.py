@@ -280,6 +280,35 @@ class SupervisorTests(unittest.TestCase):
                 second.cancel()
                 first.cancel()
 
+    def test_stale_pid_record_is_not_adopted_or_terminated(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            directory = Path(raw)
+            spec = replace(
+                synthetic_spec(directory, "run"),
+                pid_file=directory / "worker.pid.json",
+            )
+            spec.pid_file.write_text(
+                json.dumps({"pid": 987654, "worker_id": spec.worker_id}),
+                encoding="ascii",
+            )
+            supervisor = WorkerSupervisor(
+                spec,
+                objective_id="synthetic-stale-pid",
+                job_id="job-stale-pid",
+            )
+            with patch("manager.supervisor._pid_alive", return_value=True):
+                with patch("manager.supervisor._process_image_name", return_value="unrelated.exe"):
+                    try:
+                        self.assertTrue(supervisor.start())
+                        self.assertFalse(
+                            any(event["event_type"] == "worker_adopted" for event in supervisor.events)
+                        )
+                        self.assertTrue(
+                            any(event["event_type"] == "worker_started" for event in supervisor.events)
+                        )
+                    finally:
+                        supervisor.cancel()
+
 
 class TelemetryTests(unittest.TestCase):
     def test_state_store_persists_events_jobs_and_tasks(self) -> None:

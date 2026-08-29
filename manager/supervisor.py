@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import datetime as dt
+import csv
+import io
 import json
 import math
 import os
+import shutil
 import subprocess
 import tempfile
 import time
@@ -155,6 +158,49 @@ def _pid_alive(pid: int) -> bool:
     except OSError:
         return False
     return True
+
+
+def _process_image_name(pid: int) -> str | None:
+    """Return a process image name without trusting a PID alone."""
+    if pid <= 0:
+        return None
+    if os.name == "nt":
+        try:
+            result = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {pid}", "/FO", "CSV", "/NH"],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=5,
+                check=False,
+            )
+            if result.returncode != 0:
+                return None
+            for row in csv.reader(io.StringIO(result.stdout)):
+                if len(row) >= 2 and row[1].strip() == str(pid):
+                    return row[0].strip()
+        except (OSError, subprocess.SubprocessError, UnicodeError):
+            return None
+        return None
+    if os.name == "posix":
+        try:
+            return os.path.basename(os.readlink(f"/proc/{pid}/exe"))
+        except (FileNotFoundError, OSError):
+            return None
+    return None
+
+
+def _expected_image_name(command: Sequence[str]) -> str:
+    """Resolve the executable name used to identify an adopted worker."""
+    executable = shutil.which(str(command[0])) or str(command[0])
+    if os.name == "nt":
+        # ``os.path`` on another platform does not understand Windows paths;
+        # the runtime itself is still expected to work cross-platform in tests.
+        import ntpath
+
+        return ntpath.basename(executable).casefold()
+    return os.path.basename(executable).casefold()
 
 
 class _AdoptedProcess:
@@ -379,10 +425,22 @@ class WorkerSupervisor:
         if candidate.poll() is not None:
             self._clear_pid_file(pid)
             return False
+        actual_image = _process_image_name(pid)
+        expected_image = _expected_image_name(self.spec.command)
+        if actual_image is None:
+            # A live but unverifiable PID must never be killed or shadowed by a
+            # second worker. Leave the record in place for a later retry.
+            raise RuntimeError("cannot verify existing worker process identity")
+        if actual_image.casefold() != expected_image:
+            # PID reuse is normal after a reboot. Clear only our stale record;
+            # never terminate an unrelated process that happens to own it.
+            self._clear_pid_file(pid)
+            return False
         self.process = candidate
         health = self._read_health()
         if not health.healthy:
-            self._terminate_process()
+            if not self._terminate_process():
+                raise RuntimeError("could not safely terminate unhealthy adopted worker")
             self.process = None
             return False
         self.attempt += 1
@@ -456,22 +514,29 @@ class WorkerSupervisor:
                 pass
         self._stream_handles.clear()
 
-    def _terminate_process(self) -> None:
+    def _terminate_process(self) -> bool:
         process = self.process
         if process is None:
             self._clear_pid_file()
             self._close_streams()
-            return
+            return True
         pid = getattr(process, "pid", None)
-        if process.poll() is None:
-            process.terminate()
-            try:
-                process.wait(timeout=3)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait(timeout=3)
+        try:
+            if process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    try:
+                        process.wait(timeout=3)
+                    except subprocess.TimeoutExpired:
+                        return False
+        except (OSError, subprocess.SubprocessError):
+            return False
         self._clear_pid_file(pid)
         self._close_streams()
+        return True
 
     def _read_health(self) -> HealthSignals:
         process_alive = self.process is not None and self.process.poll() is None
@@ -621,7 +686,14 @@ class WorkerSupervisor:
             self._terminate_process()
             return False
 
-        self._terminate_process()
+        if not self._terminate_process():
+            self._transition(
+                JobState.ESCALATED,
+                metrics=health.as_dict(),
+                action="escalate",
+                outcome="worker_termination_unconfirmed",
+            )
+            return False
         self.restart_count += 1
         self._transition(
             JobState.RETRYING,
