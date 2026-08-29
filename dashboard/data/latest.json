@@ -1,29 +1,29 @@
 {
   "manager_version": "0.2",
-  "status": "HEALTHY",
+  "status": "STARTING",
   "objective": "Bitcoin Puzzle #71 continuous search",
   "objective_id": "p71",
   "workers": [
     {
       "id": "keyhunt-001",
       "type": "KeyHunt",
-      "state": "RUNNING",
+      "state": "VERIFYING",
       "owner": "local-manager-v2",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-29T17:32:15.610Z",
+        "observed_at": "2026-08-29T22:07:24.579Z",
         "reported": true,
-        "active": true,
-        "healthy": true,
+        "active": false,
+        "healthy": false,
+        "matches_found": 0,
+        "keys_per_second": 794540000,
+        "uptime_s": 0.6,
+        "batch_number": 138,
+        "sample_count": 1,
         "coverage_pct": 0,
-        "uptime_s": 305.9,
-        "keys_tested": 221509582848,
-        "hashrate_mkey_s": 796.91,
-        "keys_per_second": 796910000,
-        "sample_count": 21,
-        "batch_number": 67,
-        "matches_found": 0
+        "keys_tested": 450971566080,
+        "hashrate_mkey_s": 794.54
       }
     }
   ],
@@ -31,22 +31,22 @@
     {
       "id": "job-p71-001",
       "objective_id": "p71",
-      "state": "RUNNING",
+      "state": "VERIFYING",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-29T17:32:15.610Z",
+        "observed_at": "2026-08-29T22:07:24.579Z",
         "reported": true,
-        "active": true,
-        "healthy": true,
+        "active": false,
+        "healthy": false,
+        "matches_found": 0,
+        "keys_per_second": 794540000,
+        "uptime_s": 0.6,
+        "batch_number": 138,
+        "sample_count": 1,
         "coverage_pct": 0,
-        "uptime_s": 305.9,
-        "keys_tested": 221509582848,
-        "hashrate_mkey_s": 796.91,
-        "keys_per_second": 796910000,
-        "sample_count": 21,
-        "batch_number": 67,
-        "matches_found": 0
+        "keys_tested": 450971566080,
+        "hashrate_mkey_s": 794.54
       }
     }
   ],
@@ -58,12 +58,12 @@
       "model": "qwen3.5:4b",
       "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System healthy, objective running, no errors detected.",
-      "last_duration_s": 4.188,
-      "tasks_completed": 1,
-      "last_run": "2026-08-29T17:27:28.793Z",
-      "next_run": "2026-08-29T17:32:28.793Z"
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -105,28 +105,28 @@
   ],
   "queue": {},
   "gpu": {
-    "util_pct": 75.0,
-    "mem_used_mib": 2367.0,
+    "util_pct": 0.0,
+    "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 58.0,
-    "power_w": 81.4
+    "temp_c": 35.0,
+    "power_w": 10.85
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-29T17:32:15.610Z",
+    "observed_at": "2026-08-29T22:07:24.579Z",
     "reported": true,
-    "active": true,
-    "healthy": true,
+    "active": false,
+    "healthy": false,
+    "matches_found": 0,
+    "keys_per_second": 794540000,
+    "uptime_s": 0.6,
+    "batch_number": 138,
+    "sample_count": 1,
     "coverage_pct": 0,
-    "uptime_s": 305.9,
-    "keys_tested": 221509582848,
-    "hashrate_mkey_s": 796.91,
-    "keys_per_second": 796910000,
-    "sample_count": 21,
-    "batch_number": 67,
-    "matches_found": 0
+    "keys_tested": 450971566080,
+    "hashrate_mkey_s": 794.54
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-29T17:32:15.653Z"
+  "updated": "2026-08-29T22:07:25.159Z"
 }
