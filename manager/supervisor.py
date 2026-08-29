@@ -81,6 +81,17 @@ def _pid_alive(pid: int) -> bool:
             return result.returncode == 0 and str(pid) in result.stdout
         except OSError:
             return False
+    if os.name == "posix":
+        proc_stat = Path(f"/proc/{pid}/stat")
+        try:
+            # A terminated adopted process can remain a zombie until its
+            # original parent reaps it. It is no longer useful work.
+            stat = proc_stat.read_text(encoding="ascii")
+            state = stat.rsplit(") ", 1)[-1].split(" ", 1)[0]
+            if state == "Z":
+                return False
+        except (FileNotFoundError, OSError, UnicodeDecodeError):
+            pass
     try:
         os.kill(pid, 0)
     except PermissionError:

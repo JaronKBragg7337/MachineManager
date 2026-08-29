@@ -270,14 +270,15 @@ class TelemetryTests(unittest.TestCase):
                 }
             ]
         )
-        decisions = coordinator.tick(
-            {
-                "status": "HEALTHY",
-                "objective": "synthetic",
-                "workers": [],
-                "jobs": [],
-            }
-        )
+        with patch("manager.agents.time.monotonic", return_value=1.0):
+            decisions = coordinator.tick(
+                {
+                    "status": "HEALTHY",
+                    "objective": "synthetic",
+                    "workers": [],
+                    "jobs": [],
+                }
+            )
         self.assertEqual(decisions[0].action, "continue")
         self.assertEqual(coordinator.snapshot()[0]["tasks_completed"], 1)
         self.assertEqual(coordinator.events[0]["event_type"], "agent_decision")

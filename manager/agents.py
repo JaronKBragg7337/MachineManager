@@ -291,8 +291,8 @@ class AgentCoordinator:
             if spec.agent_id in self._pending:
                 status["state"] = "WORKING"
                 continue
-            last_run = self._last_run.get(spec.agent_id, 0.0)
-            if now - last_run < spec.interval_s:
+            last_run = self._last_run.get(spec.agent_id)
+            if last_run is not None and now - last_run < spec.interval_s:
                 status["state"] = "WAITING"
                 continue
 
