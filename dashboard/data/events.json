@@ -1,929 +1,5 @@
 [
   {
-    "ts": "2026-08-29T01:28:57.007Z",
-    "event_id": "evt-e7af5b8c2ade",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:29:13.204Z",
-    "event_id": "evt-cd1d5a002989",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:29:29.249Z",
-    "event_id": "evt-57f8531def73",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:29:45.381Z",
-    "event_id": "evt-2724968713c2",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:30:01.472Z",
-    "event_id": "evt-6f184f203cee",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:25:32.533Z",
-    "event_id": "evt-a251b228c040",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:34:32.952Z",
-    "event_id": "evt-385369d01467",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:30:17.475Z",
-    "event_id": "evt-76ebc6b754c6",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:30:33.385Z",
-    "event_id": "evt-f68540826f72",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:30:49.371Z",
-    "event_id": "evt-741a36ec4cb6",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:31:05.354Z",
-    "event_id": "evt-e7e6442ca0c6",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:03:40.811Z",
-    "event_id": "evt-47ea87bb4a7c",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:16:49.139Z",
-    "event_id": "evt-085c6cdaba4a",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:25:48.594Z",
-    "event_id": "evt-49ddfe3befdf",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:34:48.916Z",
-    "event_id": "evt-f5bfbc5c4cc1",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:31:21.353Z",
-    "event_id": "evt-26bd9f5ad04b",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:31:37.501Z",
-    "event_id": "evt-8b56a5aa9065",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:31:53.470Z",
-    "event_id": "evt-7c4d4a222add",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:32:09.496Z",
-    "event_id": "evt-7e3910b61259",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:32:25.593Z",
-    "event_id": "evt-e882e7e50717",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:32:41.625Z",
-    "event_id": "evt-32565af6690a",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:32:57.600Z",
-    "event_id": "evt-f42002943f43",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:33:13.654Z",
-    "event_id": "evt-5c7131a378c0",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:35:04.813Z",
-    "event_id": "evt-4a158ed3427e",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:33:14.137Z",
-    "event_id": "agent-local-manager-brain-17879671941376",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "DEGRADED",
-    "message": "continue \u00b7 fallback",
-    "metrics": {
-      "tasks_completed": 2,
-      "fallback": true
-    },
-    "error": true
-  },
-  {
-    "ts": "2026-08-29T01:33:29.721Z",
-    "event_id": "evt-d30d470afc5e",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:33:45.838Z",
-    "event_id": "evt-04b12fa3e714",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:34:01.992Z",
-    "event_id": "evt-1955cb4db148",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:34:18.067Z",
-    "event_id": "evt-07e7a0b69f23",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:34:34.184Z",
-    "event_id": "evt-87bc23a9df63",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:34:50.471Z",
-    "event_id": "evt-e16c12659f4f",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:35:06.493Z",
-    "event_id": "evt-534c1ec18601",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:26:04.718Z",
-    "event_id": "evt-78401f23280a",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:35:20.773Z",
-    "event_id": "evt-00b3d05a3a8e",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:35:21.134Z",
-    "event_id": "agent-local-manager-brain-17879745211347",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "DEGRADED",
-    "message": "continue \u00b7 fallback",
-    "metrics": {
-      "tasks_completed": 26,
-      "fallback": true
-    },
-    "error": true
-  },
-  {
-    "ts": "2026-08-29T01:35:22.672Z",
-    "event_id": "evt-82ff52364a96",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:35:38.843Z",
-    "event_id": "evt-4137432a1308",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:35:55.169Z",
-    "event_id": "evt-f0cc0be25e31",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:36:11.128Z",
-    "event_id": "evt-2b96a4e2d81b",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:36:27.154Z",
-    "event_id": "evt-ad3d21951854",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:36:43.105Z",
-    "event_id": "evt-79b036369bd0",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:36:59.156Z",
-    "event_id": "evt-389210d553d1",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:37:15.186Z",
-    "event_id": "evt-411a6d9f1b1c",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:03:56.919Z",
-    "event_id": "evt-ce5747011edf",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:17:05.092Z",
-    "event_id": "evt-73649f4eefba",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:26:20.715Z",
-    "event_id": "evt-64b721162ff0",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:35:36.612Z",
-    "event_id": "evt-474b902d2966",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:37:31.308Z",
-    "event_id": "evt-c7cd2e36c898",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:37:47.404Z",
-    "event_id": "evt-f1d6438ac4cc",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:38:03.601Z",
-    "event_id": "evt-139b2a4881b1",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:38:19.602Z",
-    "event_id": "evt-a4be73785070",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:38:20.130Z",
-    "event_id": "agent-local-manager-brain-17879675001302",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "DEGRADED",
-    "message": "continue \u00b7 fallback",
-    "metrics": {
-      "tasks_completed": 3,
-      "fallback": true
-    },
-    "error": true
-  },
-  {
-    "ts": "2026-08-29T01:38:35.698Z",
-    "event_id": "evt-23fba1303c04",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:38:51.775Z",
-    "event_id": "evt-0b09e4bd4897",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:39:07.791Z",
-    "event_id": "evt-7b1cd2bae945",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:39:23.871Z",
-    "event_id": "evt-97cb05874309",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:04:13.038Z",
-    "event_id": "evt-e69a69bf85c2",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:17:21.000Z",
-    "event_id": "evt-617bab9bf78f",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:26:36.624Z",
-    "event_id": "evt-75dc7c1fb1dc",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T03:35:52.498Z",
-    "event_id": "evt-228b788d1766",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:39:39.931Z",
-    "event_id": "evt-abeb5e01c79b",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-29T01:39:55.869Z",
-    "event_id": "evt-4420c91dbc76",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-29T01:40:11.992Z",
     "event_id": "evt-725f8b4c9d5c",
     "actor": "local-manager-v2",
@@ -7437,6 +6513,930 @@
   {
     "ts": "2026-08-29T03:40:54.542Z",
     "event_id": "evt-108c4320dd20",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:02:52.542Z",
+    "event_id": "evt-ae60861d032a",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:03:08.782Z",
+    "event_id": "evt-abdd517bd0c4",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:03:24.823Z",
+    "event_id": "evt-4279624a7918",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:16:01.439Z",
+    "event_id": "evt-a1c4c2fed0d3",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:16:17.403Z",
+    "event_id": "evt-87761e58d87b",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:16:33.300Z",
+    "event_id": "evt-e6e9a53d404f",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:24:45.042Z",
+    "event_id": "evt-b7745acc6e1b",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:25:00.823Z",
+    "event_id": "evt-0810817245f4",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:25:16.771Z",
+    "event_id": "evt-6ebeb35b52a8",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:25:17.125Z",
+    "event_id": "agent-local-manager-brain-17879739171251",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "DEGRADED",
+    "message": "continue \u00b7 fallback",
+    "metrics": {
+      "tasks_completed": 24,
+      "fallback": true
+    },
+    "error": true
+  },
+  {
+    "ts": "2026-08-29T03:31:53.962Z",
+    "event_id": "evt-47e0e0558732",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:32:09.897Z",
+    "event_id": "evt-935d0d938cf7",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:32:25.781Z",
+    "event_id": "evt-ab77b35b8fd6",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:32:41.683Z",
+    "event_id": "evt-b45957bd2411",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:32:57.531Z",
+    "event_id": "evt-d984d3b47efc",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:33:13.471Z",
+    "event_id": "evt-15bba17f2486",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:33:29.487Z",
+    "event_id": "evt-a49d022b81de",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:33:45.324Z",
+    "event_id": "evt-809400bdffcc",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:34:01.180Z",
+    "event_id": "evt-c88f59061cba",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:34:17.112Z",
+    "event_id": "evt-b55406736628",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:41:10.300Z",
+    "event_id": "evt-d685b35fc948",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:03:40.811Z",
+    "event_id": "evt-47ea87bb4a7c",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:16:49.139Z",
+    "event_id": "evt-085c6cdaba4a",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:25:32.533Z",
+    "event_id": "evt-a251b228c040",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:25:48.594Z",
+    "event_id": "evt-49ddfe3befdf",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:34:32.952Z",
+    "event_id": "evt-385369d01467",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:34:48.916Z",
+    "event_id": "evt-f5bfbc5c4cc1",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:41:26.169Z",
+    "event_id": "evt-b2cd1d94a920",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:35:04.813Z",
+    "event_id": "evt-4a158ed3427e",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:41:42.088Z",
+    "event_id": "evt-f3d4437dd0ac",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:41:57.923Z",
+    "event_id": "evt-de7f7f1652df",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:42:13.745Z",
+    "event_id": "evt-6c68539ad439",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:42:29.712Z",
+    "event_id": "evt-a32c978d3c32",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:26:04.718Z",
+    "event_id": "evt-78401f23280a",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:42:45.601Z",
+    "event_id": "evt-12555273e41e",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:35:20.773Z",
+    "event_id": "evt-00b3d05a3a8e",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:35:21.134Z",
+    "event_id": "agent-local-manager-brain-17879745211347",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "DEGRADED",
+    "message": "continue \u00b7 fallback",
+    "metrics": {
+      "tasks_completed": 26,
+      "fallback": true
+    },
+    "error": true
+  },
+  {
+    "ts": "2026-08-29T03:43:01.536Z",
+    "event_id": "evt-49c7a7dea771",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:43:17.468Z",
+    "event_id": "evt-3a72ba96624e",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:43:33.307Z",
+    "event_id": "evt-d9574ed8e06b",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:43:49.098Z",
+    "event_id": "evt-95a274af03da",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:44:04.971Z",
+    "event_id": "evt-98f5ad01e0a1",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:44:20.901Z",
+    "event_id": "evt-b7e41760130c",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:44:36.747Z",
+    "event_id": "evt-cfae4c5569c9",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:03:56.919Z",
+    "event_id": "evt-ce5747011edf",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:44:52.628Z",
+    "event_id": "evt-17fc7757c9c3",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:17:05.092Z",
+    "event_id": "evt-73649f4eefba",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:26:20.715Z",
+    "event_id": "evt-64b721162ff0",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:45:08.504Z",
+    "event_id": "evt-a4e118e16ca4",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:35:36.612Z",
+    "event_id": "evt-474b902d2966",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:45:24.328Z",
+    "event_id": "evt-122b085832ad",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:45:24.713Z",
+    "event_id": "agent-local-manager-brain-17879751247131",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "DEGRADED",
+    "message": "continue \u00b7 fallback",
+    "metrics": {
+      "tasks_completed": 28,
+      "fallback": true
+    },
+    "error": true
+  },
+  {
+    "ts": "2026-08-29T03:45:40.170Z",
+    "event_id": "evt-084b2b9c1555",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:45:56.020Z",
+    "event_id": "evt-42feffd52cea",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:46:12.090Z",
+    "event_id": "evt-78946bf0cd54",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:46:28.012Z",
+    "event_id": "evt-35930b66667d",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:46:44.138Z",
+    "event_id": "evt-3c00739fb498",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:04:13.038Z",
+    "event_id": "evt-e69a69bf85c2",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:47:00.143Z",
+    "event_id": "evt-180101bf13f1",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:17:21.000Z",
+    "event_id": "evt-617bab9bf78f",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:26:36.624Z",
+    "event_id": "evt-75dc7c1fb1dc",
+    "actor": "local-manager-v2",
+    "type": "health_check",
+    "state": "RUNNING",
+    "message": "healthy",
+    "metrics": {
+      "process_alive": true,
+      "heartbeat_fresh": true,
+      "resource_active": true,
+      "healthy": true
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-29T03:47:15.977Z",
+    "event_id": "evt-a762424b587f",
     "actor": "local-manager-v2",
     "type": "health_check",
     "state": "RUNNING",

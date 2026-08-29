@@ -27,9 +27,9 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "tasks_completed": 27,
-      "last_run": "2026-08-29T03:40:23.205Z",
-      "next_run": "2026-08-29T03:45:23.205Z"
+      "tasks_completed": 28,
+      "last_run": "2026-08-29T03:45:24.713Z",
+      "next_run": "2026-08-29T03:50:24.713Z"
     }
   ],
   "capabilities": [
@@ -71,12 +71,12 @@
   ],
   "queue": {},
   "gpu": {
-    "util_pct": 76.0,
+    "util_pct": 87.0,
     "mem_used_mib": 2376.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 66.0,
-    "power_w": 81.92
+    "temp_c": 65.0,
+    "power_w": 82.96
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-29T03:40:54.871Z"
+  "updated": "2026-08-29T03:47:16.328Z"
 }
