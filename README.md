@@ -12,18 +12,15 @@ The Bitcoin workload is the current proving ground, not the long-term limit of t
 
 **Current reward plan:** if the active Puzzle #71 workload succeeds, **2 BTC** is allocated to the designated service/developer payout wallet and the remaining recovered balance is directed to the configured public payout address below.
 
-> The dashboard displays the latest published sanitized snapshot. If the local
-> publisher is not running, it shows the last snapshot and marks it stale.
-> This section documents the active mission and intended workload, not
-> real-time process health.
+> The dashboard displays the latest published sanitized snapshot. It marks the
+> public view as stale when that snapshot is older than five minutes. The local
+> manager remains the source of truth for machine health.
 
 ## Live control center
 
 The GitHub Pages root forwards directly to the visual Machine Manager control center.
 
-Dashboard:
-
-`https://jaronkbragg7337.github.io/MachineManager/dashboard/`
+Dashboard: [Open the public Machine Manager control center](https://jaronkbragg7337.github.io/MachineManager/dashboard/)
 
 The repository page remains the source/documentation view. The Pages site is the operational dashboard.
 
@@ -94,12 +91,12 @@ This is a public receiving address only. Never store private keys or seed phrase
 
 ## Full runtime and public control center
 
-The current public control center is:
+The current public control center is the [Machine Manager operations view](https://jaronkbragg7337.github.io/MachineManager/dashboard/).
 
-https://jaronkbragg7337.github.io/MachineManager/dashboard/
-
-It is a public, read-only view of sanitized telemetry. The local runtime is
-now a general manager rather than a Puzzle #71-only script: it supports a
+It is a public, read-only view of sanitized telemetry with separate views for
+Overview, Jobs, Workers, Agents, Evaluations, Research, Activity, and
+Operations. The local runtime is now a general manager rather than a
+Puzzle #71-only script: it supports a
 durable multi-job registry, bounded retries, worker adoption after manager
 restart, a persistent work queue, capability discovery, scheduled local
 agents, and a public upload boundary.
