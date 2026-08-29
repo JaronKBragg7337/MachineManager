@@ -44,6 +44,7 @@ Specialist Workers
 - Reference Scenario Suite: Grok performs competent behavior → local Manager is evaluated against it
 - Shared event/telemetry pipeline
 - Visual control center (GitHub Pages dashboard)
+- Search progress and AI-run timeline with public-safe aggregate evidence
 - Workers are dynamically registerable; each can have its own minimal GitHub identity
 - Grok remains the escalation and teaching layer
 
@@ -80,6 +81,8 @@ for the configuration and telemetry contract.
 - Multi-job configuration and bounded CPU-only Ollama agent slots added
 - User-level Windows Task Scheduler installer added for logon start and failure restart
 - Public GitHub Pages uploader added; it activates only with a dedicated local fine-grained token
+- KeyHunt aggregate progress observer and public Search view added
+- Agent recommendations now publish short reasons and run timing without private prompts
 - Secrets layout prepared (never committed)
 - GitHub Pages control center deployed from `dashboard/`
 
@@ -94,7 +97,7 @@ This is a public receiving address only. Never store private keys or seed phrase
 The current public control center is the [Machine Manager operations view](https://jaronkbragg7337.github.io/MachineManager/dashboard/).
 
 It is a public, read-only view of sanitized telemetry with separate views for
-Overview, Jobs, Workers, Agents, Evaluations, Research, Activity, and
+Overview, Jobs, Workers, Search, Agents, Evaluations, Research, Activity, and
 Operations. The local runtime is now a general manager rather than a
 Puzzle #71-only script: it supports a
 durable multi-job registry, bounded retries, worker adoption after manager

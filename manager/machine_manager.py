@@ -106,6 +106,7 @@ class MachineManager:
                     "state": worker["state"],
                     "owner": self.actor,
                     "pid": worker["pid"],
+                    "progress": worker.get("progress", {}),
                 }
             )
             jobs.append(
@@ -113,6 +114,7 @@ class MachineManager:
                     "id": job.job_id,
                     "objective_id": job.objective_id,
                     "state": job.supervisor.state.value,
+                    "progress": worker.get("progress", {}),
                 }
             )
 

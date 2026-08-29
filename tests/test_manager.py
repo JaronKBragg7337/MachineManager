@@ -15,6 +15,7 @@ from manager.telemetry import TelemetryPublisher
 from manager.run import load_public_records, merge_public_events
 from manager.agents import AgentCoordinator, parse_agent_response
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
+from manager.probes import keyhunt_progress_probe
 from manager.state_store import StateStore
 
 
@@ -176,11 +177,64 @@ class SupervisorTests(unittest.TestCase):
             finally:
                 supervisor.cancel()
 
+    def test_worker_progress_allowlists_aggregate_report(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            directory = Path(raw)
+            progress = directory / "progress.json"
+            progress.write_text(
+                json.dumps(
+                    {
+                        "keys_tested": 123456,
+                        "keys_per_second": 789.5,
+                        "coverage_pct": 12.5,
+                        "private_key": "must never be carried forward",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            supervisor = WorkerSupervisor(
+                replace(synthetic_spec(directory, "run"), progress_file=progress),
+                objective_id="synthetic-progress",
+                job_id="job-progress",
+            )
+            try:
+                self.assertTrue(supervisor.start())
+                deadline = time.time() + 3
+                health = supervisor.observe()
+                while not health.healthy and time.time() < deadline:
+                    time.sleep(0.05)
+                    health = supervisor.observe()
+                snapshot = supervisor.snapshot()
+                self.assertEqual(snapshot["progress"]["kind"], "reported_progress")
+                self.assertEqual(snapshot["progress"]["keys_tested"], 123456)
+                self.assertEqual(snapshot["progress"]["coverage_pct"], 12.5)
+                self.assertNotIn("private_key", snapshot["progress"])
+                self.assertEqual(supervisor.events[-1]["metrics"]["keys_tested"], 123456)
+            finally:
+                supervisor.cancel()
+
+    def test_keyhunt_progress_probe_extracts_only_aggregate_values(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            output = Path(raw) / "keyhunt.stdout"
+            output.write_text(
+                "F: 0 GPU: 12.5 Mk/s C: 3.25 % R: 8 T: 1 234\n"
+                "candidate material is intentionally not parsed\n",
+                encoding="utf-8",
+            )
+            progress = keyhunt_progress_probe(output)
+            self.assertEqual(progress["hashrate_mkey_s"], 12.5)
+            self.assertEqual(progress["keys_per_second"], 12_500_000)
+            self.assertEqual(progress["coverage_pct"], 3.25)
+            self.assertEqual(progress["batch_number"], 8)
+            self.assertEqual(progress["keys_tested"], 1234)
+            self.assertEqual(progress["matches_found"], 0)
+            self.assertEqual(set(progress), {"hashrate_mkey_s", "keys_per_second", "coverage_pct", "batch_number", "keys_tested", "matches_found"})
+
     def test_healthy_worker_can_be_adopted_after_manager_restart(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             directory = Path(raw)
             spec = replace(
-                synthetic_spec(directory, "run"),
+                synthetic_spec(directory, "run", max_age=0.5),
                 pid_file=directory / "worker.pid.json",
                 startup_grace_s=0,
             )
@@ -203,7 +257,12 @@ class SupervisorTests(unittest.TestCase):
                     health = first.observe()
                 self.assertTrue(health.healthy, health.as_dict())
                 self.assertTrue(second.start())
-                self.assertTrue(second.observe().healthy)
+                second_health = second.observe()
+                deadline = time.time() + 3
+                while not second_health.healthy and time.time() < deadline:
+                    time.sleep(0.05)
+                    second_health = second.observe()
+                self.assertTrue(second_health.healthy, second_health.as_dict())
                 self.assertTrue(any(event["event_type"] == "worker_adopted" for event in second.events))
             finally:
                 second.cancel()
@@ -281,6 +340,9 @@ class TelemetryTests(unittest.TestCase):
             )
         self.assertEqual(decisions[0].action, "continue")
         self.assertEqual(coordinator.snapshot()[0]["tasks_completed"], 1)
+        self.assertEqual(coordinator.snapshot()[0]["last_reason"], "deterministic agent heartbeat")
+        self.assertEqual(coordinator.events[0]["message"], "deterministic agent heartbeat")
+        self.assertEqual(coordinator.events[0]["metrics"]["duration_s"], 0.0)
         self.assertEqual(coordinator.events[0]["event_type"], "agent_decision")
 
     def test_public_upload_rejects_pid_before_network_access(self) -> None:
@@ -368,8 +430,9 @@ class TelemetryTests(unittest.TestCase):
                     "manager_version": "0.2",
                     "status": "HEALTHY",
                     "objective": "synthetic reliability test",
-                    "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234}],
+                    "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234, "progress": {"kind": "reported_progress", "sample_count": 4, "keys_tested": 99, "private_key": "do not publish"}}],
                     "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "command": "do not publish"}],
+                    "agents": [{"id": "agent-1", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_duration_s": 0.4}],
                     "gpu": {"util_pct": 80, "power_w": 70, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
                 },
@@ -381,7 +444,7 @@ class TelemetryTests(unittest.TestCase):
                         "new_state": "RUNNING",
                         "action": "start",
                         "error": "C:\\Users\\lilli\\secret-token.txt",
-                        "metrics": {"util_pct": 80, "pid": 9999},
+                        "metrics": {"util_pct": 80, "keys_tested": 99, "pid": 9999},
                     }
                 ],
             )
@@ -391,8 +454,12 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("private_key", encoded)
             self.assertNotIn("command", encoded)
             self.assertNotIn("pid", encoded)
+            self.assertEqual(latest["workers"][0]["progress"]["keys_tested"], 99)
+            self.assertNotIn("private_key", json.dumps(latest))
+            self.assertEqual(latest["agents"][0]["last_reason"], "healthy")
             self.assertNotIn("C:\\", json.dumps(events))
             self.assertNotIn("pid", json.dumps(events))
+            self.assertEqual(events[0]["metrics"]["keys_tested"], 99)
             self.assertFalse(events[0]["error"] is False)
             self.assertEqual(latest["workers"][0]["state"], "RUNNING")
 

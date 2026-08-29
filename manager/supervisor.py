@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import math
 import os
 import subprocess
 import tempfile
@@ -18,6 +19,58 @@ from typing import Any, Callable, Mapping, Sequence
 def utc_now() -> str:
     """Return an unambiguous UTC timestamp for event records."""
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+_PROGRESS_NUMBER_KEYS = {
+    "progress_pct",
+    "coverage_pct",
+    "keys_tested",
+    "keys_per_second",
+    "hashrate_mkey_s",
+    "work_units_completed",
+    "work_units_total",
+    "units_per_second",
+    "batch_number",
+    "segment_index",
+    "segment_total",
+    "worker_tick",
+    "matches_found",
+}
+_PROGRESS_KEY_ALIASES = {
+    "progress": "progress_pct",
+    "progress_percent": "progress_pct",
+    "coverage": "coverage_pct",
+    "keys_checked": "keys_tested",
+    "keys_scanned": "keys_tested",
+    "keys_per_sec": "keys_per_second",
+    "hashrate": "hashrate_mkey_s",
+    "mkey_s": "hashrate_mkey_s",
+    "work_completed": "work_units_completed",
+    "work_total": "work_units_total",
+    "rate": "units_per_second",
+    "units_per_sec": "units_per_second",
+    "tick": "worker_tick",
+}
+
+
+def _safe_progress_values(value: Any) -> dict[str, int | float]:
+    """Keep only aggregate numeric progress fields from a worker report."""
+    if not isinstance(value, Mapping):
+        return {}
+    safe: dict[str, int | float] = {}
+    for raw_key, raw_value in value.items():
+        key = str(raw_key).strip().lower()
+        key = _PROGRESS_KEY_ALIASES.get(key, key)
+        if key not in _PROGRESS_NUMBER_KEYS or isinstance(raw_value, bool):
+            continue
+        try:
+            number = float(raw_value)
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(number):
+            continue
+        safe[key] = int(number) if number.is_integer() else number
+    return safe
 
 
 class JobState(str, Enum):
@@ -37,10 +90,11 @@ class JobState(str, Enum):
 class WorkerSpec:
     """Everything needed to start and verify one specialist worker.
 
-    ``heartbeat_file`` is deliberately a narrow progress contract. A process
+    ``heartbeat_file`` is deliberately a narrow liveness contract. A process
     being alive is never sufficient for a healthy result when a heartbeat is
-    configured. ``resource_probe`` can add a second external signal such as
-    GPU activity for workloads like KeyHunt.
+    configured. ``progress_file`` is an optional separate JSON report for
+    allowlisted aggregate work values. ``resource_probe`` can add a second
+    external signal such as GPU activity for workloads like KeyHunt.
     """
 
     worker_id: str
@@ -49,6 +103,8 @@ class WorkerSpec:
     cwd: Path | None = None
     env: Mapping[str, str] | None = None
     heartbeat_file: Path | None = None
+    progress_file: Path | None = None
+    progress_probe: Callable[[], Mapping[str, Any]] | None = None
     heartbeat_max_age_s: float = 30.0
     startup_grace_s: float = 5.0
     resource_probe: Callable[[], Mapping[str, Any]] | None = None
@@ -142,6 +198,7 @@ class HealthSignals:
     resource_active: bool
     heartbeat_age_s: float | None = None
     metrics: Mapping[str, Any] = field(default_factory=dict)
+    progress: Mapping[str, Any] = field(default_factory=dict)
 
     @property
     def healthy(self) -> bool:
@@ -154,6 +211,7 @@ class HealthSignals:
             "resource_active": self.resource_active,
             "heartbeat_age_s": self.heartbeat_age_s,
             "metrics": dict(self.metrics),
+            "progress": dict(self.progress),
             "healthy": self.healthy,
         }
 
@@ -189,6 +247,8 @@ class WorkerSupervisor:
         self.last_health: HealthSignals | None = None
         self._started_monotonic: float | None = None
         self._stream_handles: list[Any] = []
+        self._observation_count = 0
+        self._last_observed_at: str | None = None
 
     def _emit(
         self,
@@ -438,13 +498,53 @@ class WorkerSupervisor:
                 resource_active = False
                 metrics = {"probe_error": type(exc).__name__}
 
+        progress = self._read_progress()
+        if self.spec.progress_probe is not None:
+            try:
+                progress.update(_safe_progress_values(self.spec.progress_probe()))
+            except Exception:
+                pass
+
         return HealthSignals(
             process_alive=process_alive,
             heartbeat_fresh=heartbeat_fresh,
             resource_active=resource_active,
             heartbeat_age_s=heartbeat_age_s,
             metrics=metrics,
+            progress=progress,
         )
+
+    def _read_progress(self) -> dict[str, int | float]:
+        """Read only allowlisted aggregate values from an optional report."""
+        # Do not read the heartbeat file unless it is explicitly also exposed
+        # as a progress report. On Windows, opening a worker-owned heartbeat
+        # file can deny the atomic replace used by the worker itself.
+        path = self.spec.progress_file
+        if path is None or not path.is_file():
+            return {}
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            return {}
+        return _safe_progress_values(payload)
+
+    def _progress_snapshot(self, health: HealthSignals) -> dict[str, Any]:
+        uptime_s = None
+        if self._started_monotonic is not None:
+            uptime_s = round(max(0.0, time.monotonic() - self._started_monotonic), 1)
+        reported = dict(health.progress)
+        result: dict[str, Any] = {
+            "kind": "reported_progress" if reported else "verified_activity",
+            "source": "worker_log" if reported and self.spec.progress_probe else "worker_report" if reported else "resource_probe" if self.spec.resource_probe else "process",
+            "reported": bool(reported),
+            "active": health.resource_active if self.spec.resource_probe else health.process_alive,
+            "healthy": health.healthy,
+            "sample_count": self._observation_count,
+            "uptime_s": uptime_s,
+            "observed_at": self._last_observed_at or utc_now(),
+        }
+        result.update(reported)
+        return result
 
     @property
     def in_startup_grace(self) -> bool:
@@ -455,8 +555,27 @@ class WorkerSupervisor:
 
     def observe(self) -> HealthSignals:
         """Evaluate process, progress, and optional resource signals."""
+        self._observation_count += 1
+        self._last_observed_at = utc_now()
         health = self._read_health()
         self.last_health = health
+        progress = self._progress_snapshot(health)
+        event_metrics = dict(health.as_dict())
+        event_metrics.update(dict(health.metrics))
+        event_metrics.update(
+            {
+                "sample_count": self._observation_count,
+                "worker_uptime_s": progress["uptime_s"],
+                "progress_reported": progress["reported"],
+            }
+        )
+        event_metrics.update(
+            {
+                key: value
+                for key, value in health.progress.items()
+                if key in _PROGRESS_NUMBER_KEYS
+            }
+        )
         if self.state in {JobState.COMPLETE, JobState.CANCELLED, JobState.ESCALATED}:
             return health
 
@@ -474,13 +593,13 @@ class WorkerSupervisor:
             outcome = "missing_progress_or_resource_signal"
 
         if new_state != self.state:
-            self._transition(new_state, metrics=health.as_dict(), outcome=outcome)
+            self._transition(new_state, metrics=event_metrics, outcome=outcome)
         else:
             self._emit(
                 event_type="health_check",
                 previous_state=self.state,
                 new_state=self.state,
-                metrics=health.as_dict(),
+                metrics=event_metrics,
                 outcome=outcome,
             )
         return health
@@ -531,4 +650,5 @@ class WorkerSupervisor:
             "restart_count": self.restart_count,
             "pid": self.process.pid if self.process is not None and self.process.poll() is None else None,
             "health": health.as_dict(),
+            "progress": self._progress_snapshot(health),
         }

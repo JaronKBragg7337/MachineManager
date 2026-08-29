@@ -15,7 +15,7 @@ from .agents import AgentCoordinator
 from .capabilities import CapabilityRegistry
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
-from .probes import gpu_resource_ok, nvidia_smi_probe
+from .probes import gpu_resource_ok, keyhunt_progress_probe, nvidia_smi_probe
 from .public_upload import GitHubPagesPublisher, PublicUploadError
 from .scheduler import WorkScheduler
 from .state_store import StateStore
@@ -176,6 +176,11 @@ def _worker_spec(worker: Mapping[str, Any], *, config_path: Path) -> WorkerSpec:
         resource_probe = nvidia_smi_probe
         resource_ok = gpu_resource_ok
 
+    stdout_file = resolve_path(worker.get("stdout_file"), base=base)
+    progress_probe = None
+    if str(worker.get("type", "")).strip().lower() == "keyhunt" and stdout_file is not None:
+        progress_probe = lambda stdout_file=stdout_file: keyhunt_progress_probe(stdout_file)
+
     return WorkerSpec(
         worker_id=str(worker["id"]),
         worker_type=str(worker.get("type", "SpecialistWorker")),
@@ -183,12 +188,14 @@ def _worker_spec(worker: Mapping[str, Any], *, config_path: Path) -> WorkerSpec:
         cwd=resolve_path(worker.get("cwd"), base=base),
         env=worker.get("env"),
         heartbeat_file=resolve_path(worker.get("heartbeat_file"), base=base),
+        progress_file=resolve_path(worker.get("progress_file"), base=base),
+        progress_probe=progress_probe,
         heartbeat_max_age_s=float(worker.get("heartbeat_max_age_s", 30)),
         startup_grace_s=float(worker.get("startup_grace_s", 5)),
         resource_probe=resource_probe,
         resource_ok=resource_ok,
         pid_file=resolve_path(worker.get("pid_file"), base=base),
-        stdout_file=resolve_path(worker.get("stdout_file"), base=base),
+        stdout_file=stdout_file,
         stderr_file=resolve_path(worker.get("stderr_file"), base=base),
     )
 

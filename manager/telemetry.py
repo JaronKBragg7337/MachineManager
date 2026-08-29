@@ -53,6 +53,24 @@ PUBLIC_METRIC_KEYS = {
     "recovery_time_s",
     "tasks_completed",
     "fallback",
+    "duration_s",
+    "heartbeat_age_s",
+    "sample_count",
+    "worker_uptime_s",
+    "progress_reported",
+    "keys_tested",
+    "keys_per_second",
+    "hashrate_mkey_s",
+    "coverage_pct",
+    "progress_pct",
+    "work_units_completed",
+    "work_units_total",
+    "units_per_second",
+    "batch_number",
+    "segment_index",
+    "segment_total",
+    "worker_tick",
+    "matches_found",
 }
 PUBLIC_QUEUE_KEYS = {
     "QUEUED",
@@ -76,6 +94,43 @@ def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | 
             number = _number(value)
             if number is not None:
                 safe[clean_key] = number
+    return safe
+
+
+PUBLIC_PROGRESS_NUMBER_KEYS = {
+    "sample_count",
+    "uptime_s",
+    "keys_tested",
+    "keys_per_second",
+    "hashrate_mkey_s",
+    "coverage_pct",
+    "progress_pct",
+    "work_units_completed",
+    "work_units_total",
+    "units_per_second",
+    "batch_number",
+    "segment_index",
+    "segment_total",
+    "worker_tick",
+    "matches_found",
+}
+
+
+def _safe_progress(progress: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Allowlist aggregate work evidence without exposing worker internals."""
+    if not isinstance(progress, Mapping):
+        return {}
+    safe: dict[str, Any] = {}
+    for key in ("kind", "source", "observed_at"):
+        if key in progress:
+            safe[key] = _text(progress.get(key), max_len=80)
+    for key in ("reported", "active", "healthy"):
+        if isinstance(progress.get(key), bool):
+            safe[key] = progress[key]
+    for key in PUBLIC_PROGRESS_NUMBER_KEYS:
+        number = _number(progress.get(key))
+        if number is not None:
+            safe[key] = number
     return safe
 
 
@@ -118,6 +173,7 @@ class TelemetryPublisher:
                 "type": _text(worker.get("type", worker.get("worker_type"))),
                 "state": _text(worker.get("state"), default="UNKNOWN").upper(),
                 "owner": _text(worker.get("owner"), default="local-manager"),
+                "progress": _safe_progress(worker.get("progress")),
             }
             for worker in workers
         ]
@@ -128,6 +184,7 @@ class TelemetryPublisher:
                 "id": _text(job.get("id", "")),
                 "objective_id": _text(job.get("objective_id", "")),
                 "state": _text(job.get("state"), default="UNKNOWN").upper(),
+                "progress": _safe_progress(job.get("progress")),
             }
             for job in jobs
         ]
@@ -142,6 +199,8 @@ class TelemetryPublisher:
                 "state": _text(agent.get("state"), default="UNKNOWN", max_len=30).upper(),
                 "enabled": bool(agent.get("enabled", False)),
                 "last_action": _text(agent.get("last_action"), max_len=40),
+                "last_reason": _text(agent.get("last_reason"), max_len=160),
+                "last_duration_s": _number(agent.get("last_duration_s")),
                 "tasks_completed": _number(agent.get("tasks_completed")) or 0,
                 "last_run": _text(agent.get("last_run"), max_len=40),
                 "next_run": _text(agent.get("next_run"), max_len=40),
@@ -177,6 +236,8 @@ class TelemetryPublisher:
                     "type": event_type,
                     "state": state,
                     "message": message,
+                    "action": action,
+                    "outcome": outcome,
                     "metrics": _safe_metrics(event.get("metrics")),
                     "error": bool(event.get("error")),
                 }
@@ -215,17 +276,20 @@ class TelemetryPublisher:
             if number is not None:
                 gpu[target] = number
 
+        safe_workers = self._workers(snapshot.get("workers", []))
+        safe_jobs = self._jobs(snapshot.get("jobs", []))
         latest = {
             "manager_version": _text(snapshot.get("manager_version"), default="0.2", max_len=30),
             "status": _text(snapshot.get("status"), default="UNKNOWN", max_len=30).upper(),
             "objective": _text(snapshot.get("objective"), max_len=120),
             "objective_id": _text(snapshot.get("objective_id"), max_len=80),
-            "workers": self._workers(snapshot.get("workers", [])),
-            "jobs": self._jobs(snapshot.get("jobs", [])),
+            "workers": safe_workers,
+            "jobs": safe_jobs,
             "agents": self._agents(snapshot.get("agents", [])),
             "capabilities": self._capabilities(snapshot.get("capabilities", [])),
             "queue": _safe_queue(snapshot.get("queue")),
             "gpu": gpu,
+            "progress": safe_workers[0].get("progress", {}) if safe_workers else {},
             "notes": "Sanitized public telemetry only. No secrets or raw logs.",
             "updated": _text(snapshot.get("updated"), default=utc_now(), max_len=40),
         }

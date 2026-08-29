@@ -54,8 +54,18 @@ python -m manager.run --config path/to/local-config.json \
 
 The runner can publish compact dashboard files on each observation. The
 publisher allowlists worker/job identifiers, states, numeric GPU metrics, and
-short event metadata. It never copies raw logs, command lines, exception text,
-process paths, or credentials into `dashboard/data/`.
+short event metadata. It can also publish aggregate worker progress such as
+hashrate, tested work units, coverage, batch number, and observation uptime when
+the worker reports them. It never copies raw logs, command lines, exception
+text, process paths, candidate values, or credentials into `dashboard/data/`.
+
+The optional `progress_file` is a separate worker-owned JSON report. Only the
+allowlisted numeric progress fields are read; it should not be the same file as
+the liveness heartbeat on Windows because the worker may need to atomically
+replace its heartbeat file. KeyHunt jobs with a configured `stdout_file` use a
+bounded parser for its aggregate status line, so the public Search view can
+show real rate, coverage, batch, and tested-count evidence without publishing
+the raw stream.
 
 For the current Puzzle #71 experiment, keep the existing local launch
 configuration and separate experiment runtime outside this public repository
@@ -83,8 +93,10 @@ The runner stores local operational state in SQLite:
 The agents array provides bounded specialist slots. The Ollama adapter sends
 only a sanitized status context, requests strict JSON, disables GPU layers by
 default, and falls back to continue for empty, malformed, unavailable, or
-unsupported responses. Agent output is advisory; the supervisor still owns
-process control, retry limits, escalation, and secrets.
+unsupported responses. The public agent timeline records the bounded action,
+short reason, and duration; it does not publish private prompts or hidden
+reasoning. Agent output is advisory; the supervisor still owns process control,
+retry limits, escalation, and secrets.
 
 ## Public telemetry upload
 

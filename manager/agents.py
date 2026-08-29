@@ -182,6 +182,8 @@ class AgentCoordinator:
                 "state": "DISABLED" if not spec.enabled else "READY",
                 "enabled": spec.enabled,
                 "last_action": "",
+                "last_reason": "",
+                "last_duration_s": None,
                 "tasks_completed": 0,
                 "last_run": None,
                 "next_run": None,
@@ -191,6 +193,7 @@ class AgentCoordinator:
         self.events: list[dict[str, Any]] = []
         self._pending: dict[str, concurrent.futures.Future[AgentDecision]] = {}
         self._pending_snapshots: dict[str, dict[str, Any]] = {}
+        self._pending_started: dict[str, float] = {}
         self._executor = concurrent.futures.ThreadPoolExecutor(
             max_workers=max(1, len(self.specs)),
             thread_name_prefix="machine-manager-agent",
@@ -222,10 +225,13 @@ class AgentCoordinator:
         snapshot: Mapping[str, Any],
         decision: AgentDecision,
         error_name: str | None,
+        duration_s: float | None = None,
     ) -> AgentDecision:
         status = self._statuses[spec.agent_id]
         status["state"] = "READY" if error_name is None else "DEGRADED"
         status["last_action"] = decision.action
+        status["last_reason"] = decision.reason
+        status["last_duration_s"] = duration_s
         status["tasks_completed"] = int(status["tasks_completed"]) + 1
         status["last_run"] = utc_now()
         status["next_run"] = self._next_run(spec.interval_s)
@@ -243,9 +249,11 @@ class AgentCoordinator:
                 "metrics": {
                     "tasks_completed": status["tasks_completed"],
                     "fallback": decision.fallback,
+                    "duration_s": duration_s,
                 },
                 "action": decision.action,
                 "outcome": "fallback" if decision.fallback else "recommendation",
+                "message": decision.reason,
                 "artifact_refs": [],
                 "error": error_name,
                 "duration": None,
@@ -270,7 +278,9 @@ class AgentCoordinator:
                     True,
                 )
                 error_name = type(exc).__name__
-            decisions.append(self._record(spec, snapshot, decision, error_name))
+            started = self._pending_started.pop(agent_id, None)
+            duration_s = None if started is None else round(max(0.0, time.monotonic() - started), 3)
+            decisions.append(self._record(spec, snapshot, decision, error_name, duration_s))
             del self._pending[agent_id]
             self._pending_snapshots.pop(agent_id, None)
 
@@ -302,7 +312,9 @@ class AgentCoordinator:
                 future = self._executor.submit(self._ask, spec, dict(snapshot), event_list)
                 self._pending[spec.agent_id] = future
                 self._pending_snapshots[spec.agent_id] = dict(snapshot)
+                self._pending_started[spec.agent_id] = time.monotonic()
                 continue
+            started = time.monotonic()
             try:
                 decision = self._ask(spec, snapshot, event_list)
                 error_name = None
@@ -313,7 +325,8 @@ class AgentCoordinator:
                     True,
                 )
                 error_name = type(exc).__name__
-            decisions.append(self._record(spec, snapshot, decision, error_name))
+            duration_s = round(max(0.0, time.monotonic() - started), 3)
+            decisions.append(self._record(spec, snapshot, decision, error_name, duration_s))
         return decisions
 
     def close(self) -> None:
