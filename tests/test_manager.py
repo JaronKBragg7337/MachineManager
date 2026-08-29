@@ -230,6 +230,18 @@ class SupervisorTests(unittest.TestCase):
             self.assertEqual(progress["matches_found"], 0)
             self.assertEqual(set(progress), {"hashrate_mkey_s", "keys_per_second", "coverage_pct", "batch_number", "keys_tested", "matches_found"})
 
+    def test_keyhunt_progress_probe_ignores_truncated_tail_status(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            output = Path(raw) / "keyhunt.stdout"
+            output.write_text(
+                "F: 0 GPU: 12.5 Mk/s C: 3.25 % R: 8 T: 123456\n"
+                "F: 0 GPU: 12.5 Mk/s C: 3.25 % R: 9 T: 9,8",
+                encoding="utf-8",
+            )
+            progress = keyhunt_progress_probe(output)
+            self.assertEqual(progress["batch_number"], 8)
+            self.assertEqual(progress["keys_tested"], 123456)
+
     def test_healthy_worker_can_be_adopted_after_manager_restart(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             directory = Path(raw)

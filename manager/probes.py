@@ -77,6 +77,12 @@ def keyhunt_progress_probe(path: Path, *, max_bytes: int = 262_144) -> dict[str,
     except (OSError, ValueError):
         return {}
 
+    # The bounded tail can end halfway through a status line while KeyHunt is
+    # writing it. Never publish a partial cumulative counter from that line.
+    if text and not text.endswith(("\n", "\r")):
+        last_break = max(text.rfind("\n"), text.rfind("\r"))
+        text = text[: last_break + 1] if last_break >= 0 else ""
+
     matches = list(_KEYHUNT_STATUS.finditer(text))
     if not matches:
         return {}
