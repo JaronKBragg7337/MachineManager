@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-29T04:44:59.431Z",
+        "observed_at": "2026-08-29T04:49:27.670Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "matches_found": 0,
+        "sample_count": 4,
+        "keys_per_second": 794200000,
+        "batch_number": 3083,
+        "keys_tested": 9997928890368,
+        "uptime_s": 48.2,
         "coverage_pct": 0,
-        "uptime_s": 301.8,
-        "keys_per_second": 795400000,
-        "hashrate_mkey_s": 795.4,
-        "keys_tested": 9776016654336,
-        "sample_count": 20,
-        "batch_number": 3015
+        "matches_found": 0,
+        "hashrate_mkey_s": 794.2
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-29T04:44:59.431Z",
+        "observed_at": "2026-08-29T04:49:27.670Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "matches_found": 0,
+        "sample_count": 4,
+        "keys_per_second": 794200000,
+        "batch_number": 3083,
+        "keys_tested": 9997928890368,
+        "uptime_s": 48.2,
         "coverage_pct": 0,
-        "uptime_s": 301.8,
-        "keys_per_second": 795400000,
-        "hashrate_mkey_s": 795.4,
-        "keys_tested": 9776016654336,
-        "sample_count": 20,
-        "batch_number": 3015
+        "matches_found": 0,
+        "hashrate_mkey_s": 794.2
       }
     }
   ],
@@ -56,14 +56,14 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is healthy with no errors or resource constraints.",
-      "last_duration_s": 4.094,
+      "last_reason": "System is healthy and operating within normal parameters for the Bitcoin Puzzle objective.",
+      "last_duration_s": 4.296,
       "tasks_completed": 1,
-      "last_run": "2026-08-29T04:40:14.621Z",
-      "next_run": "2026-08-29T04:45:14.621Z"
+      "last_run": "2026-08-29T04:48:56.555Z",
+      "next_run": "2026-08-29T04:53:56.555Z"
     }
   ],
   "capabilities": [
@@ -105,28 +105,28 @@
   ],
   "queue": {},
   "gpu": {
-    "util_pct": 77.0,
+    "util_pct": 85.0,
     "mem_used_mib": 2376.0,
     "mem_total_mib": 8188.0,
     "temp_c": 63.0,
-    "power_w": 82.43
+    "power_w": 81.96
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-29T04:44:59.431Z",
+    "observed_at": "2026-08-29T04:49:27.670Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "matches_found": 0,
+    "sample_count": 4,
+    "keys_per_second": 794200000,
+    "batch_number": 3083,
+    "keys_tested": 9997928890368,
+    "uptime_s": 48.2,
     "coverage_pct": 0,
-    "uptime_s": 301.8,
-    "keys_per_second": 795400000,
-    "hashrate_mkey_s": 795.4,
-    "keys_tested": 9776016654336,
-    "sample_count": 20,
-    "batch_number": 3015
+    "matches_found": 0,
+    "hashrate_mkey_s": 794.2
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-29T04:44:59.910Z"
+  "updated": "2026-08-29T04:49:28.222Z"
 }
