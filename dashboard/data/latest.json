@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-29T22:07:24.579Z",
+        "observed_at": "2026-08-29T22:13:23.363Z",
         "reported": true,
         "active": false,
         "healthy": false,
+        "hashrate_mkey_s": 793.59,
+        "keys_per_second": 793590000,
+        "batch_number": 50,
         "matches_found": 0,
-        "keys_per_second": 794540000,
-        "uptime_s": 0.6,
-        "batch_number": 138,
-        "sample_count": 1,
         "coverage_pct": 0,
-        "keys_tested": 450971566080,
-        "hashrate_mkey_s": 794.54
+        "uptime_s": 0.6,
+        "sample_count": 1,
+        "keys_tested": 157085073408
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-29T22:07:24.579Z",
+        "observed_at": "2026-08-29T22:13:23.363Z",
         "reported": true,
         "active": false,
         "healthy": false,
+        "hashrate_mkey_s": 793.59,
+        "keys_per_second": 793590000,
+        "batch_number": 50,
         "matches_found": 0,
-        "keys_per_second": 794540000,
-        "uptime_s": 0.6,
-        "batch_number": 138,
-        "sample_count": 1,
         "coverage_pct": 0,
-        "keys_tested": 450971566080,
-        "hashrate_mkey_s": 794.54
+        "uptime_s": 0.6,
+        "sample_count": 1,
+        "keys_tested": 157085073408
       }
     }
   ],
@@ -106,27 +106,27 @@
   "queue": {},
   "gpu": {
     "util_pct": 0.0,
-    "mem_used_mib": 0.0,
+    "mem_used_mib": 9.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 35.0,
-    "power_w": 10.85
+    "temp_c": 53.0,
+    "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-29T22:07:24.579Z",
+    "observed_at": "2026-08-29T22:13:23.363Z",
     "reported": true,
     "active": false,
     "healthy": false,
+    "hashrate_mkey_s": 793.59,
+    "keys_per_second": 793590000,
+    "batch_number": 50,
     "matches_found": 0,
-    "keys_per_second": 794540000,
-    "uptime_s": 0.6,
-    "batch_number": 138,
-    "sample_count": 1,
     "coverage_pct": 0,
-    "keys_tested": 450971566080,
-    "hashrate_mkey_s": 794.54
+    "uptime_s": 0.6,
+    "sample_count": 1,
+    "keys_tested": 157085073408
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-29T22:07:25.159Z"
+  "updated": "2026-08-29T22:13:23.997Z"
 }
