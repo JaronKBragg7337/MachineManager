@@ -4,11 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07111f">
-  <meta name="description" content="Machine Manager public read-only operations view for autonomous jobs, workers, agents, evaluations, and research.">
+  <meta name="description" content="Machine Manager Mission Control: a public, read-only view of verified worker activity, result gates, agents, and machine telemetry.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <meta property="og:title" content="Machine Manager | Public Operations View">
-  <meta property="og:description" content="A public, read-only view of sanitized Machine Manager telemetry.">
-  <title>Machine Manager | Public Operations View</title>
+  <meta property="og:title" content="Machine Manager | Public Mission Control">
+  <meta property="og:description" content="A public, read-only view of verified worker activity, agents, result gates, and sanitized machine telemetry.">
+  <meta property="og:image" content="https://jaronkbragg7337.github.io/MachineManager/dashboard/og.png">
+  <meta property="og:image:alt" content="Machine Manager public mission control with connected supervisor, GPU search, verification, AI support, and dashboard stations.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Machine Manager | Public Mission Control">
+  <meta name="twitter:description" content="A public, read-only view of verified worker activity, agents, result gates, and sanitized machine telemetry.">
+  <meta name="twitter:image" content="https://jaronkbragg7337.github.io/MachineManager/dashboard/og.png">
+  <title>Machine Manager | Public Mission Control</title>
   <style>
     :root {
       --bg: #07111f;
@@ -428,6 +434,65 @@
     .progress-note { margin-top: 15px; padding: 13px 14px; border-left: 2px solid var(--violet); color: var(--muted); background: rgba(164, 138, 255, .06); font-size: 11px; line-height: 1.55; }
     .progress-note strong { color: var(--text); }
 
+    /* Mission Control: a data-driven spatial view of the active runtime. */
+    .mission-layout { display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(310px, .72fr); gap: 16px; }
+    .mission-room { position: relative; overflow: hidden; border: 1px solid rgba(55, 222, 235, .34); border-radius: var(--radius); background: radial-gradient(circle at 50% -15%, rgba(55, 222, 235, .17), transparent 31rem), linear-gradient(145deg, rgba(12, 43, 69, .98), rgba(6, 21, 38, .99)); box-shadow: var(--shadow); }
+    .mission-room::after { position: absolute; right: -110px; bottom: -120px; width: 330px; height: 330px; border: 1px solid rgba(55, 222, 235, .11); border-radius: 50%; box-shadow: 0 0 0 28px rgba(55, 222, 235, .018), 0 0 0 56px rgba(55, 222, 235, .012); content: ""; pointer-events: none; }
+    .mission-map { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; min-height: 400px; padding: 18px; background-image: linear-gradient(rgba(101, 177, 229, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(101, 177, 229, .045) 1px, transparent 1px); background-size: 28px 28px; }
+    .mission-wiring { position: absolute; inset: 25px; z-index: 0; width: calc(100% - 50px); height: calc(100% - 50px); pointer-events: none; }
+    .mission-wiring path { fill: none; stroke: rgba(76, 151, 204, .34); stroke-width: 1.25; stroke-linecap: round; }
+    .mission-wiring path.flow-active { stroke: rgba(55, 222, 235, .74); stroke-dasharray: 7 12; animation: route-flow 1.8s linear infinite; filter: drop-shadow(0 0 4px rgba(55, 222, 235, .35)); }
+    .mission-wiring path.flow-ready { stroke: rgba(164, 138, 255, .58); stroke-dasharray: 3 8; }
+    @keyframes route-flow { to { stroke-dashoffset: -38; } }
+    .system-station { position: relative; z-index: 1; display: flex; min-width: 0; min-height: 172px; flex-direction: column; justify-content: space-between; padding: 15px; border: 1px solid rgba(49, 109, 160, .6); border-radius: 14px; background: linear-gradient(155deg, rgba(16, 46, 75, .96), rgba(7, 24, 43, .95)); box-shadow: inset 0 1px rgba(255,255,255,.055), 0 12px 30px rgba(0,0,0,.12); }
+    .system-station.active { border-color: rgba(55, 222, 235, .58); box-shadow: inset 0 1px rgba(255,255,255,.09), 0 0 0 1px rgba(55, 222, 235, .08), 0 0 30px rgba(55, 222, 235, .09); }
+    .system-station.watch { border-color: rgba(164, 138, 255, .5); }
+    .system-station.standby { border-color: rgba(145, 167, 196, .28); background: linear-gradient(155deg, rgba(13, 33, 55, .88), rgba(6, 19, 34, .94)); }
+    .station-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 9px; }
+    .station-icon { display: grid; width: 29px; height: 29px; flex: 0 0 auto; place-items: center; border: 1px solid rgba(55, 222, 235, .3); border-radius: 9px; color: var(--cyan); background: rgba(55, 222, 235, .08); }
+    .station-icon svg { width: 15px; height: 15px; }
+    .watch .station-icon { border-color: rgba(164, 138, 255, .35); color: #c8bcff; background: rgba(164, 138, 255, .08); }
+    .standby .station-icon { border-color: rgba(145, 167, 196, .22); color: var(--muted); background: rgba(145, 167, 196, .05); }
+    .station-kicker { margin: 10px 0 0; color: var(--muted-2); font-size: 8px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+    .system-station h3 { margin: 4px 0 0; color: var(--text); font-size: 15px; letter-spacing: -.025em; overflow-wrap: anywhere; }
+    .station-copy { min-height: 31px; margin: 7px 0 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .station-signal { display: flex; align-items: baseline; justify-content: space-between; gap: 9px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(57, 105, 149, .38); }
+    .station-signal span { color: var(--muted-2); font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .station-signal strong { color: var(--cyan); font: 700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align: right; overflow-wrap: anywhere; }
+    .watch .station-signal strong { color: #c8bcff; }
+    .standby .station-signal strong { color: var(--muted); }
+    .mission-side { display: grid; gap: 16px; }
+    .mission-summary { padding: 19px; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(15, 38, 67, .93), rgba(8, 24, 43, .96)); box-shadow: var(--shadow); }
+    .mission-summary h2 { margin: 7px 0 7px; font-size: 21px; letter-spacing: -.035em; }
+    .mission-summary p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .live-readings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 17px; }
+    .live-reading { padding: 11px; border: 1px solid var(--line-soft); border-radius: 10px; background: rgba(4, 17, 33, .5); }
+    .live-reading span { display: block; color: var(--muted-2); font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .live-reading strong { display: block; margin-top: 5px; color: var(--text); font-size: 15px; letter-spacing: -.03em; overflow-wrap: anywhere; }
+    .live-reading.accent strong { color: var(--cyan); }
+    .live-reading.success strong { color: var(--green); }
+    .result-path { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 16px; }
+    .result-step { position: relative; min-height: 102px; padding: 13px 10px; border: 1px solid var(--line-soft); border-radius: 11px; background: rgba(5, 20, 39, .5); }
+    .result-step::after { position: absolute; top: 50%; right: -7px; z-index: 2; width: 7px; height: 1px; background: rgba(77, 146, 197, .62); content: ""; }
+    .result-step:last-child::after { display: none; }
+    .result-step.current { border-color: rgba(55, 222, 235, .5); background: rgba(55, 222, 235, .07); }
+    .result-step.waiting { border-color: rgba(164, 138, 255, .27); }
+    .result-step span { display: block; color: var(--muted-2); font-size: 8px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .result-step strong { display: block; margin-top: 8px; color: var(--text); font-size: 11px; line-height: 1.25; }
+    .result-step small { display: block; margin-top: 6px; color: var(--muted); font-size: 9px; line-height: 1.4; }
+    .journal-list { display: grid; gap: 0; }
+    .journal-row { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 11px; align-items: start; padding: 13px 0; border-bottom: 1px solid rgba(39, 79, 119, .43); }
+    .journal-row:last-child { border-bottom: 0; }
+    .journal-glyph { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid rgba(55, 222, 235, .27); border-radius: 9px; color: var(--cyan); background: rgba(55, 222, 235, .07); }
+    .journal-glyph.agent { border-color: rgba(164, 138, 255, .32); color: #c8bcff; background: rgba(164, 138, 255, .07); }
+    .journal-glyph.publish { border-color: rgba(77, 228, 155, .3); color: var(--green); background: rgba(77, 228, 155, .06); }
+    .journal-glyph svg { width: 14px; height: 14px; }
+    .journal-copy strong { display: block; color: var(--text); font-size: 11px; }
+    .journal-copy p { margin: 4px 0 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .journal-time { color: var(--muted-2); font: 9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
+    .truth-note { margin-top: 15px; padding: 11px 12px; border-left: 2px solid var(--cyan); color: var(--muted); background: rgba(55, 222, 235, .05); font-size: 10px; line-height: 1.5; }
+    .truth-note strong { color: var(--text); }
+
     .error-state, .loading-state { padding: 54px 22px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--muted); background: rgba(8, 24, 43, .78); text-align: center; }
     .error-state h2, .loading-state h2 { margin: 0 0 8px; color: var(--text); font-size: 20px; }
     .error-state p, .loading-state p { max-width: 520px; margin: 0 auto 18px; font-size: 12px; line-height: 1.5; }
@@ -437,6 +502,7 @@
     .footer a { color: var(--cyan); }
     .footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
     .mobile-nav { display: none; }
+    .mobile-menu-panel { display: none; }
 
     @media (max-width: 1120px) {
       .main-content { padding-right: 22px; padding-left: 22px; }
@@ -485,6 +551,9 @@
       .heading-actions { justify-content: flex-start; }
       .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .progress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mission-layout { grid-template-columns: 1fr; }
+      .mission-map { grid-template-columns: repeat(2, minmax(0, 1fr)); min-height: 0; }
+      .mission-wiring { display: none; }
       .jobs-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .worker-cards, .agent-cards, .blueprint-grid { grid-template-columns: 1fr; }
       .evaluation-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -500,6 +569,10 @@
       .resource-card, .kpi-card { padding: 11px; }
       .resource-value { font-size: 20px; }
       .kpi-value { font-size: 21px; }
+      .mission-map { grid-template-columns: 1fr; padding: 14px; }
+      .system-station { min-height: 0; }
+      .result-path { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .result-step:nth-child(2)::after { display: none; }
       .jobs-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .lifecycle { gap: 1px; }
       .life-step { font-size: 7px; letter-spacing: .02em; }
@@ -513,17 +586,17 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar" aria-label="Primary navigation">
-      <a class="brand" href="#/overview" aria-label="Machine Manager overview">
+      <a class="brand" href="#/overview" aria-label="Machine Manager Mission Control">
         <span class="brand-mark">MM</span>
         <span class="brand-copy"><strong>MACHINE<br>MANAGER</strong><small>PUBLIC OPERATIONS</small></span>
       </a>
       <div class="sidebar-rule"></div>
       <p class="nav-label">Workspace</p>
       <nav class="primary-nav" aria-label="Workspace">
-        <a href="#/overview" data-route="overview"><span class="nav-icon" data-icon="grid"></span><span>Overview</span><span class="nav-arrow">›</span></a>
+        <a href="#/overview" data-route="overview"><span class="nav-icon" data-icon="grid"></span><span>Mission Control</span><span class="nav-arrow">›</span></a>
         <a href="#/jobs" data-route="jobs"><span class="nav-icon" data-icon="briefcase"></span><span>Jobs</span><span class="nav-arrow">›</span></a>
         <a href="#/workers" data-route="workers"><span class="nav-icon" data-icon="cpu"></span><span>Workers</span><span class="nav-arrow">›</span></a>
-        <a href="#/search" data-route="search"><span class="nav-icon" data-icon="target"></span><span>Search</span><span class="nav-arrow">›</span></a>
+        <a href="#/search" data-route="search"><span class="nav-icon" data-icon="target"></span><span>Search Evidence</span><span class="nav-arrow">›</span></a>
         <a href="#/agents" data-route="agents"><span class="nav-icon" data-icon="bot"></span><span>Agents</span><span class="nav-arrow">›</span></a>
         <a href="#/evaluations" data-route="evaluations"><span class="nav-icon" data-icon="chart"></span><span>Evaluations</span><span class="nav-arrow">›</span></a>
         <a href="#/research" data-route="research"><span class="nav-icon" data-icon="flask"></span><span>Research</span><span class="nav-arrow">›</span></a>
@@ -536,7 +609,7 @@
     </aside>
 
     <nav class="mobile-nav" aria-label="Quick navigation">
-      <a href="#/overview" data-route="overview"><span data-icon="grid"></span><span>Overview</span></a>
+      <a href="#/overview" data-route="overview"><span data-icon="grid"></span><span>Control</span></a>
       <a href="#/search" data-route="search"><span data-icon="target"></span><span>Search</span></a>
       <a href="#/agents" data-route="agents"><span data-icon="bot"></span><span>Agents</span></a>
       <a href="#/activity" data-route="activity"><span data-icon="activity"></span><span>Activity</span></a>
@@ -555,10 +628,10 @@
         </div>
       </header>
       <div class="mobile-menu-panel" id="mobileMenuPanel">
-        <a href="#/overview" data-route="overview">Overview</a>
+        <a href="#/overview" data-route="overview">Mission Control</a>
         <a href="#/jobs" data-route="jobs">Jobs</a>
         <a href="#/workers" data-route="workers">Workers</a>
-        <a href="#/search" data-route="search">Search</a>
+        <a href="#/search" data-route="search">Search Evidence</a>
         <a href="#/agents" data-route="agents">Agents</a>
         <a href="#/evaluations" data-route="evaluations">Evaluations</a>
         <a href="#/research" data-route="research">Research</a>
@@ -574,10 +647,10 @@
     "use strict";
 
     const routes = {
-      overview: { label: "Overview", eyebrow: "Command center" },
+      overview: { label: "Mission Control", eyebrow: "Live system map" },
       jobs: { label: "Jobs", eyebrow: "Work registry" },
       workers: { label: "Workers", eyebrow: "Execution layer" },
-      search: { label: "Search", eyebrow: "Bitcoin workstream" },
+      search: { label: "Search Evidence", eyebrow: "Bitcoin workstream" },
       agents: { label: "Agents", eyebrow: "Bounded specialists" },
       evaluations: { label: "Evaluations", eyebrow: "Reference and manager runs" },
       research: { label: "Research", eyebrow: "Future workstreams" },
@@ -760,6 +833,7 @@
     function compactNumber(value) {
       const number = numberValue(value);
       if (number === null) return "--";
+      if (Math.abs(number) >= 1000000000000) return (number / 1000000000000).toFixed(1).replace(/\.0$/, "") + "T";
       if (Math.abs(number) >= 1000000000) return (number / 1000000000).toFixed(1).replace(/\.0$/, "") + "B";
       if (Math.abs(number) >= 1000000) return (number / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
       if (Math.abs(number) >= 1000) return (number / 1000).toFixed(1).replace(/\.0$/, "") + "K";
@@ -849,7 +923,8 @@
       ];
       const chips = definitions.map(function (definition) {
         const value = numberValue(metrics[definition[0]]);
-        return value === null ? "" : '<span class="event-metric">' + escapeHtml(definition[2] + " " + compactNumber(value) + definition[1]) + '</span>';
+        if (value === null || (definition[0] === "coverage_pct" && value <= 0)) return "";
+        return '<span class="event-metric">' + escapeHtml(definition[2] + " " + compactNumber(value) + definition[1]) + '</span>';
       }).filter(Boolean);
       if (typeof metrics.progress_reported === "boolean") chips.push('<span class="event-metric">Progress ' + (metrics.progress_reported ? "reported" : "activity") + '</span>');
       return chips.length ? '<div class="event-metrics">' + chips.join("") + '</div>' : "";
@@ -879,7 +954,7 @@
       return '<section class="panel"><div class="panel-head"><h2>RECENT ACTIVITY</h2>' + (withFilters ? filters : '<span class="subhead">' + escapeHtml(String(dataSets().events.length)) + ' published events</span>') + '</div><div class="panel-body"><div class="event-list">' + (events.length ? events.map(eventRow).join("") : '<div class="empty-cell">No events match this filter.</div>') + "</div></div></section>";
     }
 
-    function renderOverview() {
+    function renderLegacyOverview() {
       const latest = state.latest || {};
       const sets = dataSets();
       const job = currentJob();
@@ -900,6 +975,86 @@
         '<div class="kpi-grid"><div class="kpi-card accent"><span class="label">Active jobs</span><div class="kpi-value">' + escapeHtml(String(sets.jobs.length)) + '</div><div class="kpi-note">' + escapeHtml(String(runningCount(sets.jobs))) + ' running now</div></div><div class="kpi-card success"><span class="label">Workers</span><div class="kpi-value">' + escapeHtml(String(sets.workers.length)) + '</div><div class="kpi-note">' + escapeHtml(String(runningCount(sets.workers))) + ' reporting active</div></div><div class="kpi-card"><span class="label">Agents</span><div class="kpi-value">' + escapeHtml(String(sets.agents.length)) + '</div><div class="kpi-note">' + escapeHtml(String(sets.agents.reduce(function (sum, agent) { return sum + (numberValue(agent.tasks_completed) || 0); }, 0))) + ' bounded tasks completed</div></div><div class="kpi-card ' + (passes.total && passes.rate === 100 ? "success" : "warn") + '"><span class="label">Evaluation pass rate</span><div class="kpi-value">' + escapeHtml(passes.total ? String(passes.rate) + "%" : "--") + '</div><div class="kpi-note">' + escapeHtml(passes.total ? String(passes.pass) + "/" + String(passes.total) + " published scenarios" : "No scenarios published") + "</div></div></div>" +
         '<div class="section-grid"><section class="panel"><div class="panel-head"><h2>WORKERS</h2><span class="subhead">' + escapeHtml(String(sets.workers.length)) + ' registered</span></div><div class="panel-body">' + renderWorkersTable(sets.workers) + '<a class="panel-link" href="#/workers">View worker health →</a></div></section><section class="panel"><div class="panel-head"><h2>AGENTS</h2><span class="subhead">bounded specialists</span></div><div class="panel-body">' + renderAgentsTable(sets.agents) + '<a class="panel-link" href="#/agents">View agent activity →</a></div></section></div>' +
         '<div class="section-grid"><div>' + renderEventPanel(7, false) + '</div><section class="panel"><div class="panel-head"><h2>CAPABILITY SURFACE</h2><span class="subhead">' + escapeHtml(String(sets.capabilities.filter(function (item) { return item.enabled; }).length)) + '/' + escapeHtml(String(sets.capabilities.length)) + ' enabled</span></div><div class="panel-body">' + renderCapabilities(sets.capabilities.slice(0, 5)) + '<a class="panel-link" href="#/operations">View runtime details →</a></div></section></div>';
+    }
+
+    function missionRate(progress) {
+      const direct = numberValue(progress.keys_per_second);
+      if (direct !== null) return compactNumber(direct) + "/s";
+      const mkeys = numberValue(progress.hashrate_mkey_s);
+      return mkeys === null ? "Not reported" : compactNumber(mkeys) + " MKey/s";
+    }
+
+    function missionStation(config) {
+      const visualTone = config.visualTone === "active" ? "active" : config.visualTone === "watch" ? "watch" : "standby";
+      return '<article class="system-station ' + visualTone + '"><div><div class="station-top"><span class="station-icon" data-icon="' + escapeHtml(config.icon || "grid") + '"></span>' + badge(config.state || "UNKNOWN", config.badgeLabel) + '</div><p class="station-kicker">' + escapeHtml(config.kicker || "System station") + '</p><h3>' + escapeHtml(config.title || "Unnamed station") + '</h3><p class="station-copy">' + escapeHtml(config.copy || "No public detail is available for this station.") + '</p></div><div class="station-signal"><span>' + escapeHtml(config.signalLabel || "Signal") + '</span><strong>' + escapeHtml(config.signal || "--") + '</strong></div></article>';
+    }
+
+    function missionReading(label, value, className) {
+      return '<div class="live-reading ' + (className || "") + '"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(value) + '</strong></div>';
+    }
+
+    function journalRow(iconName, className, title, copy, timestamp) {
+      return '<article class="journal-row"><span class="journal-glyph ' + (className || "") + '" data-icon="' + escapeHtml(iconName) + '"></span><div class="journal-copy"><strong>' + escapeHtml(title) + '</strong><p>' + escapeHtml(copy) + '</p></div><time class="journal-time">' + escapeHtml(relative(timestamp)) + '</time></article>';
+    }
+
+    function renderMissionMap(latest, sets, worker, progress) {
+      const active = progress.active === true || upper(worker.state) === "RUNNING";
+      const agent = sets.agents[0] || {};
+      const matching = numberValue(progress.matches_found);
+      const matchSignal = matching === null ? "Awaiting report" : matching > 0 ? String(Math.round(matching)) + " signal(s)" : "No match reported";
+      const current = freshness();
+      const healthChecks = sets.events.filter(function (event) { return String(event.type || "").toLowerCase().includes("health"); }).length;
+      const activeFlow = active ? "flow-active" : "";
+      return '<section class="mission-room"><div class="panel-head"><h2>LIVE MACHINE ROOM</h2><span class="subhead">Every station is driven by published telemetry</span></div><div class="mission-map" aria-label="Live systems map"><svg class="mission-wiring" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true"><path class="' + activeFlow + '" d="M167 103 H500"></path><path class="' + activeFlow + '" d="M500 103 H833"></path><path class="flow-ready" d="M167 315 H500"></path><path class="flow-ready" d="M500 315 H833"></path><path class="' + activeFlow + '" d="M500 103 V315"></path></svg>' +
+        missionStation({ icon: "settings", kicker: "Supervisor", title: "Machine Manager", state: latest.status || "UNKNOWN", copy: "Checks process state, heartbeat, GPU activity, and reported work before calling the job healthy.", signalLabel: "Health records", signal: String(healthChecks) + " published", visualTone: upper(latest.status) === "HEALTHY" ? "active" : "watch" }) +
+        missionStation({ icon: "cpu", kicker: "Primary worker", title: worker.id || "GPU search worker", state: worker.state || "UNKNOWN", copy: "Tests candidate batches in the active puzzle range. Only aggregate evidence is published.", signalLabel: "Reported rate", signal: missionRate(progress), visualTone: active ? "active" : "watch" }) +
+        missionStation({ icon: "target", kicker: "Verification gate", title: "Result Gate", state: matching && matching > 0 ? "VERIFYING" : "WATCHING", badgeLabel: matching && matching > 0 ? "VERIFYING" : "WATCHING", copy: "A possible signal is independently re-derived before any result is treated as real.", signalLabel: "Current result", signal: matchSignal, visualTone: "watch" }) +
+        missionStation({ icon: "flask", kicker: "Future work", title: "Research Bay", state: "STANDBY", copy: "Reserved for the next bounded research or revenue-oriented objective. Nothing is pretending to run here yet.", signalLabel: "Queue", signal: "Ready for objective", visualTone: "standby" }) +
+        missionStation({ icon: "bot", kicker: "Support specialist", title: agent.id || "AI reviewer", state: agent.state || "STANDBY", copy: agent.last_reason || "No bounded recommendation has been published yet.", signalLabel: "Last action", signal: agent.last_action || "Awaiting run", visualTone: agent.enabled ? "watch" : "standby" }) +
+        missionStation({ icon: "activity", kicker: "Public evidence", title: "Dashboard Publisher", state: current.label, copy: "Publishes sanitized work evidence so the public page shows what the system is actually doing.", signalLabel: "Snapshot", signal: relative(latest.updated), visualTone: current.key === "fresh" ? "active" : "watch" }) +
+        '</div></section>';
+    }
+
+    function renderResultPath(progress, active) {
+      const matching = numberValue(progress.matches_found);
+      const hasSignal = matching !== null && matching > 0;
+      return '<section class="panel"><div class="panel-head"><h2>HOW A REAL RESULT BECOMES TRUSTWORTHY</h2><span class="subhead">No fake completion claim</span></div><div class="panel-body"><div class="result-path"><div class="result-step ' + (active ? "current" : "") + '"><span>01 · Work</span><strong>Candidate batches tested</strong><small>Aggregate work is observed; raw candidate material stays local.</small></div><div class="result-step ' + (active ? "current" : "") + '"><span>02 · Compare</span><strong>Target address check</strong><small>Normal outcome: no target match reported.</small></div><div class="result-step ' + (hasSignal ? "current" : "waiting") + '"><span>03 · Verify</span><strong>Independent re-derivation</strong><small>' + escapeHtml(hasSignal ? "A signal requires a separate confirmation." : "Opens only if a potential signal appears.") + '</small></div><div class="result-step ' + (hasSignal ? "current" : "waiting") + '"><span>04 · Alert</span><strong>Verified-result record</strong><small>A real result is never exposed as a raw key on this public page.</small></div></div><div class="truth-note"><strong>What you are seeing:</strong> real system activity and safe aggregate work evidence. A moving visual is tied to a manager record, not a made-up progress animation.</div></div></section>';
+    }
+
+    function renderWorkJournal(latest, sets, worker, progress) {
+      const active = progress.active === true || upper(worker.state) === "RUNNING";
+      const agent = sets.agents[0] || {};
+      const healthEvent = recentEvents(20, "health")[0] || {};
+      const keys = numberValue(progress.keys_tested);
+      const batch = numberValue(progress.batch_number);
+      const matches = numberValue(progress.matches_found);
+      const searchDetail = [missionRate(progress), keys === null ? "candidate total not reported" : compactNumber(keys) + " candidate checks reported", batch === null ? "batch not reported" : "batch #" + Math.round(batch), matches === null ? "match count awaiting report" : matches > 0 ? String(Math.round(matches)) + " possible signal(s) reported" : "no match reported"].join(" · ");
+      const rows = [
+        journalRow("cpu", "", active ? "GPU search work is active" : "GPU search work is awaiting evidence", searchDetail + ".", progress.observed_at || latest.updated),
+        journalRow("check", "", "Manager health decision: " + upper(latest.status || healthEvent.state || "UNKNOWN"), "The supervisor checks process state, recent heartbeat, accelerator activity, and reported progress together.", healthEvent.ts || latest.updated),
+        journalRow("bot", "agent", agent.id ? "AI reviewer: " + (agent.last_action || "awaiting action") : "AI reviewer is not yet published", agent.last_reason || "No bounded recommendation has been published yet.", agent.last_run || latest.updated),
+        journalRow("activity", "publish", "Public evidence snapshot published", "This page receives compact, sanitized telemetry; it never receives private keys, seeds, raw commands, or unrestricted model reasoning.", latest.updated)
+      ];
+      return '<section class="panel"><div class="panel-head"><h2>LIVE WORK JOURNAL</h2><span class="subhead">Readable summary, not private chain-of-thought</span></div><div class="panel-body"><div class="journal-list">' + rows.join("") + '</div><a class="panel-link" href="#/activity">Open the full published timeline →</a></div></section>';
+    }
+
+    function renderOverview() {
+      const latest = state.latest || {};
+      const sets = dataSets();
+      const worker = primaryWorker();
+      const progress = workProgress();
+      const gpu = latest.gpu || {};
+      const active = progress.active === true || upper(worker.state) === "RUNNING";
+      const keys = numberValue(progress.keys_tested);
+      const batch = numberValue(progress.batch_number);
+      const matches = numberValue(progress.matches_found);
+      const vramTotal = numberValue(gpu.mem_total_mib);
+      const vramUsed = numberValue(gpu.mem_used_mib);
+      const vramPercent = vramTotal ? vramUsed / vramTotal * 100 : null;
+      return pageHeading("Mission Control", "Watch the real work move through the machine", "A spatial, public-safe view of the supervisor, GPU worker, verification gate, AI support, and the evidence this system publishes.", '<a class="btn" href="#/search">Inspect search evidence <span>→</span></a>') + snapshotStrip() +
+        '<div class="mission-layout"><div>' + renderMissionMap(latest, sets, worker, progress) + '</div><aside class="mission-side"><section class="mission-summary"><p class="eyebrow">Current work</p><h2>' + escapeHtml(latest.objective || "No active objective") + '</h2><p>' + escapeHtml(active ? "The GPU worker is publishing reported work evidence. This is a bounded numeric search, not a phrase-guessing task." : "The dashboard is waiting for current worker activity evidence.") + '</p><div class="live-readings">' + missionReading("Reported rate", missionRate(progress), "accent") + missionReading("Candidate checks", keys === null ? "Not reported" : compactNumber(keys), "accent") + missionReading("Current batch", batch === null ? "Not reported" : "#" + Math.round(batch), "") + missionReading("Result signal", matches === null ? "Awaiting report" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "No match", matches === 0 ? "success" : "") + '</div></section><section class="mission-summary"><p class="eyebrow">Live machine signal</p><h2>' + escapeHtml(upper(latest.status || "UNKNOWN")) + '</h2><p>The manager has a fresh record of the operating state. Resource readings below are machine-level evidence, not a claimed probability of success.</p><div class="live-readings">' + missionReading("GPU activity", numberValue(gpu.util_pct) === null ? "--" : Math.round(gpu.util_pct) + "%", "success") + missionReading("Temperature", numberValue(gpu.temp_c) === null ? "--" : Math.round(gpu.temp_c) + "°C", "") + missionReading("VRAM", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1) + " GB", "") + missionReading("Public age", relative(latest.updated), "") + '</div></section></aside></div>' +
+        renderResultPath(progress, active) +
+        '<div class="section-grid"><div>' + renderWorkJournal(latest, sets, worker, progress) + '</div><section class="panel resource-panel"><div class="panel-head"><h2>MACHINE EVIDENCE</h2><span class="subhead">sanitized telemetry</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", numberValue(gpu.util_pct) === null ? "--" : String(Math.round(gpu.util_pct)), "%", "Current accelerator activity", numberValue(gpu.util_pct), "green") + resourceCard("VRAM used", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1), "GB", vramTotal === null ? "Capacity unknown" : "of " + (vramTotal / 1024).toFixed(1) + " GB", vramPercent, "") + resourceCard("GPU temperature", numberValue(gpu.temp_c) === null ? "--" : String(Math.round(gpu.temp_c)), "°C", "Thermal signal", numberValue(gpu.temp_c) === null ? null : Math.min(gpu.temp_c / 90 * 100, 100), numberValue(gpu.temp_c) !== null && gpu.temp_c >= 80 ? "amber" : "green") + resourceCard("Power draw", numberValue(gpu.power_w) === null ? "--" : String(Math.round(gpu.power_w)), "W", "Current board draw", numberValue(gpu.power_w) === null ? null : Math.min(gpu.power_w / 140 * 100, 100), "") + '</div></div></section></div>';
     }
 
     function lifecycle(stateValue) {
@@ -971,14 +1126,17 @@
       const workEvents = recentEvents(18, "work");
       const exactTotals = progressMetric(progress, ["keys_tested", "work_units_completed"]);
       const rate = progressMetric(progress, ["keys_per_second", "units_per_second", "hashrate_mkey_s"], "/s");
-      const coverage = progressMetric(progress, ["coverage_pct", "progress_pct"], "%");
+      const reportedCoverage = numberValue(progress.coverage_pct) || numberValue(progress.progress_pct);
+      const coverage = reportedCoverage && reportedCoverage > 0 ? compactNumber(reportedCoverage) + "%" : "Not estimated";
       const samples = progressMetric(progress, ["sample_count"]);
       const uptime = progressMetric(progress, ["uptime_s"], "s");
+      const matches = numberValue(progress.matches_found);
+      const resultSignal = matches === null ? "Awaiting a worker report" : matches > 0 ? String(Math.round(matches)) + " possible signal(s) reported" : "No target match reported";
       const signalClass = active ? "" : " warn";
       const eventMarkup = workEvents.length ? workEvents.map(eventRow).join("") : '<div class="empty-cell">No worker observations are in this public snapshot yet.</div>';
-      return pageHeading("Bitcoin workstream", "See what is actually being tested", "KeyHunt performs the candidate search. This view records safe aggregate evidence of that work and keeps manager decisions separate from solver output.", '<a class="btn" href="#/activity">Open full activity <span>→</span></a>') + snapshotStrip() +
-        '<div class="progress-grid">' + progressCard("Verified signal", active ? "ACTIVE" : "WAITING", signalLabel, active ? "success" : "warn") + progressCard("Observation samples", samples, "Manager observations retained in the local record", "accent") + progressCard("Search totals", exactTotals, progress.reported ? "Aggregate worker report" : "Exact count not reported by this worker") + progressCard("Work rate", rate, coverage === "Not reported" ? "Coverage not reported" : "Coverage " + coverage) + '</div>' +
-        '<div class="progress-signal' + signalClass + '"><span class="status-dot"></span><div><strong>' + escapeHtml(signalLabel) + '</strong><br>' + escapeHtml(active ? "The manager has recent process and resource evidence for the active worker." : "The public snapshot does not currently contain a verified active-work signal.") + '</div></div>' +
+      return pageHeading("Bitcoin workstream", "See what is actually being tested", "This is a bounded numeric address-comparison search, not a phrase-guessing task. KeyHunt supplies safe aggregate work evidence while the manager verifies the runtime.", '<a class="btn" href="#/activity">Open full activity <span>→</span></a>') + snapshotStrip() +
+        '<div class="progress-grid">' + progressCard("Verified signal", active ? "ACTIVE" : "WAITING", signalLabel, active ? "success" : "warn") + progressCard("Observation samples", samples, "Manager observations retained in the local record", "accent") + progressCard("Search totals", exactTotals, progress.reported ? "Aggregate worker report" : "Exact count not reported by this worker") + progressCard("Work rate", rate, "Coverage " + coverage) + '</div>' +
+        '<div class="progress-signal' + signalClass + '"><span class="status-dot"></span><div><strong>' + escapeHtml(signalLabel) + '</strong><br>' + escapeHtml((active ? "The manager has recent process and resource evidence for the active worker. " : "The public snapshot does not currently contain a verified active-work signal. ") + "Result gate: " + resultSignal + ".") + '</div></div>' +
         '<div class="section-grid"><section class="panel"><div class="panel-head"><h2>WORKER EVIDENCE</h2><span class="subhead">' + escapeHtml(worker.id || job.id || "No worker") + '</span></div><div class="panel-body">' + progressDetail(progress) + '<div class="progress-note"><strong>What this means:</strong><br>' + escapeHtml(progress.reported ? "The worker has supplied allowlisted aggregate progress fields. Candidate values are never displayed here." : "This worker currently supplies process and GPU activity evidence, but no exact candidate-count report. The UI will not invent a number.") + '</div></div></section><section class="panel"><div class="panel-head"><h2>SEARCH BOUNDARY</h2><span class="subhead">public-safe view</span></div><div class="panel-body"><div class="facts-list"><div class="fact-row"><span>Job</span><strong>' + escapeHtml(job.id || "--") + '</strong></div><div class="fact-row"><span>Worker type</span><strong>' + escapeHtml(worker.type || "--") + '</strong></div><div class="fact-row"><span>GPU utilization</span><strong>' + escapeHtml(progressMetric(gpu, ["util_pct"], "%")) + '</strong></div><div class="fact-row"><span>Worker uptime</span><strong>' + escapeHtml(uptime) + '</strong></div><div class="fact-row"><span>Last observation</span><strong>' + escapeHtml(formatDate(progress.observed_at || latest.updated, true)) + '</strong></div></div><div class="ops-note"><strong>Audit rule:</strong><br>Aggregate batches, rates, and state transitions are useful evidence. Private keys, candidate values, raw command lines, and unrestricted model reasoning stay outside the public feed.</div></div></section></div>' +
         '<section class="panel"><div class="panel-head"><h2>WORK OBSERVATION STREAM</h2><span class="subhead">' + escapeHtml(String(workEvents.length)) + ' recent records</span></div><div class="panel-body"><div class="event-list">' + eventMarkup + '</div></div></section>';
     }
