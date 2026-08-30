@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T19:34:55.398Z",
+        "observed_at": "2026-08-30T19:40:01.335Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "keys_tested": 1266595921920,
-        "sample_count": 139,
+        "sample_count": 156,
         "hashrate_mkey_s": 728.08,
-        "uptime_s": 2192.2,
+        "uptime_s": 2498.1,
         "batch_number": 417,
         "keys_per_second": 728080000,
         "coverage_pct": 0,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T19:34:55.398Z",
+        "observed_at": "2026-08-30T19:40:01.335Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "keys_tested": 1266595921920,
-        "sample_count": 139,
+        "sample_count": 156,
         "hashrate_mkey_s": 728.08,
-        "uptime_s": 2192.2,
+        "uptime_s": 2498.1,
         "batch_number": 417,
         "keys_per_second": 728080000,
         "coverage_pct": 0,
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "restart",
-      "last_reason": "Worker state escalated due to missing progress signals and retry limit reached; attempting restart to recover search continuity.",
-      "last_duration_s": 3.781,
-      "tasks_completed": 8,
-      "last_run": "2026-08-30T19:34:57.919Z",
-      "next_run": "2026-08-30T19:39:57.919Z"
+      "last_reason": "Retry limit reached on Bitcoin Puzzle #71 with no progress signal; attempting restart to reset worker state.",
+      "last_duration_s": 6.578,
+      "tasks_completed": 9,
+      "last_run": "2026-08-30T19:40:03.781Z",
+      "next_run": "2026-08-30T19:45:03.781Z"
     }
   ],
   "capabilities": [
@@ -207,19 +207,14 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NEEDS_EVIDENCE_REVIEW",
-      "scanned_at": "2026-08-30T18:35:34.667Z",
-      "files_scanned": 2084,
-      "files_skipped": 18,
-      "candidate_count": 9,
+      "state": "NO_CANDIDATES",
+      "scanned_at": "2026-08-30T19:35:55.229Z",
+      "files_scanned": 2997,
+      "files_skipped": 3,
+      "candidate_count": 0,
       "truncated": false,
-      "more_pending": false,
-      "categories": {
-        "approval_gate": 2,
-        "autonomy_limit": 5,
-        "data_boundary": 1,
-        "scope_boundary": 1
-      }
+      "more_pending": true,
+      "categories": {}
     },
     {
       "id": "machine-manager-source",
@@ -263,16 +258,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "REVIEW",
+      "state": "WAITING",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 9,
-        "files_scanned": 2084,
-        "more_pending": false
+        "candidate_count": 0,
+        "files_scanned": 2997,
+        "more_pending": true
       },
-      "updated": "2026-08-30T18:51:28.451Z"
+      "updated": "2026-08-30T19:35:55.578Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -332,25 +327,25 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 43.0,
+    "temp_c": 47.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T19:34:55.398Z",
+    "observed_at": "2026-08-30T19:40:01.335Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "keys_tested": 1266595921920,
-    "sample_count": 139,
+    "sample_count": 156,
     "hashrate_mkey_s": 728.08,
-    "uptime_s": 2192.2,
+    "uptime_s": 2498.1,
     "batch_number": 417,
     "keys_per_second": 728080000,
     "coverage_pct": 0,
     "matches_found": 0
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T19:34:57.919Z"
+  "updated": "2026-08-30T19:40:03.781Z"
 }
