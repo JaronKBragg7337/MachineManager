@@ -13,6 +13,7 @@ from pathlib import Path
 from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor, _expected_image_name
 from manager.telemetry import TelemetryPublisher
 from manager.run import (
+    _public_state_marker,
     load_public_records,
     manager_from_config,
     merge_public_events,
@@ -766,6 +767,38 @@ class TelemetryTests(unittest.TestCase):
                         with self.assertRaises(PublicUploadError):
                             publisher.publish()
                     request.assert_not_called()
+
+    def test_public_upload_bypasses_cadence_for_a_meaningful_state_change(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            publisher = GitHubPagesPublisher(
+                Path(raw) / "dashboard",
+                owner="owner",
+                repository="repo",
+            )
+            publisher.last_publish_monotonic = 100.0
+            with patch.dict(os.environ, {"MACHINE_MANAGER_GITHUB_TOKEN": "test-only"}):
+                with patch.object(publisher, "publish", return_value=True) as publish:
+                    self.assertFalse(publisher.maybe_publish(now=101.0))
+                    publish.assert_not_called()
+                    self.assertTrue(publisher.maybe_publish(now=101.0, immediate=True))
+                    publish.assert_called_once_with()
+
+    def test_public_state_marker_ignores_progress_but_records_lifecycle_changes(self) -> None:
+        baseline = {
+            "status": "HEALTHY",
+            "workers": [{"id": "worker-1", "state": "RUNNING", "progress": {"keys_tested": 1}}],
+            "jobs": [{"id": "job-1", "state": "RUNNING"}],
+            "workstreams": [{"id": "lane-1", "state": "RUNNING"}],
+            "updated": "2026-08-30T00:00:00Z",
+        }
+        progress_only = json.loads(json.dumps(baseline))
+        progress_only["workers"][0]["progress"]["keys_tested"] = 2
+        progress_only["updated"] = "2026-08-30T00:01:00Z"
+        lifecycle_change = json.loads(json.dumps(baseline))
+        lifecycle_change["workers"][0]["state"] = "RETRYING"
+
+        self.assertEqual(_public_state_marker(baseline), _public_state_marker(progress_only))
+        self.assertNotEqual(_public_state_marker(baseline), _public_state_marker(lifecycle_change))
 
     def test_public_upload_builds_one_attributed_commit(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

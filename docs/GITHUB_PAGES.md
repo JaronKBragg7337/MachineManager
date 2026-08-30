@@ -31,8 +31,10 @@ observation. To move updates from the laptop to GitHub Pages, enable
 public_upload in the local config and provide a dedicated fine-grained
 MACHINE_MANAGER_GITHUB_TOKEN through an ignored env_file. The uploader batches
 the sanitized latest, events, and scenarios files into one normal commit every
-five minutes by default. It never uploads raw logs, command lines, private
-paths, or credentials.
+five minutes by default. A public manager, worker, job, or work-lane state
+change publishes immediately, so recovery and lifecycle changes do not wait for
+the regular cadence. It never uploads raw logs, command lines, private paths,
+or credentials.
 
 This makes the dashboard public and remotely viewable whenever the machine is
 online. It is not a substitute for an always-on host: a sleeping or powered-off

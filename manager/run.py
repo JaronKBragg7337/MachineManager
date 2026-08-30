@@ -286,6 +286,40 @@ def _persist_runtime(
         store.upsert_agent(agent)
 
 
+def _public_state_marker(snapshot: Mapping[str, Any]) -> str:
+    """Return the compact state changes that justify an immediate public update.
+
+    Metrics and timestamps intentionally do not participate: normal progress is
+    published on the configured cadence, while an operational state transition
+    becomes visible as soon as the local publisher has produced a safe record.
+    """
+
+    def entries(name: str) -> list[dict[str, str]]:
+        source = snapshot.get(name, [])
+        if not isinstance(source, list):
+            return []
+        return [
+            {
+                "id": str(item.get("id", item.get("worker_id", ""))),
+                "state": str(item.get("state", "UNKNOWN")).upper(),
+            }
+            for item in source
+            if isinstance(item, Mapping)
+        ]
+
+    return json.dumps(
+        {
+            "status": str(snapshot.get("status", "UNKNOWN")).upper(),
+            "workers": entries("workers"),
+            "jobs": entries("jobs"),
+            "workstreams": entries("workstreams"),
+        },
+        ensure_ascii=True,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
 def _print_safe(message: str) -> None:
     print(str(message).encode("ascii", "replace").decode("ascii"), flush=True)
 
@@ -358,6 +392,7 @@ def main() -> int:
     primary_job_id = ""
     objective = ""
     public_event_limit = 500
+    last_public_marker: str | None = None
     try:
         try:
             lock = InstanceLock(lock_path).acquire()
@@ -539,7 +574,10 @@ def main() -> int:
                 )
             if remote_publisher:
                 try:
-                    remote_publisher.maybe_publish()
+                    public_marker = _public_state_marker(snapshot)
+                    immediate_public_update = public_marker != last_public_marker
+                    last_public_marker = public_marker
+                    remote_publisher.maybe_publish(immediate=immediate_public_update)
                 except PublicUploadError as exc:
                     _print_safe(f"Public upload deferred: {type(exc).__name__}")
             if status_path and remote_publisher:

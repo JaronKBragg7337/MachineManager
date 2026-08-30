@@ -251,12 +251,13 @@ class GitHubPagesPublisher:
         self.last_error = None
         return True
 
-    def maybe_publish(self, *, now: float | None = None) -> bool:
+    def maybe_publish(self, *, now: float | None = None, immediate: bool = False) -> bool:
+        """Publish on the regular cadence, or immediately for a public state change."""
         if not self.configured:
             return False
         now = time.monotonic() if now is None else float(now)
         if (
-            self.last_publish_monotonic is not None
+            not immediate and self.last_publish_monotonic is not None
             and now - self.last_publish_monotonic < self.interval_s
         ):
             return False
