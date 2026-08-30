@@ -1,29 +1,29 @@
 {
   "manager_version": "0.2",
-  "status": "ESCALATED",
+  "status": "STARTING",
   "objective": "Bitcoin Puzzle #71 continuous search",
   "objective_id": "p71",
   "workers": [
     {
       "id": "keyhunt-001",
       "type": "KeyHunt",
-      "state": "ESCALATED",
+      "state": "VERIFYING",
       "owner": "local-manager-v2",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T19:40:01.335Z",
+        "observed_at": "2026-08-30T19:43:48.829Z",
         "reported": true,
         "active": false,
         "healthy": false,
-        "keys_tested": 1266595921920,
-        "sample_count": 156,
+        "sample_count": 1,
+        "matches_found": 0,
+        "uptime_s": 0.6,
         "hashrate_mkey_s": 728.08,
-        "uptime_s": 2498.1,
-        "batch_number": 417,
         "keys_per_second": 728080000,
         "coverage_pct": 0,
-        "matches_found": 0
+        "batch_number": 417,
+        "keys_tested": 1266595921920
       }
     }
   ],
@@ -31,22 +31,22 @@
     {
       "id": "job-p71-001",
       "objective_id": "p71",
-      "state": "ESCALATED",
+      "state": "VERIFYING",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T19:40:01.335Z",
+        "observed_at": "2026-08-30T19:43:48.829Z",
         "reported": true,
         "active": false,
         "healthy": false,
-        "keys_tested": 1266595921920,
-        "sample_count": 156,
+        "sample_count": 1,
+        "matches_found": 0,
+        "uptime_s": 0.6,
         "hashrate_mkey_s": 728.08,
-        "uptime_s": 2498.1,
-        "batch_number": 417,
         "keys_per_second": 728080000,
         "coverage_pct": 0,
-        "matches_found": 0
+        "batch_number": 417,
+        "keys_tested": 1266595921920
       }
     }
   ],
@@ -56,14 +56,14 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
-      "last_action": "restart",
-      "last_reason": "Retry limit reached on Bitcoin Puzzle #71 with no progress signal; attempting restart to reset worker state.",
-      "last_duration_s": 6.578,
-      "tasks_completed": 9,
-      "last_run": "2026-08-30T19:40:03.781Z",
-      "next_run": "2026-08-30T19:45:03.781Z"
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -283,6 +283,19 @@
       "updated": "2026-08-30T18:51:28.451Z"
     },
     {
+      "id": "constraint-evidence-map-20260830",
+      "objective_id": "machine-manager-governance",
+      "title": "Data-boundary evidence map",
+      "lane": "Capability evidence",
+      "owner": "codex-evidence-worker",
+      "state": "COMPLETE",
+      "summary": "Mapped public data boundaries to verified controls and added synthetic regressions that stop unsafe publication before network transport.",
+      "next_action": "Run an operation-specific capability test only when a review lead is tied to a live objective.",
+      "source_kind": "static",
+      "metrics": {},
+      "updated": "2026-08-30T19:43:49.465Z"
+    },
+    {
       "id": "revenue-lane-scout-20260830",
       "objective_id": "revenue-discovery",
       "title": "Revenue-lane source scout",
@@ -310,42 +323,42 @@
     }
   ],
   "autonomy": {
-    "paid_work": true,
-    "procurement_when_funded": true,
-    "public_submissions": true,
-    "terms_aware_execution": true,
-    "developer_tools": true,
-    "outreach_opt_out": true,
-    "account_enrollment": true,
     "transparent_outreach": true,
+    "outreach_opt_out": true,
+    "terms_aware_execution": true,
+    "account_enrollment": true,
+    "paid_work": true,
     "gpu_idle_use": true,
+    "procurement_when_funded": true,
+    "developer_tools": true,
+    "public_submissions": true,
     "mode": "EXECUTE_AND_REPORT",
     "handoff_style": "service-required"
   },
   "queue": {},
   "gpu": {
     "util_pct": 0.0,
-    "mem_used_mib": 0.0,
+    "mem_used_mib": 8.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 47.0,
+    "temp_c": 45.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T19:40:01.335Z",
+    "observed_at": "2026-08-30T19:43:48.829Z",
     "reported": true,
     "active": false,
     "healthy": false,
-    "keys_tested": 1266595921920,
-    "sample_count": 156,
+    "sample_count": 1,
+    "matches_found": 0,
+    "uptime_s": 0.6,
     "hashrate_mkey_s": 728.08,
-    "uptime_s": 2498.1,
-    "batch_number": 417,
     "keys_per_second": 728080000,
     "coverage_pct": 0,
-    "matches_found": 0
+    "batch_number": 417,
+    "keys_tested": 1266595921920
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T19:40:03.781Z"
+  "updated": "2026-08-30T19:43:49.464Z"
 }
