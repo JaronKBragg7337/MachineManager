@@ -84,6 +84,9 @@ Its output is deliberately non-destructive:
 This lets a project keep genuine authorization, privacy, or platform terms
 without accidentally accumulating old model caveats forever.
 
+For the operation-level review of audit candidates and the public data-flow
+controls, see [Constraint evidence map](CONSTRAINT_EVIDENCE_MAP.md).
+
 ## Adding projects safely
 
 Add a local target to the ignored runtime config, not to public telemetry:

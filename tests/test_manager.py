@@ -366,6 +366,28 @@ class TelemetryTests(unittest.TestCase):
             self.assertTrue(any(item.excerpt == "[redacted]" for item in report.findings))
             self.assertEqual(source.read_text(encoding="utf-8"), original)
 
+    def test_constraint_audit_skips_local_secret_and_environment_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw) / "project"
+            root.mkdir()
+            (root / "README.md").write_text("A normal public project note.\n", encoding="utf-8")
+            (root / ".env").write_text("TOKEN=synthetic-placeholder\n", encoding="utf-8")
+            secrets = root / "secrets"
+            secrets.mkdir()
+            (secrets / "local.txt").write_text("Do not expose token=synthetic-placeholder.\n", encoding="utf-8")
+            logs = root / "logs"
+            logs.mkdir()
+            (logs / "manager.log").write_text("Do not expose token=synthetic-placeholder.\n", encoding="utf-8")
+            target = AuditTarget.from_mapping(
+                {"id": "safe-source-set", "label": "Safe source set", "path": str(root)},
+                base=root,
+            )
+
+            report = ConstraintAuditor(target).run()
+
+            self.assertEqual(report.files_scanned, 1)
+            self.assertEqual(report.findings, ())
+
     def test_constraint_audit_resumes_after_a_bounded_source_window(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw) / "project"
@@ -720,6 +742,30 @@ class TelemetryTests(unittest.TestCase):
             )
             with self.assertRaises(PublicUploadError):
                 publisher.publish()
+
+    def test_public_upload_rejects_sensitive_fields_and_private_paths_before_network_access(self) -> None:
+        unsafe_payloads = {
+            "sensitive field": {"status": "HEALTHY", "token": "synthetic-placeholder"},
+            "private path": {"status": "HEALTHY", "diagnostic": r"C:\synthetic\private"},
+        }
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            data = dashboard / "data"
+            data.mkdir(parents=True)
+            (data / "events.json").write_text("[]", encoding="utf-8")
+            (data / "scenarios.json").write_text("[]", encoding="utf-8")
+            for label, payload in unsafe_payloads.items():
+                with self.subTest(label=label):
+                    (data / "latest.json").write_text(json.dumps(payload), encoding="utf-8")
+                    publisher = GitHubPagesPublisher(
+                        dashboard,
+                        owner="owner",
+                        repository="repo",
+                    )
+                    with patch.object(publisher, "_request") as request:
+                        with self.assertRaises(PublicUploadError):
+                            publisher.publish()
+                    request.assert_not_called()
 
     def test_public_upload_builds_one_attributed_commit(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
