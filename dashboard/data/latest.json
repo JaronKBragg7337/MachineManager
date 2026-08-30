@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T15:33:31.248Z",
+        "observed_at": "2026-08-30T15:34:07.645Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "matches_found": 0,
         "keys_per_second": 792200000,
-        "sample_count": 1,
-        "uptime_s": 1.0,
+        "sample_count": 3,
+        "uptime_s": 37.5,
         "hashrate_mkey_s": 792.2,
         "coverage_pct": 0,
         "keys_tested": 106099113984,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T15:33:31.248Z",
+        "observed_at": "2026-08-30T15:34:07.645Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "matches_found": 0,
         "keys_per_second": 792200000,
-        "sample_count": 1,
-        "uptime_s": 1.0,
+        "sample_count": 3,
+        "uptime_s": 37.5,
         "hashrate_mkey_s": 792.2,
         "coverage_pct": 0,
         "keys_tested": 106099113984,
@@ -56,14 +56,14 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
-      "last_action": "",
-      "last_reason": "",
-      "last_duration_s": null,
-      "tasks_completed": 0,
-      "last_run": "",
-      "next_run": ""
+      "last_action": "continue",
+      "last_reason": "System healthy, objective active, and resources within safe limits.",
+      "last_duration_s": 4.031,
+      "tasks_completed": 1,
+      "last_run": "2026-08-30T15:33:52.291Z",
+      "next_run": "2026-08-30T15:38:52.291Z"
     }
   ],
   "capabilities": [
@@ -202,32 +202,28 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NEEDS_EVIDENCE_REVIEW",
-      "scanned_at": "2026-08-30T15:22:58.910Z",
-      "files_scanned": 3000,
-      "files_skipped": 18,
-      "candidate_count": 10,
-      "truncated": true,
-      "more_pending": false,
-      "categories": {
-        "approval_gate": 2,
-        "autonomy_limit": 4,
-        "scope_boundary": 4
-      }
+      "state": "NO_CANDIDATES",
+      "scanned_at": "2026-08-30T15:33:52.159Z",
+      "files_scanned": 2997,
+      "files_skipped": 3,
+      "candidate_count": 0,
+      "truncated": false,
+      "more_pending": true,
+      "categories": {}
     },
     {
       "id": "machine-manager-source",
       "label": "Machine Manager",
       "state": "NEEDS_EVIDENCE_REVIEW",
-      "scanned_at": "2026-08-30T15:22:36.834Z",
+      "scanned_at": "2026-08-30T15:33:32.390Z",
       "files_scanned": 45,
       "files_skipped": 0,
-      "candidate_count": 17,
+      "candidate_count": 18,
       "truncated": false,
       "more_pending": false,
       "categories": {
         "approval_gate": 2,
-        "autonomy_limit": 11,
+        "autonomy_limit": 12,
         "data_boundary": 3,
         "scope_boundary": 1
       }
@@ -248,28 +244,28 @@
   },
   "queue": {},
   "gpu": {
-    "util_pct": 89.0,
+    "util_pct": 75.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 65.0,
-    "power_w": 83.52
+    "temp_c": 61.0,
+    "power_w": 82.48
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T15:33:31.248Z",
+    "observed_at": "2026-08-30T15:34:07.645Z",
     "reported": true,
     "active": true,
     "healthy": true,
     "matches_found": 0,
     "keys_per_second": 792200000,
-    "sample_count": 1,
-    "uptime_s": 1.0,
+    "sample_count": 3,
+    "uptime_s": 37.5,
     "hashrate_mkey_s": 792.2,
     "coverage_pct": 0,
     "keys_tested": 106099113984,
     "batch_number": 32
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T15:33:32.252Z"
+  "updated": "2026-08-30T15:34:08.691Z"
 }
