@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T23:29:05.570Z",
+        "observed_at": "2026-08-30T23:34:12.730Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -21,8 +21,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 13084.7,
-        "sample_count": 732,
+        "uptime_s": 13391.9,
+        "sample_count": 749,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T23:29:05.570Z",
+        "observed_at": "2026-08-30T23:34:12.730Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -44,8 +44,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 13084.7,
-        "sample_count": 732,
+        "uptime_s": 13391.9,
+        "sample_count": 749,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is in a stable escalated state with consistent agent recommendations and no critical resource failures.",
-      "last_duration_s": 6.172,
-      "tasks_completed": 43,
-      "last_run": "2026-08-30T23:26:44.843Z",
-      "next_run": "2026-08-30T23:31:44.843Z"
+      "last_reason": "System is in escalated state with GPU active and workers running; no credential or file access required.",
+      "last_duration_s": 6.234,
+      "tasks_completed": 44,
+      "last_run": "2026-08-30T23:31:52.357Z",
+      "next_run": "2026-08-30T23:36:52.357Z"
     }
   ],
   "capabilities": [
@@ -351,7 +351,7 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T23:29:05.570Z",
+    "observed_at": "2026-08-30T23:34:12.730Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -360,10 +360,10 @@
     "keys_per_second": 742080000,
     "matches_found": 0,
     "keys_tested": 810842849280,
-    "uptime_s": 13084.7,
-    "sample_count": 732,
+    "uptime_s": 13391.9,
+    "sample_count": 749,
     "hashrate_mkey_s": 742.08
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T23:29:08.085Z"
+  "updated": "2026-08-30T23:34:15.365Z"
 }
