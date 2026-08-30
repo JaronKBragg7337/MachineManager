@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-30T17:57:42.572Z",
-    "event_id": "agent-local-manager-brain-17881126625729",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System healthy, objective running, no errors or resource constraints detected.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 29,
-      "fallback": false,
-      "duration_s": 4.078
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-30T18:02:48.614Z",
     "event_id": "agent-local-manager-brain-17881129686142",
     "actor": "local-manager-brain",
@@ -14120,6 +14104,22 @@
       "tasks_completed": 30,
       "fallback": false,
       "duration_s": 6.172
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-30T22:25:15.222Z",
+    "event_id": "agent-local-manager-brain-17881287152226",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in escalated state with zero GPU utilization; no immediate intervention required.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 31,
+      "fallback": false,
+      "duration_s": 5.985
     },
     "error": false
   }
