@@ -34,6 +34,37 @@ def load_config(path: Path) -> dict[str, Any]:
     return config
 
 
+def host_boot_marker() -> str | None:
+    """Return a stable identifier for the current host boot when available."""
+    if os.name == "nt":
+        try:
+            import ctypes
+
+            get_tick_count = ctypes.windll.kernel32.GetTickCount64
+            get_tick_count.restype = ctypes.c_ulonglong
+            boot_epoch = time.time() - (int(get_tick_count()) / 1000)
+            return f"windows:{int((boot_epoch + 30) // 60)}"
+        except (AttributeError, OSError):
+            return None
+
+    boot_id = Path("/proc/sys/kernel/random/boot_id")
+    try:
+        value = boot_id.read_text(encoding="ascii").strip()
+    except OSError:
+        return None
+    return f"posix:{value}" if value else None
+
+
+def update_host_boot_marker(store: StateStore, *, marker: str | None = None) -> bool:
+    """Persist the current boot identity and report whether the host rebooted."""
+    marker = marker if marker is not None else host_boot_marker()
+    if not marker:
+        return False
+    previous = store.get_meta("host_boot_marker")
+    store.set_meta("host_boot_marker", marker)
+    return isinstance(previous, str) and previous != marker
+
+
 def load_env_file(path: Path | None) -> None:
     """Load a simple local-only KEY=VALUE file without printing its values."""
     if path is None or not path.exists():
@@ -205,6 +236,7 @@ def manager_from_config(
     *,
     config_path: Path,
     state_store: StateStore | None = None,
+    reset_retry_budget: bool = False,
 ) -> tuple[MachineManager, str, str]:
     entries = _job_entries(config)
     manager = MachineManager(actor=str(config.get("actor", "local-manager")))
@@ -218,7 +250,9 @@ def manager_from_config(
             job_id=entry["job_id"],
             max_restarts=entry["max_restarts"],
             initial_attempt=int((prior or {}).get("attempt", 0) or 0),
-            initial_restart_count=int((prior or {}).get("restart_count", 0) or 0),
+            initial_restart_count=0
+            if reset_retry_budget
+            else int((prior or {}).get("restart_count", 0) or 0),
         )
     return manager, primary_objective_id, primary_job_id
 
@@ -270,6 +304,11 @@ def main() -> int:
     parser.add_argument("--state-db", type=Path)
     parser.add_argument("--lock-file", type=Path)
     parser.add_argument("--log-file", type=Path)
+    parser.add_argument(
+        "--resume-after-host-boot",
+        action="store_true",
+        help="reset the bounded worker retry budget once after a confirmed host restart",
+    )
     parser.add_argument("--once", action="store_true", help="start and perform one observation")
     args = parser.parse_args()
 
@@ -320,11 +359,38 @@ def main() -> int:
             _print_safe("Machine Manager is already running.")
             return 0
 
+        host_boot_changed = update_host_boot_marker(store)
         manager, primary_objective_id, primary_job_id = manager_from_config(
             config,
             config_path=config_path,
             state_store=store,
+            reset_retry_budget=host_boot_changed or args.resume_after_host_boot,
         )
+        prior_primary_job = store.get_job(primary_job_id) or {}
+        if host_boot_changed or args.resume_after_host_boot:
+            store.append_event(
+                {
+                    "timestamp": utc_now(),
+                    "event_id": f"evt-host-boot-{time.time_ns()}",
+                    "objective_id": primary_objective_id,
+                    "job_id": primary_job_id,
+                    "worker_id": "",
+                    "actor": str(config.get("actor", "local-manager")),
+                    "event_type": "retry_budget_reset",
+                    "previous_state": str(prior_primary_job.get("state", "UNKNOWN")),
+                    "new_state": "QUEUED",
+                    "metrics": {
+                        "attempt": int(prior_primary_job.get("attempt", 0) or 0),
+                        "restart_count": 0,
+                        "max_restarts": manager.jobs[primary_job_id].supervisor.max_restarts,
+                    },
+                    "action": "resume_after_host_boot",
+                    "outcome": "retry_budget_reset",
+                    "artifact_refs": [],
+                    "error": None,
+                    "duration": None,
+                }
+            )
         agents_raw = config.get("agents", [])
         if not isinstance(agents_raw, list):
             raise ValueError("config.agents must be an array")

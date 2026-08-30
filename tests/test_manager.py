@@ -12,7 +12,12 @@ from pathlib import Path
 
 from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor, _expected_image_name
 from manager.telemetry import TelemetryPublisher
-from manager.run import load_public_records, merge_public_events
+from manager.run import (
+    load_public_records,
+    manager_from_config,
+    merge_public_events,
+    update_host_boot_marker,
+)
 from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_agent_response
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
 from manager.probes import keyhunt_progress_probe
@@ -320,6 +325,57 @@ class SupervisorTests(unittest.TestCase):
 
 
 class TelemetryTests(unittest.TestCase):
+    def test_host_boot_marker_only_reports_a_changed_boot(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            database = Path(raw) / "state.sqlite3"
+            with StateStore(database) as store:
+                self.assertFalse(update_host_boot_marker(store, marker="windows:100"))
+                self.assertFalse(update_host_boot_marker(store, marker="windows:100"))
+                self.assertTrue(update_host_boot_marker(store, marker="windows:101"))
+
+    def test_host_boot_resume_keeps_attempt_history_but_clears_retry_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            directory = Path(raw)
+            database = directory / "state.sqlite3"
+            config = {
+                "job_id": "job-recovery",
+                "objective_id": "objective-recovery",
+                "max_restarts": 3,
+                "worker": {
+                    "id": "worker-recovery",
+                    "type": "SyntheticWorker",
+                    "command": [sys.executable, "-c", "pass"],
+                },
+            }
+            with StateStore(database) as store:
+                store.upsert_job(
+                    {
+                        "job_id": "job-recovery",
+                        "objective_id": "objective-recovery",
+                        "state": "ESCALATED",
+                        "attempt": 7,
+                        "restart_count": 3,
+                        "updated": "2026-08-30T00:00:00Z",
+                    }
+                )
+                preserved, _, _ = manager_from_config(
+                    config,
+                    config_path=directory / "manager.json",
+                    state_store=store,
+                )
+                resumed, _, _ = manager_from_config(
+                    config,
+                    config_path=directory / "manager.json",
+                    state_store=store,
+                    reset_retry_budget=True,
+                )
+            preserved_snapshot = preserved.jobs["job-recovery"].supervisor.snapshot()
+            resumed_snapshot = resumed.jobs["job-recovery"].supervisor.snapshot()
+            self.assertEqual(preserved_snapshot["attempt"], 7)
+            self.assertEqual(preserved_snapshot["restart_count"], 3)
+            self.assertEqual(resumed_snapshot["attempt"], 7)
+            self.assertEqual(resumed_snapshot["restart_count"], 0)
+
     def test_state_store_persists_events_jobs_and_tasks(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             database = Path(raw) / "state.sqlite3"
