@@ -49,7 +49,16 @@ class CapabilityRegistry:
         ]
 
     @classmethod
-    def default(cls, *, github_upload_enabled: bool = False, agents_enabled: bool = False) -> "CapabilityRegistry":
+    def default(
+        cls,
+        *,
+        github_upload_enabled: bool = False,
+        agents_enabled: bool = False,
+        execute_and_report_enabled: bool = False,
+        transparent_outreach_enabled: bool = False,
+        developer_tools_enabled: bool = False,
+        gpu_idle_use_enabled: bool = False,
+    ) -> "CapabilityRegistry":
         registry = cls()
         registry.register("process-supervision", "Start, observe, recover, and stop bounded worker processes.")
         registry.register("gpu-monitoring", "Read external GPU activity signals for GPU-bound workers.")
@@ -58,4 +67,8 @@ class CapabilityRegistry:
         registry.register("local-ollama-agents", "Ask configured local models for bounded recommendations.", enabled=agents_enabled)
         registry.register("public-telemetry", "Publish an allowlisted, sanitized dashboard snapshot.")
         registry.register("github-pages-upload", "Upload sanitized dashboard files when a dedicated token is configured.", enabled=github_upload_enabled)
+        registry.register("execute-and-report-charter", "Pursue authorized work through research, build, verification, publication, and follow-up.", enabled=execute_and_report_enabled)
+        registry.register("transparent-outreach", "Prepare AI-disclosed first contact and permanently suppress opted-out recipients.", enabled=transparent_outreach_enabled)
+        registry.register("developer-tooling", "Install and use normal developer tooling when a capable worker needs it.", enabled=developer_tools_enabled)
+        registry.register("idle-gpu-work", "Use available GPU capacity for declared work when the protected worker is idle.", enabled=gpu_idle_use_enabled)
         return registry

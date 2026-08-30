@@ -8,6 +8,19 @@
   "env_file": "../secrets/manager.env",
   "event_retention": 5000,
   "public_event_limit": 500,
+  "autonomy": {
+    "mode": "EXECUTE_AND_REPORT",
+    "allow_account_enrollment": true,
+    "allow_public_submissions": true,
+    "allow_outreach": true,
+    "honor_outreach_opt_out": true,
+    "allow_paid_work": true,
+    "allow_procurement_when_funded": true,
+    "allow_tool_installation": true,
+    "allow_gpu_when_protected_worker_idle": true,
+    "respect_program_terms": true,
+    "first_contact_disclosure": "Hello — I’m an AI assistant acting on Jaron’s behalf."
+  },
   "public_upload": {
     "enabled": false,
     "owner": "JaronKBragg7337",

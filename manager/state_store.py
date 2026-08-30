@@ -78,6 +78,16 @@ class StateStore:
                 );
                 CREATE INDEX IF NOT EXISTS tasks_due_idx
                     ON tasks(status, scheduled_at, updated);
+                CREATE TABLE IF NOT EXISTS outreach_contacts (
+                    channel TEXT NOT NULL,
+                    recipient_hash TEXT NOT NULL,
+                    state TEXT NOT NULL,
+                    first_contacted_at TEXT,
+                    last_contacted_at TEXT,
+                    updated TEXT NOT NULL,
+                    payload TEXT NOT NULL,
+                    PRIMARY KEY (channel, recipient_hash)
+                );
                 """
             )
 
@@ -255,6 +265,60 @@ class StateStore:
             return json.loads(row["value"])
         except json.JSONDecodeError:
             return default
+
+    def upsert_outreach_contact(
+        self,
+        *,
+        channel: str,
+        recipient_hash: str,
+        state: str,
+        first_contacted_at: str | None,
+        last_contacted_at: str | None,
+        updated: str,
+    ) -> None:
+        """Store only a recipient hash so outreach state never becomes public data."""
+        payload = {
+            "channel": str(channel),
+            "recipient_hash": str(recipient_hash),
+            "state": str(state),
+            "first_contacted_at": first_contacted_at,
+            "last_contacted_at": last_contacted_at,
+            "updated": str(updated),
+        }
+        with self._lock, self._connection:
+            self._connection.execute(
+                """
+                INSERT INTO outreach_contacts
+                    (channel, recipient_hash, state, first_contacted_at, last_contacted_at, updated, payload)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(channel, recipient_hash) DO UPDATE SET
+                    state=excluded.state,
+                    first_contacted_at=excluded.first_contacted_at,
+                    last_contacted_at=excluded.last_contacted_at,
+                    updated=excluded.updated,
+                    payload=excluded.payload
+                """,
+                (
+                    payload["channel"],
+                    payload["recipient_hash"],
+                    payload["state"],
+                    payload["first_contacted_at"],
+                    payload["last_contacted_at"],
+                    payload["updated"],
+                    self._json(payload),
+                ),
+            )
+
+    def get_outreach_contact(self, *, channel: str, recipient_hash: str) -> dict[str, Any] | None:
+        with self._lock:
+            row = self._connection.execute(
+                """
+                SELECT payload FROM outreach_contacts
+                WHERE channel = ? AND recipient_hash = ?
+                """,
+                (str(channel), str(recipient_hash)),
+            ).fetchone()
+        return self._object(row["payload"]) if row else None
 
     def enqueue_task(
         self,

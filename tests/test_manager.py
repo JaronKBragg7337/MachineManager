@@ -19,6 +19,7 @@ from manager.run import (
     update_host_boot_marker,
 )
 from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_agent_response
+from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, OutreachBlockedError, OutreachRegistry
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
 from manager.probes import keyhunt_progress_probe
 from manager.state_store import StateStore
@@ -325,6 +326,55 @@ class SupervisorTests(unittest.TestCase):
 
 
 class TelemetryTests(unittest.TestCase):
+    def test_operating_charter_defaults_to_execute_and_report(self) -> None:
+        charter = OperatingCharter.from_mapping()
+        summary = charter.public_summary()
+        self.assertEqual(summary["mode"], "EXECUTE_AND_REPORT")
+        self.assertTrue(summary["public_submissions"])
+        self.assertTrue(summary["transparent_outreach"])
+        self.assertTrue(summary["procurement_when_funded"])
+        self.assertEqual(summary["handoff_style"], "service-required")
+
+    def test_outreach_is_disclosed_once_and_opt_out_is_durable(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            database = Path(raw) / "state.sqlite3"
+            with StateStore(database) as store:
+                registry = OutreachRegistry(store, OperatingCharter.from_mapping())
+                draft = registry.prepare(
+                    channel="email",
+                    recipient="person@example.com",
+                    message="I have a proposal that may help your project.",
+                )
+                self.assertTrue(draft.first_contact)
+                self.assertTrue(draft.content.startswith(FIRST_CONTACT_DISCLOSURE))
+                registry.record_sent(draft, timestamp="2026-08-30T00:00:00Z")
+
+                follow_up = registry.prepare(
+                    channel="email",
+                    recipient="person@example.com",
+                    message="Following up with the completed work.",
+                )
+                self.assertFalse(follow_up.first_contact)
+                self.assertEqual(follow_up.content, "Following up with the completed work.")
+
+                registry.record_opt_out(
+                    channel="email",
+                    recipient="person@example.com",
+                    timestamp="2026-08-30T00:01:00Z",
+                )
+                with self.assertRaises(OutreachBlockedError):
+                    registry.prepare(
+                        channel="email",
+                        recipient="person@example.com",
+                        message="This must never be sent.",
+                    )
+                record = store.get_outreach_contact(
+                    channel="email",
+                    recipient_hash=registry.recipient_hash("email", "person@example.com"),
+                )
+                self.assertEqual(record["state"], "DO_NOT_CONTACT")
+                self.assertNotIn("person@example.com", json.dumps(record))
+
     def test_host_boot_marker_only_reports_a_changed_boot(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             database = Path(raw) / "state.sqlite3"
@@ -612,6 +662,7 @@ class TelemetryTests(unittest.TestCase):
                     "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234, "progress": {"kind": "reported_progress", "sample_count": 4, "keys_tested": 99, "private_key": "do not publish"}}],
                     "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "command": "do not publish"}],
                     "agents": [{"id": "agent-1", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_duration_s": 0.4}],
+                    "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
                     "gpu": {"util_pct": 80, "power_w": 70, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
                 },
@@ -636,6 +687,9 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["workers"][0]["progress"]["keys_tested"], 99)
             self.assertNotIn("private_key", json.dumps(latest))
             self.assertEqual(latest["agents"][0]["last_reason"], "healthy")
+            self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
+            self.assertTrue(latest["autonomy"]["developer_tools"])
+            self.assertNotIn("private_note", json.dumps(latest))
             self.assertNotIn("C:\\", json.dumps(events))
             self.assertNotIn("pid", json.dumps(events))
             self.assertEqual(events[0]["metrics"]["keys_tested"], 99)

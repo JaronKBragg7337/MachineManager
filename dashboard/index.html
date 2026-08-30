@@ -655,6 +655,7 @@
         <a href="#/agents" data-route="agents"><span class="nav-icon" data-icon="bot"></span><span>Agents</span><span class="nav-arrow">›</span></a>
         <a href="#/evaluations" data-route="evaluations"><span class="nav-icon" data-icon="chart"></span><span>Evaluations</span><span class="nav-arrow">›</span></a>
         <a href="#/research" data-route="research"><span class="nav-icon" data-icon="flask"></span><span>Research</span><span class="nav-arrow">›</span></a>
+        <a href="#/autonomy" data-route="autonomy"><span class="nav-icon" data-icon="check"></span><span>Autonomy</span><span class="nav-arrow">›</span></a>
         <a href="#/activity" data-route="activity"><span class="nav-icon" data-icon="activity"></span><span>Activity</span><span class="nav-arrow">›</span></a>
         <a href="#/operations" data-route="operations"><span class="nav-icon" data-icon="settings"></span><span>Operations</span><span class="nav-arrow">›</span></a>
       </nav>
@@ -690,6 +691,7 @@
         <a href="#/agents" data-route="agents">Agents</a>
         <a href="#/evaluations" data-route="evaluations">Evaluations</a>
         <a href="#/research" data-route="research">Research</a>
+        <a href="#/autonomy" data-route="autonomy">Autonomy</a>
         <a href="#/activity" data-route="activity">Activity</a>
         <a href="#/operations" data-route="operations">Operations</a>
       </div>
@@ -709,6 +711,7 @@
       agents: { label: "Agents", eyebrow: "Bounded specialists" },
       evaluations: { label: "Evaluations", eyebrow: "Reference and manager runs" },
       research: { label: "Research", eyebrow: "Future workstreams" },
+      autonomy: { label: "Autonomy", eyebrow: "Execution charter" },
       activity: { label: "Activity", eyebrow: "Published event timeline" },
       operations: { label: "Operations", eyebrow: "Runtime and capabilities" }
     };
@@ -844,9 +847,28 @@
         jobs: asArray(latest.jobs),
         agents: asArray(latest.agents),
         capabilities: asArray(latest.capabilities),
+        autonomy: autonomySummary(),
         events: asArray(state.events),
         scenarios: asArray(state.scenarios)
       };
+    }
+
+    function autonomySummary() {
+      const latest = state.latest || {};
+      const published = latest.autonomy && typeof latest.autonomy === "object" ? latest.autonomy : {};
+      return Object.assign({
+        mode: "EXECUTE_AND_REPORT",
+        account_enrollment: true,
+        public_submissions: true,
+        transparent_outreach: true,
+        outreach_opt_out: true,
+        paid_work: true,
+        procurement_when_funded: true,
+        developer_tools: true,
+        gpu_idle_use: true,
+        terms_aware_execution: true,
+        handoff_style: "service-required"
+      }, published);
     }
 
     function currentJob() {
@@ -1296,6 +1318,16 @@
       return pageHeading("Future workstreams", "The puzzle is the proving ground, not the product", "The same manager can coordinate many kinds of useful work once every objective has a worker, evidence contract, resource budget, and success criteria.", '<a class="btn" href="#/jobs">View current jobs <span>→</span></a>') + snapshotStrip() + '<div class="research-hero"><section class="research-callout"><p class="eyebrow">Next expansion surface</p><h2>From continuous search to continuous discovery.</h2><p>Research workers can investigate questions, compare evidence, run bounded experiments, and hand findings back to a manager for verification. The Bitcoin workload is already exercising the hardest foundation: persistence, health, recovery, telemetry, and evaluation.</p></section><section class="research-status"><div><p class="eyebrow">Research registry</p><div class="big-state">Ready for the next objective</div><p>No research job is published in the current snapshot.</p></div><a class="text-link" href="#/operations">Review runtime surface →</a></section></div><div class="blueprint-grid"><article class="blueprint-card"><div class="blueprint-number">01</div><h3>Question</h3><p>Define a falsifiable question, scope, constraints, and a useful completion condition.</p></article><article class="blueprint-card"><div class="blueprint-number">02</div><h3>Evidence</h3><p>Assign bounded research workers and preserve sources, outputs, timestamps, and provenance.</p></article><article class="blueprint-card"><div class="blueprint-number">03</div><h3>Synthesis</h3><p>Use specialist agents to compare findings, identify disagreement, and surface uncertainty.</p></article><article class="blueprint-card"><div class="blueprint-number">04</div><h3>Decision</h3><p>Turn verified findings into the next experiment, product move, or revenue-oriented action.</p></article></div>';
     }
 
+    function autonomyFact(label, enabled, detail) {
+      return '<div class="fact-row"><span>' + escapeHtml(label) + '</span><strong>' + escapeHtml(enabled ? "Authorized" : "Not configured") + '</strong></div>' + (detail ? '<p class="muted" style="margin:8px 0 14px">' + escapeHtml(detail) + '</p>' : '');
+    }
+
+    function renderAutonomy() {
+      const policy = dataSets().autonomy;
+      const policyMode = String(policy.mode || "EXECUTE_AND_REPORT").replace(/_/g, " ");
+      return pageHeading("Execution charter", "Act, verify, report, repeat", "Jaron has authorized Machine Manager to pursue useful work continuously. Workers should complete the next useful move and retain a precise handoff only when an outside service actually requires a user-owned interaction.", '<a class="btn" href="https://github.com/JaronKBragg7337/MachineManager/blob/main/docs/OPERATING_CHARTER.md" target="_blank" rel="noreferrer">Read full charter <span>↗</span></a>') + snapshotStrip() + '<div class="research-hero"><section class="research-callout"><p class="eyebrow">Operating mode</p><h2>' + escapeHtml(policyMode) + '</h2><p>Research, build, test, publish, submit, follow up, measure value, then continue. The system records work and asks only for the concrete interaction an outside service itself requires.</p></section><section class="research-status"><div><p class="eyebrow">Handoff style</p><div class="big-state">' + escapeHtml(String(policy.handoff_style || "service-required").replace(/-/g, " ")) + '</div><p>A password, 2FA prompt, identity verification, or payment connection becomes a live work item—not a reason to abandon the objective.</p></div><a class="text-link" href="#/activity">Inspect public work evidence →</a></section></div><div class="blueprint-grid"><article class="blueprint-card"><div class="blueprint-number">01</div><h3>Find and finish</h3><p>Capable workers can discover opportunities, build the work, verify it, and preserve a result instead of stopping at a proposal.</p></article><article class="blueprint-card"><div class="blueprint-number">02</div><h3>Publish and submit</h3><p>Code, pull requests, competition entries, proposals, and public work can move forward as part of the declared objective.</p></article><article class="blueprint-card"><div class="blueprint-number">03</div><h3>Respectful outreach</h3><p>Every first message discloses AI assistance on Jaron’s behalf. An opt-out is remembered locally and ends future contact.</p></article><article class="blueprint-card"><div class="blueprint-number">04</div><h3>Build value</h3><p>Paid work and useful procurement are evaluated through intent, cost, expected value, outcome, and a later review—not arbitrary inactivity.</p></article></div><div class="section-grid"><section class="panel"><div class="panel-head"><h2>AUTHORIZED WORK</h2><span class="subhead">operator mandate</span></div><div class="panel-body"><div class="facts-list">' + autonomyFact("Account enrollment", policy.account_enrollment, "Continue until a service presents an actual credential or 2FA handoff.") + autonomyFact("Public submissions", policy.public_submissions, "Prepare and deliver public code, entries, proposals, and posts when a capable worker is available.") + autonomyFact("Paid work", policy.paid_work, "Track useful delivery and payout status as real work outcomes.") + autonomyFact("Procurement when funded", policy.procurement_when_funded, "A connected funding source enables documented, value-oriented purchases.") + '</div></div></section><section class="panel"><div class="panel-head"><h2>WORKER CAPACITY</h2><span class="subhead">shared MSI workspace</span></div><div class="panel-body"><div class="facts-list">' + autonomyFact("Transparent outreach", policy.transparent_outreach && policy.outreach_opt_out, "First contact is disclosed; people who decline are permanently suppressed.") + autonomyFact("Developer tooling", policy.developer_tools, "Workers can obtain ordinary tools needed to finish the assigned product-quality job.") + autonomyFact("Idle GPU work", policy.gpu_idle_use, "Declared compute work may use the GPU whenever the protected worker is not using it.") + autonomyFact("Terms-aware execution", policy.terms_aware_execution, "Following a platform’s rules protects eligibility for the payout rather than slowing the work down.") + '</div></div></section></div>';
+    }
+
     function renderActivity() {
       const allEvents = dataSets().events;
       const filteredEvents = recentEvents(null, state.eventFilter);
@@ -1336,6 +1368,7 @@
       if (route === "agents") return renderAgents();
       if (route === "evaluations") return renderEvaluations();
       if (route === "research") return renderResearch();
+      if (route === "autonomy") return renderAutonomy();
       if (route === "activity") return renderActivity();
       if (route === "operations") return renderOperations();
       return renderOverview();

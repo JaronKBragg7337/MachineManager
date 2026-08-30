@@ -22,6 +22,8 @@ The GitHub Pages root forwards directly to the visual Machine Manager control ce
 
 Dashboard: [Open the public Machine Manager control center](https://jaronkbragg7337.github.io/MachineManager/dashboard/)
 
+Operating mandate: [Read the Machine Manager Operating Charter](docs/OPERATING_CHARTER.md)
+
 The repository page remains the source/documentation view. The Pages site is the operational dashboard.
 
 ## Hierarchy
@@ -105,11 +107,13 @@ restart, a persistent work queue, capability discovery, scheduled local
 agents, and a public upload boundary.
 
 The Bitcoin search is the first proving-ground job. Future research,
-breakthrough, engineering, and revenue-oriented jobs should be registered as
-separate objectives with their own worker, evidence, resource budget, and
-success criteria. Agents may recommend bounded actions, but they do not get
-unrestricted shell access or authority to bypass retry, resource, or secret
-controls.
+engineering, revenue, and delivery work should be registered as separate
+objectives with their own worker, evidence, resource budget, and success
+criteria. The active [Operating Charter](docs/OPERATING_CHARTER.md) is
+**execute-and-report**: capable workers should research, build, verify,
+publish, follow up, and continue rather than stop after a draft. A service-owned
+credential, 2FA, identity, or payment interaction becomes a specific handoff
+item while the task and its evidence remain intact.
 
 Public updates require a dedicated fine-grained GitHub token stored only in a
 local ignored env file. The Windows Task Scheduler installer can keep the

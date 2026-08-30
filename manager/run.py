@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .agents import AgentCoordinator
+from .autonomy import OperatingCharter
 from .capabilities import CapabilityRegistry
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
@@ -314,6 +315,7 @@ def main() -> int:
 
     config_path = args.config.resolve()
     config = load_config(config_path)
+    charter = OperatingCharter.from_mapping(config.get("autonomy"))
     base = config_path.parent
     load_env_file(resolve_path(config.get("env_file"), base=base))
     manager_log_path = (
@@ -414,6 +416,10 @@ def main() -> int:
                 for item in agents_raw
                 if isinstance(item, Mapping)
             ),
+            execute_and_report_enabled=charter.mode == "EXECUTE_AND_REPORT",
+            transparent_outreach_enabled=charter.allow_outreach and charter.honor_outreach_opt_out,
+            developer_tools_enabled=charter.allow_tool_installation,
+            gpu_idle_use_enabled=charter.allow_gpu_when_protected_worker_idle,
         )
         interval = max(0.1, float(config.get("poll_interval_s", 15)))
         objective = str(config.get("objective", primary_objective_id))
@@ -434,6 +440,7 @@ def main() -> int:
             agents.tick(snapshot, events=store.recent_events(limit=20))
             snapshot["agents"] = agents.snapshot()
             snapshot["capabilities"] = capabilities.snapshot()
+            snapshot["autonomy"] = charter.public_summary()
             snapshot["queue"] = scheduler.snapshot()
             _persist_runtime(manager, agents, store, seen_event_ids)
             public_events = merge_public_events(
@@ -479,6 +486,7 @@ def main() -> int:
                 stopped["updated"] = utc_now()
                 stopped["agents"] = agents.snapshot()
                 stopped["capabilities"] = capabilities.snapshot()
+                stopped["autonomy"] = charter.public_summary()
                 stopped["queue"] = scheduler.snapshot()
                 public_events = merge_public_events(
                     public_events,

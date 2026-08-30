@@ -80,6 +80,18 @@ PUBLIC_QUEUE_KEYS = {
     "ESCALATED",
     "CANCELLED",
 }
+PUBLIC_AUTONOMY_BOOL_KEYS = {
+    "account_enrollment",
+    "public_submissions",
+    "transparent_outreach",
+    "outreach_opt_out",
+    "paid_work",
+    "procurement_when_funded",
+    "developer_tools",
+    "gpu_idle_use",
+    "terms_aware_execution",
+}
+PUBLIC_AUTONOMY_TEXT_KEYS = {"mode", "handoff_style"}
 
 
 def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | bool]:
@@ -143,6 +155,19 @@ def _safe_queue(queue: Mapping[str, Any] | None) -> dict[str, int]:
         number = _number(value)
         if number is not None:
             safe[clean_key] = max(0, int(number))
+    return safe
+
+
+def _safe_autonomy(value: Mapping[str, Any] | None) -> dict[str, str | bool]:
+    if not isinstance(value, Mapping):
+        return {}
+    safe: dict[str, str | bool] = {}
+    for key in PUBLIC_AUTONOMY_BOOL_KEYS:
+        if isinstance(value.get(key), bool):
+            safe[key] = value[key]
+    for key in PUBLIC_AUTONOMY_TEXT_KEYS:
+        if key in value:
+            safe[key] = _text(value[key], max_len=80)
     return safe
 
 
@@ -287,6 +312,7 @@ class TelemetryPublisher:
             "jobs": safe_jobs,
             "agents": self._agents(snapshot.get("agents", [])),
             "capabilities": self._capabilities(snapshot.get("capabilities", [])),
+            "autonomy": _safe_autonomy(snapshot.get("autonomy")),
             "queue": _safe_queue(snapshot.get("queue")),
             "gpu": gpu,
             "progress": safe_workers[0].get("progress", {}) if safe_workers else {},
