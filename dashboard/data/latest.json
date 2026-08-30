@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T18:56:44.961Z",
+        "observed_at": "2026-08-30T18:58:25.690Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 166.0,
-        "matches_found": 0,
-        "hashrate_mkey_s": 796.19,
-        "keys_per_second": 796190000,
-        "sample_count": 22,
+        "keys_tested": 164836147200,
+        "sample_count": 1,
+        "hashrate_mkey_s": 794.15,
+        "uptime_s": 1.0,
+        "batch_number": 50,
+        "keys_per_second": 794150000,
         "coverage_pct": 0,
-        "batch_number": 32,
-        "keys_tested": 106149445632
+        "matches_found": 0
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T18:56:44.961Z",
+        "observed_at": "2026-08-30T18:58:25.690Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 166.0,
-        "matches_found": 0,
-        "hashrate_mkey_s": 796.19,
-        "keys_per_second": 796190000,
-        "sample_count": 22,
+        "keys_tested": 164836147200,
+        "sample_count": 1,
+        "hashrate_mkey_s": 794.15,
+        "uptime_s": 1.0,
+        "batch_number": 50,
+        "keys_per_second": 794150000,
         "coverage_pct": 0,
-        "batch_number": 32,
-        "keys_tested": 106149445632
+        "matches_found": 0
       }
     }
   ],
@@ -56,14 +56,14 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System is healthy with stable GPU utilization and no errors detected.",
-      "last_duration_s": 4.375,
-      "tasks_completed": 2,
-      "last_run": "2026-08-30T18:56:45.006Z",
-      "next_run": "2026-08-30T19:01:45.006Z"
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -306,51 +306,51 @@
       "title": "First revenue task assessment",
       "lane": "Opportunity delivery",
       "owner": "opportunity-runner",
-      "state": "QUEUED",
-      "summary": "No platform account, claim, application, or submission has been created for this mission.",
-      "next_action": "Inspect one exact public task and register only the concrete service handoff it actually requires.",
+      "state": "REVIEW",
+      "summary": "A public listing assessment found no verifiable active agent-eligible software task; no account, claim, application, or submission was created.",
+      "next_action": "Recheck the public agent listings when a concrete task appears, then verify its scope, reward, deadline, and service handoffs.",
       "source_kind": "static",
       "metrics": {},
-      "updated": "2026-08-30T18:51:28.452Z"
+      "updated": "2026-08-30T18:58:26.650Z"
     }
   ],
   "autonomy": {
-    "outreach_opt_out": true,
-    "developer_tools": true,
-    "transparent_outreach": true,
-    "account_enrollment": true,
-    "terms_aware_execution": true,
-    "procurement_when_funded": true,
-    "gpu_idle_use": true,
     "paid_work": true,
+    "procurement_when_funded": true,
     "public_submissions": true,
+    "terms_aware_execution": true,
+    "developer_tools": true,
+    "outreach_opt_out": true,
+    "account_enrollment": true,
+    "transparent_outreach": true,
+    "gpu_idle_use": true,
     "mode": "EXECUTE_AND_REPORT",
     "handoff_style": "service-required"
   },
   "queue": {},
   "gpu": {
-    "util_pct": 83.0,
+    "util_pct": 75.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 63.0,
-    "power_w": 82.55
+    "temp_c": 64.0,
+    "power_w": 81.73
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T18:56:44.961Z",
+    "observed_at": "2026-08-30T18:58:25.690Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 166.0,
-    "matches_found": 0,
-    "hashrate_mkey_s": 796.19,
-    "keys_per_second": 796190000,
-    "sample_count": 22,
+    "keys_tested": 164836147200,
+    "sample_count": 1,
+    "hashrate_mkey_s": 794.15,
+    "uptime_s": 1.0,
+    "batch_number": 50,
+    "keys_per_second": 794150000,
     "coverage_pct": 0,
-    "batch_number": 32,
-    "keys_tested": 106149445632
+    "matches_found": 0
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T18:56:45.006Z"
+  "updated": "2026-08-30T18:58:26.649Z"
 }
