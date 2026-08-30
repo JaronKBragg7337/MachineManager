@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T19:48:55.933Z",
+        "observed_at": "2026-08-30T19:51:03.529Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "sample_count": 21,
-        "matches_found": 0,
-        "uptime_s": 307.1,
-        "hashrate_mkey_s": 799.01,
-        "keys_per_second": 799010000,
         "coverage_pct": 0,
-        "batch_number": 68,
-        "keys_tested": 222063230976
+        "batch_number": 103,
+        "keys_per_second": 797480000,
+        "matches_found": 0,
+        "keys_tested": 337826021376,
+        "uptime_s": 0.9,
+        "sample_count": 1,
+        "hashrate_mkey_s": 797.48
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T19:48:55.933Z",
+        "observed_at": "2026-08-30T19:51:03.529Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "sample_count": 21,
-        "matches_found": 0,
-        "uptime_s": 307.1,
-        "hashrate_mkey_s": 799.01,
-        "keys_per_second": 799010000,
         "coverage_pct": 0,
-        "batch_number": 68,
-        "keys_tested": 222063230976
+        "batch_number": 103,
+        "keys_per_second": 797480000,
+        "matches_found": 0,
+        "keys_tested": 337826021376,
+        "uptime_s": 0.9,
+        "sample_count": 1,
+        "hashrate_mkey_s": 797.48
       }
     }
   ],
@@ -58,12 +58,12 @@
       "model": "qwen3.5:4b",
       "state": "WORKING",
       "enabled": true,
-      "last_action": "restart",
-      "last_reason": "Retry limit reached on job-p71-001 after failed verification attempts.",
-      "last_duration_s": 3.687,
-      "tasks_completed": 1,
-      "last_run": "2026-08-30T19:44:09.247Z",
-      "next_run": "2026-08-30T19:49:09.247Z"
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -323,42 +323,42 @@
     }
   ],
   "autonomy": {
+    "paid_work": true,
+    "procurement_when_funded": true,
     "transparent_outreach": true,
     "outreach_opt_out": true,
-    "terms_aware_execution": true,
-    "account_enrollment": true,
-    "paid_work": true,
-    "gpu_idle_use": true,
-    "procurement_when_funded": true,
-    "developer_tools": true,
     "public_submissions": true,
+    "developer_tools": true,
+    "account_enrollment": true,
+    "terms_aware_execution": true,
+    "gpu_idle_use": true,
     "mode": "EXECUTE_AND_REPORT",
     "handoff_style": "service-required"
   },
   "queue": {},
   "gpu": {
-    "util_pct": 87.0,
+    "util_pct": 88.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 58.0,
-    "power_w": 81.8
+    "temp_c": 64.0,
+    "power_w": 82.36
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T19:48:55.933Z",
+    "observed_at": "2026-08-30T19:51:03.529Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "sample_count": 21,
-    "matches_found": 0,
-    "uptime_s": 307.1,
-    "hashrate_mkey_s": 799.01,
-    "keys_per_second": 799010000,
     "coverage_pct": 0,
-    "batch_number": 68,
-    "keys_tested": 222063230976
+    "batch_number": 103,
+    "keys_per_second": 797480000,
+    "matches_found": 0,
+    "keys_tested": 337826021376,
+    "uptime_s": 0.9,
+    "sample_count": 1,
+    "hashrate_mkey_s": 797.48
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T19:48:55.967Z"
+  "updated": "2026-08-30T19:51:04.461Z"
 }
