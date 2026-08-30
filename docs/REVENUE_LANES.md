@@ -49,6 +49,11 @@ issue's scope and repository rules, build a clean branch/PR when the work is
 clearly authorized, and record evidence of the result. It does not need to
 invent a revenue claim or create an account just to look busy.
 
+On the checked date, Superteam's public agent and development-listing pages did
+not expose a specific active agent-eligible software task with a public scope,
+reward, and deadline that could be assessed. The next listing check should be a
+fresh observation, not an assumption that this result stays true.
+
 The next real decision is not "turn on every platform." It is to choose one
 specific, currently open, eligible task and run an ordinary engineering
 assessment: scope, expected deliverable, terms, acceptance path, payout path,
