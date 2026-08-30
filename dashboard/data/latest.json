@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T20:02:43.205Z",
+        "observed_at": "2026-08-30T20:07:49.190Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -21,8 +21,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 701.5,
-        "sample_count": 47,
+        "uptime_s": 1008.2,
+        "sample_count": 64,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T20:02:43.205Z",
+        "observed_at": "2026-08-30T20:07:49.190Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -44,8 +44,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 701.5,
-        "sample_count": 47,
+        "uptime_s": 1008.2,
+        "sample_count": 64,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -58,12 +58,12 @@
       "model": "qwen3.5:4b",
       "state": "WAITING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System is healthy with normal resource utilization and no errors detected.",
-      "last_duration_s": 5.953,
-      "tasks_completed": 3,
-      "last_run": "2026-08-30T20:01:54.752Z",
-      "next_run": "2026-08-30T20:06:54.752Z"
+      "last_action": "escalate",
+      "last_reason": "Retry limit reached with missing progress signals; human intervention required.",
+      "last_duration_s": 3.219,
+      "tasks_completed": 4,
+      "last_run": "2026-08-30T20:06:58.111Z",
+      "next_run": "2026-08-30T20:11:58.111Z"
     }
   ],
   "capabilities": [
@@ -338,15 +338,15 @@
   "queue": {},
   "gpu": {
     "util_pct": 0.0,
-    "mem_used_mib": 2367.0,
+    "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 52.0,
-    "power_w": 75.66
+    "temp_c": 42.0,
+    "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T20:02:43.205Z",
+    "observed_at": "2026-08-30T20:07:49.190Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -355,10 +355,10 @@
     "keys_per_second": 742080000,
     "matches_found": 0,
     "keys_tested": 810842849280,
-    "uptime_s": 701.5,
-    "sample_count": 47,
+    "uptime_s": 1008.2,
+    "sample_count": 64,
     "hashrate_mkey_s": 742.08
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T20:02:45.017Z"
+  "updated": "2026-08-30T20:07:51.696Z"
 }
