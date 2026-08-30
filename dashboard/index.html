@@ -653,6 +653,7 @@
         <a href="#/workers" data-route="workers"><span class="nav-icon" data-icon="cpu"></span><span>Workers</span><span class="nav-arrow">›</span></a>
         <a href="#/search" data-route="search"><span class="nav-icon" data-icon="target"></span><span>Search Evidence</span><span class="nav-arrow">›</span></a>
         <a href="#/agents" data-route="agents"><span class="nav-icon" data-icon="bot"></span><span>Agents</span><span class="nav-arrow">›</span></a>
+        <a href="#/work" data-route="work"><span class="nav-icon" data-icon="briefcase"></span><span>Work Lanes</span><span class="nav-arrow">›</span></a>
         <a href="#/evaluations" data-route="evaluations"><span class="nav-icon" data-icon="chart"></span><span>Evaluations</span><span class="nav-arrow">›</span></a>
         <a href="#/research" data-route="research"><span class="nav-icon" data-icon="flask"></span><span>Research</span><span class="nav-arrow">›</span></a>
         <a href="#/autonomy" data-route="autonomy"><span class="nav-icon" data-icon="check"></span><span>Autonomy</span><span class="nav-arrow">›</span></a>
@@ -668,7 +669,7 @@
     <nav class="mobile-nav" aria-label="Quick navigation">
       <a href="#/overview" data-route="overview"><span data-icon="grid"></span><span>Control</span></a>
       <a href="#/search" data-route="search"><span data-icon="target"></span><span>Search</span></a>
-      <a href="#/agents" data-route="agents"><span data-icon="bot"></span><span>Agents</span></a>
+      <a href="#/work" data-route="work"><span data-icon="briefcase"></span><span>Work</span></a>
       <a href="#/activity" data-route="activity"><span data-icon="activity"></span><span>Activity</span></a>
     </nav>
 
@@ -690,6 +691,7 @@
         <a href="#/workers" data-route="workers">Workers</a>
         <a href="#/search" data-route="search">Search Evidence</a>
         <a href="#/agents" data-route="agents">Agents</a>
+        <a href="#/work" data-route="work">Work Lanes</a>
         <a href="#/evaluations" data-route="evaluations">Evaluations</a>
         <a href="#/research" data-route="research">Research</a>
         <a href="#/autonomy" data-route="autonomy">Autonomy</a>
@@ -711,6 +713,7 @@
       workers: { label: "Workers", eyebrow: "Execution layer" },
       search: { label: "Search Evidence", eyebrow: "Bitcoin workstream" },
       agents: { label: "Agents", eyebrow: "Bounded specialists" },
+      work: { label: "Work Lanes", eyebrow: "Visible agent missions" },
       evaluations: { label: "Evaluations", eyebrow: "Reference and manager runs" },
       research: { label: "Research", eyebrow: "Future workstreams" },
       autonomy: { label: "Autonomy", eyebrow: "Execution charter" },
@@ -850,6 +853,7 @@
         workers: asArray(latest.workers),
         jobs: asArray(latest.jobs),
         agents: asArray(latest.agents),
+        workstreams: asArray(latest.workstreams),
         capabilities: asArray(latest.capabilities),
         workerProfiles: asArray(latest.worker_profiles),
         constraintAudits: asArray(latest.constraint_audits),
@@ -1301,6 +1305,31 @@
       return pageHeading("Bounded specialists", "Agents support the manager", "Local and future cloud models can advise the runtime without becoming an unrestricted operator.", '<a class="btn" href="#/search">View workstream <span>→</span></a>') + snapshotStrip() + '<div class="agent-cards">' + cards + '</div><div class="section-grid"><div>' + renderAgentRuns(12) + '</div><section class="panel"><div class="panel-head"><h2>AGENT CONTRACT</h2><span class="subhead">designed for growth</span></div><div class="panel-body"><div class="facts-list"><div class="fact-row"><span>Authority</span><strong>Recommend only</strong></div><div class="fact-row"><span>Escalation</span><strong>Manager controlled</strong></div><div class="fact-row"><span>Resource policy</span><strong>Bounded slots</strong></div><div class="fact-row"><span>Public record</span><strong>Sanitized activity</strong></div></div></div></section></div>';
     }
 
+    function workstreamMetricCards(stream) {
+      const metrics = stream.metrics && typeof stream.metrics === "object" ? stream.metrics : {};
+      const cards = [];
+      if (metrics.candidate_count !== undefined) cards.push(["Review leads", compactNumber(metrics.candidate_count)]);
+      if (metrics.files_scanned !== undefined) cards.push(["Files scanned", compactNumber(metrics.files_scanned)]);
+      if (metrics.more_pending !== undefined) cards.push(["More pending", metrics.more_pending ? "Yes" : "No"]);
+      if (metrics.tasks_completed !== undefined) cards.push(["Completed passes", compactNumber(metrics.tasks_completed)]);
+      if (metrics.capability_count !== undefined) cards.push(["Capability records", compactNumber(metrics.capability_count)]);
+      return cards.length ? '<div class="agent-meta">' + cards.map(function (card) { return '<div class="mini-card"><span class="label">' + escapeHtml(card[0]) + '</span><div class="value">' + escapeHtml(card[1]) + '</div></div>'; }).join("") + '</div>' : '';
+    }
+
+    function workstreamCard(stream) {
+      const stateLabel = upper(stream.state || "UNKNOWN").replace(/_/g, " ");
+      return '<article class="agent-card"><div class="agent-top"><div><p class="eyebrow">' + escapeHtml(stream.lane || "Work lane") + '</p><h2>' + escapeHtml(stream.title || stream.id || "Unnamed work stream") + '</h2><div class="agent-model">Owner · ' + escapeHtml(stream.owner || "local-manager") + '</div></div>' + badge(stream.state, stateLabel) + '</div>' + workstreamMetricCards(stream) + '<div class="agent-boundary"><strong>What is happening:</strong> ' + escapeHtml(stream.summary || "No public summary is published yet.") + '<br><br><strong>Next action:</strong> ' + escapeHtml(stream.next_action || "Await the next observed state update.") + '<br><br><span class="muted">Observed ' + escapeHtml(formatDate(stream.updated, true)) + ' · source: ' + escapeHtml(String(stream.source_kind || "static").replace(/_/g, " ")) + '</span></div></article>';
+    }
+
+    function renderWork() {
+      const streams = dataSets().workstreams;
+      const running = streams.filter(function (stream) { return upper(stream.state) === "RUNNING"; }).length;
+      const review = streams.filter(function (stream) { return upper(stream.state) === "REVIEW"; }).length;
+      const complete = streams.filter(function (stream) { return upper(stream.state) === "COMPLETE"; }).length;
+      const workEvents = recentEvents(16).filter(function (event) { return String(event.type || "").toLowerCase().includes("workstream"); });
+      return pageHeading("Visible agent missions", "See the work, not just the worker count", "Each lane is a configured mission tied to an observed runtime signal or an explicitly registered bounded task. This page does not claim invisible background work.", '<a class="btn" href="#/activity">Open activity ledger <span>→</span></a>') + snapshotStrip() + '<div class="kpi-grid"><div class="kpi-card accent"><span class="label">Published lanes</span><div class="kpi-value">' + escapeHtml(String(streams.length)) + '</div><div class="kpi-note">Configured and visible</div></div><div class="kpi-card ' + (running ? "success" : "") + '"><span class="label">Working now</span><div class="kpi-value">' + escapeHtml(String(running)) + '</div><div class="kpi-note">Observed RUNNING state</div></div><div class="kpi-card ' + (review ? "warn" : "") + '"><span class="label">Needs review</span><div class="kpi-value">' + escapeHtml(String(review)) + '</div><div class="kpi-note">Evidence-backed next move</div></div><div class="kpi-card"><span class="label">Completed</span><div class="kpi-value">' + escapeHtml(String(complete)) + '</div><div class="kpi-note">Recorded mission outcomes</div></div></div><section class="panel"><div class="panel-head"><h2>WORK LANES</h2><span class="subhead">observed state only</span></div><div class="panel-body"><div class="agent-cards">' + (streams.length ? streams.map(workstreamCard).join("") : '<div class="empty-cell">No work lanes are registered in the current snapshot yet. The local manager can add a configured, bounded mission without exposing local paths, raw prompts, or credentials.</div>') + '</div></div></section><section class="panel"><div class="panel-head"><h2>WORK LANE EVENTS</h2><span class="subhead">state changes only</span></div><div class="panel-body"><div class="event-list">' + (workEvents.length ? workEvents.map(eventRow).join("") : '<div class="empty-cell">No work-lane state changes have been published yet.</div>') + '</div></div></section><div class="ops-note"><strong>Truthful visibility.</strong><br>A stream can be a running evidence worker, a bounded specialist task, or a completed mission. It never exposes raw prompts, private source paths, credentials, candidate values, or unverified claims of progress.</div>';
+    }
+
     function renderScenariosTable(scenarios) {
       if (!scenarios.length) return '<div class="empty-cell">No evaluation records are published.</div>';
       return '<div class="table-wrap"><table><thead><tr><th>Scenario</th><th>Run type</th><th>Result</th><th>Score</th><th>Recovery</th></tr></thead><tbody>' + scenarios.map(function (scenario) {
@@ -1405,6 +1434,7 @@
       if (route === "workers") return renderWorkers();
       if (route === "search") return renderSearch();
       if (route === "agents") return renderAgents();
+      if (route === "work") return renderWork();
       if (route === "evaluations") return renderEvaluations();
       if (route === "research") return renderResearch();
       if (route === "autonomy") return renderAutonomy();

@@ -99,6 +99,20 @@ latency); it does not publish private prompts or hidden reasoning. Agent output
 is advisory; the supervisor still owns process control, retry limits,
 escalation, and secrets.
 
+## Visible work lanes
+
+The optional `workstreams` array is a public-safe ledger for missions beyond
+the primary process-supervised job. A lane can follow a configured constraint
+audit, bounded local agent, worker capability profile, or a deliberately
+registered static milestone. The local manager persists the current observed
+state and publishes only an allowlisted summary: title, owner label, state,
+compact metrics, next action, and timestamp.
+
+`RUNNING` is reserved for an observed active source. `REVIEW` means the source
+has produced evidence that deserves a defined next test. `COMPLETE` is a
+recorded bounded outcome, not a claim that a background worker is still active.
+Details are in [`docs/WORK_LANES.md`](WORK_LANES.md).
+
 ## Public telemetry upload
 
 Local publication and public publication are separate steps:

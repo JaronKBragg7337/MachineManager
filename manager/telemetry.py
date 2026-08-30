@@ -102,6 +102,19 @@ PUBLIC_OBSERVATION_STATES = {
 }
 PUBLIC_AUDIT_STATES = {"NEEDS_EVIDENCE_REVIEW", "NO_CANDIDATES", "RUNNING", "FAILED", "UNKNOWN"}
 PUBLIC_AUDIT_CATEGORIES = {"approval_gate", "autonomy_limit", "scope_boundary", "data_boundary"}
+PUBLIC_WORKSTREAM_STATES = {
+    "QUEUED",
+    "RUNNING",
+    "WAITING",
+    "REVIEW",
+    "COMPLETE",
+    "FAILED",
+    "ESCALATED",
+    "DEGRADED",
+    "UNKNOWN",
+}
+PUBLIC_WORKSTREAM_SOURCES = {"static", "agent", "constraint_audit", "worker_profile"}
+PUBLIC_WORKSTREAM_METRICS = {"candidate_count", "files_scanned", "more_pending", "tasks_completed", "capability_count"}
 
 
 def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | bool]:
@@ -324,6 +337,46 @@ class TelemetryPublisher:
             )
         return public
 
+    def _workstreams(self, streams: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        public: list[dict[str, Any]] = []
+        for stream in streams:
+            if len(public) >= 30 or not isinstance(stream, Mapping):
+                continue
+            state = _text(stream.get("state"), default="UNKNOWN", max_len=30).upper()
+            if state not in PUBLIC_WORKSTREAM_STATES:
+                state = "UNKNOWN"
+            source_kind = _text(stream.get("source_kind"), default="static", max_len=40).lower()
+            if source_kind not in PUBLIC_WORKSTREAM_SOURCES:
+                source_kind = "static"
+            metrics: dict[str, int | bool] = {}
+            raw_metrics = stream.get("metrics", {})
+            if isinstance(raw_metrics, Mapping):
+                for key, value in raw_metrics.items():
+                    if key not in PUBLIC_WORKSTREAM_METRICS:
+                        continue
+                    if isinstance(value, bool):
+                        metrics[key] = value
+                    else:
+                        number = _number(value)
+                        if number is not None:
+                            metrics[key] = max(0, int(number))
+            public.append(
+                {
+                    "id": _text(stream.get("id"), max_len=100),
+                    "objective_id": _text(stream.get("objective_id"), max_len=100),
+                    "title": _text(stream.get("title"), max_len=120),
+                    "lane": _text(stream.get("lane"), max_len=80),
+                    "owner": _text(stream.get("owner"), max_len=80),
+                    "state": state,
+                    "summary": _text(stream.get("summary"), max_len=220),
+                    "next_action": _text(stream.get("next_action"), max_len=180),
+                    "source_kind": source_kind,
+                    "metrics": metrics,
+                    "updated": _text(stream.get("updated"), max_len=40),
+                }
+            )
+        return public
+
     def _events(self, events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         public: list[dict[str, Any]] = []
         for event in events:
@@ -395,6 +448,7 @@ class TelemetryPublisher:
             "capabilities": self._capabilities(snapshot.get("capabilities", [])),
             "worker_profiles": self._worker_profiles(snapshot.get("worker_profiles", [])),
             "constraint_audits": self._constraint_audits(snapshot.get("constraint_audits", [])),
+            "workstreams": self._workstreams(snapshot.get("workstreams", [])),
             "autonomy": _safe_autonomy(snapshot.get("autonomy")),
             "queue": _safe_queue(snapshot.get("queue")),
             "gpu": gpu,

@@ -83,6 +83,21 @@
       "keep_gpu_free": true
     }
   ],
+  "workstreams": [
+    {
+      "id": "machine-manager-evidence",
+      "objective_id": "machine-manager-governance",
+      "title": "Machine Manager evidence audit",
+      "lane": "Capability evidence",
+      "owner": "evidence-coordinator",
+      "summary": "Maps configured source into review leads without changing source files.",
+      "next_action": "Continue the saved scan window, then review the evidence-backed leads.",
+      "source": {
+        "kind": "constraint_audit",
+        "id": "machine-manager-source"
+      }
+    }
+  ],
   "jobs": [
     {
       "id": "synthetic-worker-001",

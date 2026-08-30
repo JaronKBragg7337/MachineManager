@@ -105,6 +105,14 @@ class StateStore:
                 );
                 CREATE INDEX IF NOT EXISTS constraint_audits_updated_idx
                     ON constraint_audits(updated, target_id);
+                CREATE TABLE IF NOT EXISTS workstreams (
+                    stream_id TEXT PRIMARY KEY,
+                    state TEXT NOT NULL,
+                    updated TEXT NOT NULL,
+                    payload TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS workstreams_updated_idx
+                    ON workstreams(updated, stream_id);
                 """
             )
 
@@ -513,3 +521,43 @@ class StateStore:
                 "SELECT status, COUNT(*) AS count FROM tasks GROUP BY status"
             ).fetchall()
         return {str(row["status"]): int(row["count"]) for row in rows}
+
+    def upsert_workstream(self, snapshot: Mapping[str, Any]) -> None:
+        stream_id = str(snapshot.get("id", snapshot.get("stream_id", "")))
+        if not stream_id:
+            raise ValueError("workstream id is required")
+        updated = str(snapshot.get("updated", ""))
+        if not updated:
+            raise ValueError("workstream updated timestamp is required")
+        with self._lock, self._connection:
+            self._connection.execute(
+                """
+                INSERT INTO workstreams (stream_id, state, updated, payload)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(stream_id) DO UPDATE SET
+                    state=excluded.state,
+                    updated=excluded.updated,
+                    payload=excluded.payload
+                """,
+                (
+                    stream_id,
+                    str(snapshot.get("state", "UNKNOWN")),
+                    updated,
+                    self._json(dict(snapshot)),
+                ),
+            )
+
+    def get_workstream(self, stream_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            row = self._connection.execute(
+                "SELECT payload FROM workstreams WHERE stream_id = ?",
+                (stream_id,),
+            ).fetchone()
+        return self._object(row["payload"]) if row else None
+
+    def list_workstreams(self) -> list[dict[str, Any]]:
+        with self._lock:
+            rows = self._connection.execute(
+                "SELECT payload FROM workstreams ORDER BY updated DESC, stream_id"
+            ).fetchall()
+        return [self._object(row["payload"]) for row in rows]

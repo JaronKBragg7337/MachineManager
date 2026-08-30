@@ -60,6 +60,7 @@ class CapabilityRegistry:
         gpu_idle_use_enabled: bool = False,
         evidence_ledger_enabled: bool = False,
         constraint_audit_enabled: bool = False,
+        workstreams_enabled: bool = False,
     ) -> "CapabilityRegistry":
         registry = cls()
         registry.register("process-supervision", "Start, observe, recover, and stop bounded worker processes.")
@@ -75,4 +76,5 @@ class CapabilityRegistry:
         registry.register("idle-gpu-work", "Use available GPU capacity for declared work when the protected worker is idle.", enabled=gpu_idle_use_enabled)
         registry.register("capability-evidence-ledger", "Record tested and observed worker capabilities by model/runtime version.", enabled=evidence_ledger_enabled)
         registry.register("constraint-audit", "Find candidate approval and policy language for evidence-based review without changing source automatically.", enabled=constraint_audit_enabled)
+        registry.register("workstream-ledger", "Publish configured worker missions with observed state instead of an unexplained queue count.", enabled=workstreams_enabled)
         return registry

@@ -23,6 +23,7 @@ from .scheduler import WorkScheduler
 from .state_store import StateStore
 from .supervisor import WorkerSpec
 from .telemetry import TelemetryPublisher, utc_now
+from .workstreams import WorkstreamRegistry
 
 
 def load_json_document(path: Path) -> Any:
@@ -345,6 +346,7 @@ def main() -> int:
     manager: MachineManager | None = None
     agents: AgentCoordinator | None = None
     scheduler: WorkScheduler | None = None
+    workstreams: WorkstreamRegistry | None = None
     local_publisher: TelemetryPublisher | None = None
     remote_publisher: GitHubPagesPublisher | None = None
     capabilities: CapabilityRegistry | None = None
@@ -400,6 +402,30 @@ def main() -> int:
             raise ValueError("config.agents must be an array")
         agents = AgentCoordinator(agents_raw)
         scheduler = WorkScheduler(store)
+        try:
+            workstreams = WorkstreamRegistry(store, config.get("workstreams", []))
+        except (TypeError, ValueError) as exc:
+            store.append_event(
+                {
+                    "timestamp": utc_now(),
+                    "event_id": f"evt-workstream-config-{time.time_ns()}",
+                    "objective_id": primary_objective_id,
+                    "job_id": primary_job_id,
+                    "worker_id": "",
+                    "actor": str(config.get("actor", "local-manager")),
+                    "event_type": "workstream_configuration_deferred",
+                    "previous_state": "UNKNOWN",
+                    "new_state": "DEFERRED",
+                    "metrics": {},
+                    "action": "load_workstream_config",
+                    "outcome": "core_supervision_continues",
+                    "artifact_refs": [],
+                    "error": type(exc).__name__,
+                    "duration": None,
+                }
+            )
+            _append_manager_log(manager_log_path, f"Workstream configuration deferred: {type(exc).__name__}")
+            workstreams = None
         try:
             evidence = EvidenceCoordinator(
                 store,
@@ -457,6 +483,7 @@ def main() -> int:
             gpu_idle_use_enabled=charter.allow_gpu_when_protected_worker_idle,
             evidence_ledger_enabled=bool(evidence and evidence.enabled),
             constraint_audit_enabled=bool(evidence and evidence.targets),
+            workstreams_enabled=bool(workstreams and workstreams.specs),
         )
         interval = max(0.1, float(config.get("poll_interval_s", 15)))
         objective = str(config.get("objective", primary_objective_id))
@@ -483,6 +510,17 @@ def main() -> int:
             snapshot["autonomy"] = charter.public_summary()
             snapshot["worker_profiles"] = evidence.public_profiles() if evidence else []
             snapshot["constraint_audits"] = evidence.public_audits() if evidence else []
+            if workstreams is not None:
+                stream_snapshot, stream_events = workstreams.sync(
+                    agents=snapshot["agents"],
+                    audits=snapshot["constraint_audits"],
+                    profiles=snapshot["worker_profiles"],
+                )
+                snapshot["workstreams"] = stream_snapshot
+                for event in stream_events:
+                    store.append_event(event)
+            else:
+                snapshot["workstreams"] = []
             snapshot["queue"] = scheduler.snapshot()
             _persist_runtime(manager, agents, store, seen_event_ids)
             public_events = merge_public_events(
