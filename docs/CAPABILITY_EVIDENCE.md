@@ -111,8 +111,9 @@ The manager runs due audits in a low-priority background thread so worker
 health checks are not paused. When a target has more files than its configured
 window, the next scheduled pass resumes after the last local source file it
 processed. It wraps to the beginning only after the full target has been
-covered. Failed or unavailable audit targets become a recorded event; they do
-not stop a protected workload.
+covered. A changed scan strategy starts a fresh window immediately rather than
+waiting for an older interval to expire. Failed or unavailable audit targets
+become a recorded event; they do not stop a protected workload.
 
 ## New worker onboarding
 

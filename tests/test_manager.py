@@ -390,6 +390,7 @@ class TelemetryTests(unittest.TestCase):
             self.assertTrue(second.more_pending)
             self.assertFalse(third.more_pending)
             self.assertFalse(third.next_cursor)
+            self.assertTrue(first.scan_signature)
             self.assertTrue(first_paths.isdisjoint(second_paths))
             self.assertTrue(first_paths.isdisjoint(third_paths))
             self.assertTrue(second_paths.isdisjoint(third_paths))

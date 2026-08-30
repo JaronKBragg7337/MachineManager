@@ -99,6 +99,7 @@ EXCLUDED_FILENAMES = {
 SENSITIVE_CONTENT = re.compile(
     r"(?i)(?:github_pat_|ghp_[A-Za-z0-9_]+|(?:token|secret|password|credential|api[ _-]?key)\s*[:=])"
 )
+AUDIT_ALGORITHM_VERSION = "2"
 
 
 def utc_now() -> str:
@@ -274,6 +275,21 @@ class AuditTarget:
             interval_s=interval_s,
         )
 
+    @property
+    def scan_signature(self) -> str:
+        """Identify a scan strategy without storing a local path in telemetry."""
+        material = json.dumps(
+            {
+                "algorithm": AUDIT_ALGORITHM_VERSION,
+                "max_file_bytes": self.max_file_bytes,
+                "max_files": self.max_files,
+                "max_findings": self.max_findings,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(material).hexdigest()
+
 
 @dataclass(frozen=True)
 class ConstraintRule:
@@ -365,6 +381,7 @@ class ConstraintAuditReport:
     truncated: bool
     more_pending: bool
     next_cursor: str
+    scan_signature: str
     findings: tuple[ConstraintFinding, ...]
 
     def local_record(self) -> dict[str, Any]:
@@ -379,6 +396,7 @@ class ConstraintAuditReport:
             "truncated": self.truncated,
             "more_pending": self.more_pending,
             "next_cursor": self.next_cursor,
+            "scan_signature": self.scan_signature,
             "candidate_count": len(self.findings),
             "categories": self.category_counts(),
             "findings": [item.local_record() for item in self.findings],
@@ -496,6 +514,7 @@ class ConstraintAuditor:
             truncated=truncated,
             more_pending=more_pending,
             next_cursor=next_cursor,
+            scan_signature=self.target.scan_signature,
             findings=tuple(findings),
         )
 
@@ -619,6 +638,8 @@ class EvidenceCoordinator:
         if target.target_id in self._pending:
             return False
         previous = self.store.get_constraint_audit(target.target_id)
+        if previous and str(previous.get("scan_signature", "")) != target.scan_signature:
+            return True
         previous_time = _parse_timestamp((previous or {}).get("scanned_at"))
         interval = target.interval_s if target.interval_s is not None else self.audit_interval_s
         return previous_time is None or now - previous_time >= interval
