@@ -1,36 +1,5 @@
 [
   {
-    "ts": "2026-08-30T17:56:53.341Z",
-    "event_id": "evt-759ab6e8e275",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "action": "",
-    "outcome": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true,
-      "util_pct": 75.0,
-      "mem_used_mib": 2367.0,
-      "mem_total_mib": 8188.0,
-      "temp_c": 63.0,
-      "power_w": 80.96,
-      "sample_count": 565,
-      "worker_uptime_s": 5872.1,
-      "progress_reported": true,
-      "hashrate_mkey_s": 793.92,
-      "keys_per_second": 793920000,
-      "coverage_pct": 0,
-      "batch_number": 1428,
-      "keys_tested": 4634638811136,
-      "matches_found": 0
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-30T17:57:08.442Z",
     "event_id": "evt-b182f3e6327c",
     "actor": "local-manager-v2",
@@ -14180,6 +14149,22 @@
       "tasks_completed": 26,
       "fallback": false,
       "duration_s": 6.11
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-30T22:04:46.548Z",
+    "event_id": "agent-local-manager-brain-17881274865484",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no active resource constraints or errors; continuing the continuous search objective.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 27,
+      "fallback": false,
+      "duration_s": 6.547
     },
     "error": false
   }

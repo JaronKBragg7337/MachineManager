@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T22:02:53.245Z",
+        "observed_at": "2026-08-30T22:07:59.580Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -21,8 +21,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 7912.4,
-        "sample_count": 446,
+        "uptime_s": 8218.8,
+        "sample_count": 463,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T22:02:53.245Z",
+        "observed_at": "2026-08-30T22:07:59.580Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -44,8 +44,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 7912.4,
-        "sample_count": 446,
+        "uptime_s": 8218.8,
+        "sample_count": 463,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "Constraint audit completed with no candidates; awaiting synchronized workstream state before proceeding.",
-      "last_duration_s": 6.11,
-      "tasks_completed": 26,
-      "last_run": "2026-08-30T21:59:39.604Z",
-      "next_run": "2026-08-30T22:04:39.604Z"
+      "last_reason": "System is in a stable escalated state with no active resource constraints or errors; continuing the continuous search objective.",
+      "last_duration_s": 6.547,
+      "tasks_completed": 27,
+      "last_run": "2026-08-30T22:04:46.548Z",
+      "next_run": "2026-08-30T22:09:46.548Z"
     }
   ],
   "capabilities": [
@@ -346,7 +346,7 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T22:02:53.245Z",
+    "observed_at": "2026-08-30T22:07:59.580Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -355,10 +355,10 @@
     "keys_per_second": 742080000,
     "matches_found": 0,
     "keys_tested": 810842849280,
-    "uptime_s": 7912.4,
-    "sample_count": 446,
+    "uptime_s": 8218.8,
+    "sample_count": 463,
     "hashrate_mkey_s": 742.08
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T22:02:55.813Z"
+  "updated": "2026-08-30T22:08:02.223Z"
 }
