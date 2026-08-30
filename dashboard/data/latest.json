@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T22:33:36.035Z",
+        "observed_at": "2026-08-30T22:37:49.425Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -21,8 +21,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 9755.1,
-        "sample_count": 548,
+        "uptime_s": 10008.6,
+        "sample_count": 562,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T22:33:36.035Z",
+        "observed_at": "2026-08-30T22:37:49.425Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -44,8 +44,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 9755.1,
-        "sample_count": 548,
+        "uptime_s": 10008.6,
+        "sample_count": 562,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is in a stable escalated state with consistent agent recommendations and no critical resource failures.",
-      "last_duration_s": 6.25,
-      "tasks_completed": 32,
-      "last_run": "2026-08-30T22:30:21.595Z",
-      "next_run": "2026-08-30T22:35:21.595Z"
+      "last_reason": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+      "last_duration_s": 6.125,
+      "tasks_completed": 33,
+      "last_run": "2026-08-30T22:35:29.100Z",
+      "next_run": "2026-08-30T22:40:29.100Z"
     }
   ],
   "capabilities": [
@@ -207,14 +207,19 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NO_CANDIDATES",
-      "scanned_at": "2026-08-30T21:37:15.131Z",
-      "files_scanned": 2994,
-      "files_skipped": 6,
-      "candidate_count": 0,
+      "state": "NEEDS_EVIDENCE_REVIEW",
+      "scanned_at": "2026-08-30T22:37:42.135Z",
+      "files_scanned": 2084,
+      "files_skipped": 18,
+      "candidate_count": 9,
       "truncated": false,
-      "more_pending": true,
-      "categories": {}
+      "more_pending": false,
+      "categories": {
+        "approval_gate": 2,
+        "autonomy_limit": 5,
+        "data_boundary": 1,
+        "scope_boundary": 1
+      }
     },
     {
       "id": "machine-manager-source",
@@ -258,16 +263,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "WAITING",
+      "state": "REVIEW",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 0,
-        "files_scanned": 2994,
-        "more_pending": true
+        "candidate_count": 9,
+        "files_scanned": 2084,
+        "more_pending": false
       },
-      "updated": "2026-08-30T21:37:17.384Z"
+      "updated": "2026-08-30T22:37:52.011Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -340,13 +345,13 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 41.0,
+    "temp_c": 42.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T22:33:36.035Z",
+    "observed_at": "2026-08-30T22:37:49.425Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -355,10 +360,10 @@
     "keys_per_second": 742080000,
     "matches_found": 0,
     "keys_tested": 810842849280,
-    "uptime_s": 9755.1,
-    "sample_count": 548,
+    "uptime_s": 10008.6,
+    "sample_count": 562,
     "hashrate_mkey_s": 742.08
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T22:33:38.584Z"
+  "updated": "2026-08-30T22:37:52.002Z"
 }
