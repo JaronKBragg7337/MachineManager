@@ -20,6 +20,7 @@ from manager.run import (
 )
 from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_agent_response
 from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, OutreachBlockedError, OutreachRegistry
+from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
 from manager.probes import keyhunt_progress_probe
 from manager.state_store import StateStore
@@ -326,6 +327,103 @@ class SupervisorTests(unittest.TestCase):
 
 
 class TelemetryTests(unittest.TestCase):
+    def test_worker_profile_requires_retest_when_model_version_changes(self) -> None:
+        profile = WorkerProfile.from_mapping(
+            {
+                "id": "test-worker",
+                "provider": "test",
+                "model": "example-model",
+                "model_version": "2026.09",
+                "verified_model_version": "2026.08",
+                "capabilities": [
+                    {
+                        "id": "repository-build",
+                        "status": "TESTED_PASS",
+                        "summary": "A bounded build test passed for the older version.",
+                    }
+                ],
+            }
+        )
+        self.assertTrue(profile.retest_required)
+        self.assertEqual(profile.local_record()["state"], "RETEST_REQUIRED")
+
+    def test_constraint_audit_records_candidates_without_changing_source(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw) / "project"
+            root.mkdir()
+            source = root / "README.md"
+            original = "Never publish automatically without approval.\nOnly allowed targets are listed below.\nDo not expose token=not-for-publication.\n"
+            source.write_text(original, encoding="utf-8")
+            target = AuditTarget.from_mapping(
+                {"id": "test-project", "label": "Test project", "path": str(root)},
+                base=root,
+            )
+            report = ConstraintAuditor(target).run()
+            categories = report.category_counts()
+            self.assertGreaterEqual(categories["autonomy_limit"], 1)
+            self.assertGreaterEqual(categories["scope_boundary"], 1)
+            self.assertGreaterEqual(categories["data_boundary"], 1)
+            self.assertTrue(any(item.excerpt == "[redacted]" for item in report.findings))
+            self.assertEqual(source.read_text(encoding="utf-8"), original)
+
+    def test_evidence_coordinator_persists_profiles_and_retest_events(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            database = root / "state.sqlite3"
+            base_config = {
+                "worker_profiles": [
+                    {
+                        "id": "test-worker",
+                        "provider": "test",
+                        "model": "example-model",
+                        "model_version": "v1",
+                        "verified_model_version": "v1",
+                        "capabilities": [],
+                    }
+                ]
+            }
+            changed_config = {
+                "worker_profiles": [
+                    {
+                        "id": "test-worker",
+                        "provider": "test",
+                        "model": "example-model",
+                        "model_version": "v2",
+                        "verified_model_version": "v1",
+                        "capabilities": [],
+                    }
+                ]
+            }
+            with StateStore(database) as store:
+                initial = EvidenceCoordinator(
+                    store,
+                    base_config,
+                    base=root,
+                    actor="test-manager",
+                    objective_id="objective-1",
+                    job_id="job-1",
+                )
+                try:
+                    first_events = initial.tick(now=0)
+                finally:
+                    initial.close()
+                self.assertTrue(any(event["event_type"] == "worker_profile_recorded" for event in first_events))
+                changed = EvidenceCoordinator(
+                    store,
+                    changed_config,
+                    base=root,
+                    actor="test-manager",
+                    objective_id="objective-1",
+                    job_id="job-1",
+                )
+                try:
+                    changed_events = changed.tick(now=0)
+                    profiles = changed.public_profiles()
+                finally:
+                    changed.close()
+            self.assertTrue(any(event["event_type"] == "worker_profile_retest_due" for event in changed_events))
+            self.assertTrue(profiles[0]["retest_required"])
+
     def test_operating_charter_defaults_to_execute_and_report(self) -> None:
         charter = OperatingCharter.from_mapping()
         summary = charter.public_summary()
@@ -662,6 +760,8 @@ class TelemetryTests(unittest.TestCase):
                     "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234, "progress": {"kind": "reported_progress", "sample_count": 4, "keys_tested": 99, "private_key": "do not publish"}}],
                     "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "command": "do not publish"}],
                     "agents": [{"id": "agent-1", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_duration_s": 0.4}],
+                    "worker_profiles": [{"id": "profile-1", "provider": "test", "model": "safe", "model_version": "v1", "state": "READY", "retest_required": False, "private_path": "C:\\Users\\lilli\\private", "capabilities": [{"id": "safe-capability", "status": "TESTED_PASS", "summary": "token=not-for-publication", "private_note": "do not publish"}]}],
+                    "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
                     "gpu": {"util_pct": 80, "power_w": 70, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
@@ -690,6 +790,11 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
             self.assertTrue(latest["autonomy"]["developer_tools"])
             self.assertNotIn("private_note", json.dumps(latest))
+            self.assertNotIn("private_path", json.dumps(latest))
+            self.assertNotIn("findings", json.dumps(latest))
+            self.assertNotIn("C:\\", json.dumps(latest))
+            self.assertEqual(latest["worker_profiles"][0]["capabilities"][0]["summary"], "[redacted]")
+            self.assertEqual(latest["constraint_audits"][0]["categories"], {"approval_gate": 2})
             self.assertNotIn("C:\\", json.dumps(events))
             self.assertNotIn("pid", json.dumps(events))
             self.assertEqual(events[0]["metrics"]["keys_tested"], 99)

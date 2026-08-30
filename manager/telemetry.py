@@ -92,6 +92,16 @@ PUBLIC_AUTONOMY_BOOL_KEYS = {
     "terms_aware_execution",
 }
 PUBLIC_AUTONOMY_TEXT_KEYS = {"mode", "handoff_style"}
+PUBLIC_PROFILE_STATES = {"READY", "RETEST_REQUIRED", "UNKNOWN"}
+PUBLIC_OBSERVATION_STATES = {
+    "TESTED_PASS",
+    "TESTED_FAIL",
+    "OBSERVED",
+    "UNKNOWN",
+    "UNAVAILABLE",
+}
+PUBLIC_AUDIT_STATES = {"NEEDS_EVIDENCE_REVIEW", "NO_CANDIDATES", "RUNNING", "FAILED", "UNKNOWN"}
+PUBLIC_AUDIT_CATEGORIES = {"approval_gate", "autonomy_limit", "scope_boundary", "data_boundary"}
 
 
 def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | bool]:
@@ -243,6 +253,76 @@ class TelemetryPublisher:
             for item in capabilities
         ]
 
+    def _worker_profiles(self, profiles: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        public: list[dict[str, Any]] = []
+        for profile in profiles:
+            if len(public) >= 30:
+                break
+            raw_capabilities = profile.get("capabilities", [])
+            capabilities: list[dict[str, Any]] = []
+            if isinstance(raw_capabilities, Iterable) and not isinstance(raw_capabilities, (str, bytes, Mapping)):
+                for item in raw_capabilities:
+                    if not isinstance(item, Mapping) or len(capabilities) >= 30:
+                        continue
+                    status = _text(item.get("status"), default="UNKNOWN", max_len=30).upper()
+                    if status not in PUBLIC_OBSERVATION_STATES:
+                        status = "UNKNOWN"
+                    capabilities.append(
+                        {
+                            "id": _text(item.get("id"), max_len=100),
+                            "status": status,
+                            "summary": _text(item.get("summary"), max_len=180),
+                            "observed_at": _text(item.get("observed_at"), max_len=40),
+                        }
+                    )
+            state = _text(profile.get("state"), default="UNKNOWN", max_len=40).upper()
+            if state not in PUBLIC_PROFILE_STATES:
+                state = "UNKNOWN"
+            public.append(
+                {
+                    "id": _text(profile.get("id"), max_len=100),
+                    "provider": _text(profile.get("provider"), max_len=60),
+                    "model": _text(profile.get("model"), max_len=100),
+                    "model_version": _text(profile.get("model_version"), max_len=100),
+                    "state": state,
+                    "retest_required": bool(profile.get("retest_required", False)),
+                    "last_verified": _text(profile.get("last_verified"), max_len=40),
+                    "capabilities": capabilities,
+                }
+            )
+        return public
+
+    def _constraint_audits(self, audits: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
+        public: list[dict[str, Any]] = []
+        for audit in audits:
+            if len(public) >= 30:
+                break
+            raw_categories = audit.get("categories", {})
+            categories: dict[str, int] = {}
+            if isinstance(raw_categories, Mapping):
+                for key, value in raw_categories.items():
+                    clean_key = _text(key, max_len=40)
+                    number = _number(value)
+                    if clean_key in PUBLIC_AUDIT_CATEGORIES and number is not None:
+                        categories[clean_key] = max(0, int(number))
+            state = _text(audit.get("state"), default="UNKNOWN", max_len=40).upper()
+            if state not in PUBLIC_AUDIT_STATES:
+                state = "UNKNOWN"
+            public.append(
+                {
+                    "id": _text(audit.get("id"), max_len=100),
+                    "label": _text(audit.get("label"), max_len=100),
+                    "state": state,
+                    "scanned_at": _text(audit.get("scanned_at"), max_len=40),
+                    "files_scanned": max(0, int(_number(audit.get("files_scanned")) or 0)),
+                    "files_skipped": max(0, int(_number(audit.get("files_skipped")) or 0)),
+                    "candidate_count": max(0, int(_number(audit.get("candidate_count")) or 0)),
+                    "truncated": bool(audit.get("truncated", False)),
+                    "categories": categories,
+                }
+            )
+        return public
+
     def _events(self, events: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         public: list[dict[str, Any]] = []
         for event in events:
@@ -312,6 +392,8 @@ class TelemetryPublisher:
             "jobs": safe_jobs,
             "agents": self._agents(snapshot.get("agents", [])),
             "capabilities": self._capabilities(snapshot.get("capabilities", [])),
+            "worker_profiles": self._worker_profiles(snapshot.get("worker_profiles", [])),
+            "constraint_audits": self._constraint_audits(snapshot.get("constraint_audits", [])),
             "autonomy": _safe_autonomy(snapshot.get("autonomy")),
             "queue": _safe_queue(snapshot.get("queue")),
             "gpu": gpu,

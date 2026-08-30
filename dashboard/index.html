@@ -656,6 +656,7 @@
         <a href="#/evaluations" data-route="evaluations"><span class="nav-icon" data-icon="chart"></span><span>Evaluations</span><span class="nav-arrow">›</span></a>
         <a href="#/research" data-route="research"><span class="nav-icon" data-icon="flask"></span><span>Research</span><span class="nav-arrow">›</span></a>
         <a href="#/autonomy" data-route="autonomy"><span class="nav-icon" data-icon="check"></span><span>Autonomy</span><span class="nav-arrow">›</span></a>
+        <a href="#/evidence" data-route="evidence"><span class="nav-icon" data-icon="clipboard"></span><span>Evidence</span><span class="nav-arrow">›</span></a>
         <a href="#/activity" data-route="activity"><span class="nav-icon" data-icon="activity"></span><span>Activity</span><span class="nav-arrow">›</span></a>
         <a href="#/operations" data-route="operations"><span class="nav-icon" data-icon="settings"></span><span>Operations</span><span class="nav-arrow">›</span></a>
       </nav>
@@ -692,6 +693,7 @@
         <a href="#/evaluations" data-route="evaluations">Evaluations</a>
         <a href="#/research" data-route="research">Research</a>
         <a href="#/autonomy" data-route="autonomy">Autonomy</a>
+        <a href="#/evidence" data-route="evidence">Evidence</a>
         <a href="#/activity" data-route="activity">Activity</a>
         <a href="#/operations" data-route="operations">Operations</a>
       </div>
@@ -712,6 +714,7 @@
       evaluations: { label: "Evaluations", eyebrow: "Reference and manager runs" },
       research: { label: "Research", eyebrow: "Future workstreams" },
       autonomy: { label: "Autonomy", eyebrow: "Execution charter" },
+      evidence: { label: "Evidence", eyebrow: "Capability and constraint ledger" },
       activity: { label: "Activity", eyebrow: "Published event timeline" },
       operations: { label: "Operations", eyebrow: "Runtime and capabilities" }
     };
@@ -729,6 +732,7 @@
       refresh: '<path d="M20 11a8 8 0 0 0-14.8-4L3 9"></path><path d="M3 4v5h5"></path><path d="M4 13a8 8 0 0 0 14.8 4L21 15"></path><path d="M21 20v-5h-5"></path>',
       clock: '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>',
       check: '<path d="m5 12 4 4L19 6"></path>',
+      clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4V3h6v1M8 9h8M8 13h8M8 17h5"></path>',
       alert: '<path d="M12 3 2.7 20h18.6L12 3Z"></path><path d="M12 9v4M12 17h.01"></path>'
     };
     const state = {
@@ -808,10 +812,10 @@
 
     function tone(value) {
       const normalized = upper(value).toLowerCase().replace(/[^a-z]/g, "");
-      if (["healthy", "running", "pass", "complete", "fresh", "working", "recovered"].includes(normalized)) return "healthy";
+      if (["healthy", "running", "pass", "complete", "fresh", "working", "recovered", "testedpass", "observed"].includes(normalized)) return "healthy";
       if (["stale", "aging", "degraded", "stalled", "idle", "standby"].includes(normalized)) return normalized === "aging" ? "aging" : "stale";
       if (["failed", "fail", "error"].includes(normalized)) return "failed";
-      if (["queued", "starting", "verifying", "retrying", "escalated", "cancelled"].includes(normalized)) return normalized;
+      if (["queued", "starting", "verifying", "retrying", "retestrequired", "needsevidencereview", "escalated", "cancelled"].includes(normalized)) return normalized === "retestrequired" || normalized === "needsevidencereview" ? "verifying" : normalized;
       return "unknown";
     }
 
@@ -847,6 +851,8 @@
         jobs: asArray(latest.jobs),
         agents: asArray(latest.agents),
         capabilities: asArray(latest.capabilities),
+        workerProfiles: asArray(latest.worker_profiles),
+        constraintAudits: asArray(latest.constraint_audits),
         autonomy: autonomySummary(),
         events: asArray(state.events),
         scenarios: asArray(state.scenarios)
@@ -1328,6 +1334,39 @@
       return pageHeading("Execution charter", "Act, verify, report, repeat", "Jaron has authorized Machine Manager to pursue useful work continuously. Workers should complete the next useful move and retain a precise handoff only when an outside service actually requires a user-owned interaction.", '<a class="btn" href="https://github.com/JaronKBragg7337/MachineManager/blob/main/docs/OPERATING_CHARTER.md" target="_blank" rel="noreferrer">Read full charter <span>↗</span></a>') + snapshotStrip() + '<div class="research-hero"><section class="research-callout"><p class="eyebrow">Operating mode</p><h2>' + escapeHtml(policyMode) + '</h2><p>Research, build, test, publish, submit, follow up, measure value, then continue. The system records work and asks only for the concrete interaction an outside service itself requires.</p></section><section class="research-status"><div><p class="eyebrow">Handoff style</p><div class="big-state">' + escapeHtml(String(policy.handoff_style || "service-required").replace(/-/g, " ")) + '</div><p>A password, 2FA prompt, identity verification, or payment connection becomes a live work item—not a reason to abandon the objective.</p></div><a class="text-link" href="#/activity">Inspect public work evidence →</a></section></div><div class="blueprint-grid"><article class="blueprint-card"><div class="blueprint-number">01</div><h3>Find and finish</h3><p>Capable workers can discover opportunities, build the work, verify it, and preserve a result instead of stopping at a proposal.</p></article><article class="blueprint-card"><div class="blueprint-number">02</div><h3>Publish and submit</h3><p>Code, pull requests, competition entries, proposals, and public work can move forward as part of the declared objective.</p></article><article class="blueprint-card"><div class="blueprint-number">03</div><h3>Respectful outreach</h3><p>Every first message discloses AI assistance on Jaron’s behalf. An opt-out is remembered locally and ends future contact.</p></article><article class="blueprint-card"><div class="blueprint-number">04</div><h3>Build value</h3><p>Paid work and useful procurement are evaluated through intent, cost, expected value, outcome, and a later review—not arbitrary inactivity.</p></article></div><div class="section-grid"><section class="panel"><div class="panel-head"><h2>AUTHORIZED WORK</h2><span class="subhead">operator mandate</span></div><div class="panel-body"><div class="facts-list">' + autonomyFact("Account enrollment", policy.account_enrollment, "Continue until a service presents an actual credential or 2FA handoff.") + autonomyFact("Public submissions", policy.public_submissions, "Prepare and deliver public code, entries, proposals, and posts when a capable worker is available.") + autonomyFact("Paid work", policy.paid_work, "Track useful delivery and payout status as real work outcomes.") + autonomyFact("Procurement when funded", policy.procurement_when_funded, "A connected funding source enables documented, value-oriented purchases.") + '</div></div></section><section class="panel"><div class="panel-head"><h2>WORKER CAPACITY</h2><span class="subhead">shared MSI workspace</span></div><div class="panel-body"><div class="facts-list">' + autonomyFact("Transparent outreach", policy.transparent_outreach && policy.outreach_opt_out, "First contact is disclosed; people who decline are permanently suppressed.") + autonomyFact("Developer tooling", policy.developer_tools, "Workers can obtain ordinary tools needed to finish the assigned product-quality job.") + autonomyFact("Idle GPU work", policy.gpu_idle_use, "Declared compute work may use the GPU whenever the protected worker is not using it.") + autonomyFact("Terms-aware execution", policy.terms_aware_execution, "Following a platform’s rules protects eligibility for the payout rather than slowing the work down.") + '</div></div></section></div>';
     }
 
+    function profileCapabilityRow(capability) {
+      return '<div class="capability-row"><div><strong>' + escapeHtml(capability.id || "Unnamed capability") + '</strong><p>' + escapeHtml(capability.summary || "No public evidence summary is published yet.") + '</p></div><span class="capability-state ' + (upper(capability.status) === "TESTED_FAIL" || upper(capability.status) === "UNAVAILABLE" ? "off" : "") + '">' + escapeHtml(upper(capability.status || "UNKNOWN").replace(/_/g, " ")) + '</span></div>';
+    }
+
+    function profileCard(profile) {
+      const capabilities = asArray(profile.capabilities);
+      const tested = capabilities.filter(function (item) { return upper(item.status) === "TESTED_PASS"; }).length;
+      const observed = capabilities.filter(function (item) { return upper(item.status) === "OBSERVED"; }).length;
+      const stateLabel = profile.retest_required ? "RETEST REQUIRED" : upper(profile.state || "UNKNOWN").replace(/_/g, " ");
+      return '<article class="agent-card"><div class="agent-top"><div><p class="eyebrow">' + escapeHtml(profile.provider || "worker provider") + '</p><h2>' + escapeHtml(profile.id || "Unnamed worker") + '</h2><div class="agent-model">' + escapeHtml(profile.model || "Model not published") + (profile.model_version ? " · " + escapeHtml(profile.model_version) : "") + '</div></div>' + badge(profile.retest_required ? "RETEST_REQUIRED" : profile.state, stateLabel) + '</div><div class="agent-meta"><div class="mini-card"><span class="label">Tested pass</span><div class="value">' + escapeHtml(String(tested)) + '</div></div><div class="mini-card"><span class="label">Observed</span><div class="value">' + escapeHtml(String(observed)) + '</div></div><div class="mini-card"><span class="label">Evidence records</span><div class="value">' + escapeHtml(String(capabilities.length)) + '</div></div><div class="mini-card"><span class="label">Last verified</span><div class="value">' + escapeHtml(formatDate(profile.last_verified, true)) + '</div></div></div><div class="agent-boundary"><strong>Evidence contract:</strong> ' + (profile.retest_required ? "The configured model/runtime changed after its recorded verification. Retest the relevant capability before treating an older result as current." : "This profile records tested and observed behavior for the current configured version. Unknown capability remains unknown until it is exercised.") + '</div><div class="capability-list">' + (capabilities.length ? capabilities.map(profileCapabilityRow).join("") : '<div class="empty-cell">No capability observations have been recorded yet.</div>') + '</div></article>';
+    }
+
+    function auditCategoryText(categories) {
+      const items = Object.keys(categories || {}).sort().map(function (key) {
+        return key.replace(/_/g, " ") + ": " + String(categories[key]);
+      });
+      return items.length ? items.join(" · ") : "No candidate categories";
+    }
+
+    function auditCard(audit) {
+      const stateLabel = upper(audit.state || "UNKNOWN").replace(/_/g, " ");
+      return '<article class="agent-card"><div class="agent-top"><div><p class="eyebrow">Constraint review target</p><h2>' + escapeHtml(audit.label || audit.id || "Unnamed audit") + '</h2><div class="agent-model">Published summary only — local paths and excerpts stay on the MSI.</div></div>' + badge(audit.state, stateLabel) + '</div><div class="agent-meta"><div class="mini-card"><span class="label">Files scanned</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.files_scanned) || 0)) + '</div></div><div class="mini-card"><span class="label">Candidates</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.candidate_count) || 0)) + '</div></div><div class="mini-card"><span class="label">Files skipped</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.files_skipped) || 0)) + '</div></div><div class="mini-card"><span class="label">Last scan</span><div class="value">' + escapeHtml(formatDate(audit.scanned_at, true)) + '</div></div></div><div class="agent-boundary"><strong>Candidate categories:</strong> ' + escapeHtml(auditCategoryText(audit.categories)) + (audit.truncated ? '<br><br><strong>Bounded scan:</strong> the audit reached its configured file or finding limit; it can be expanded locally without exposing source here.' : '') + '<br><br>These are review leads, not automatic removals. A rule may be required, provider-enforced, duplicated, obsolete, project-specific, or waiting for a real test.</div></article>';
+    }
+
+    function renderEvidence() {
+      const sets = dataSets();
+      const profiles = sets.workerProfiles;
+      const audits = sets.constraintAudits;
+      const retests = profiles.filter(function (profile) { return profile.retest_required; }).length;
+      const candidates = audits.reduce(function (sum, audit) { return sum + (numberValue(audit.candidate_count) || 0); }, 0);
+      return pageHeading("Evidence ledger", "Measure capability. Review constraints.", "This is the cross-project learning layer: it records what a particular worker actually demonstrated, then surfaces old approval and limitation language for evidence-based review. It never edits project rules automatically.", '<a class="btn" href="https://github.com/JaronKBragg7337/MachineManager/blob/main/docs/CAPABILITY_EVIDENCE.md" target="_blank" rel="noreferrer">Read evidence guide <span>↗</span></a>') + snapshotStrip() + '<div class="kpi-grid"><div class="kpi-card accent"><span class="label">Worker profiles</span><div class="kpi-value">' + escapeHtml(String(profiles.length)) + '</div><div class="kpi-note">Version-aware records</div></div><div class="kpi-card ' + (retests ? "warn" : "success") + '"><span class="label">Retests due</span><div class="kpi-value">' + escapeHtml(String(retests)) + '</div><div class="kpi-note">After a material worker change</div></div><div class="kpi-card"><span class="label">Audit targets</span><div class="kpi-value">' + escapeHtml(String(audits.length)) + '</div><div class="kpi-note">Explicit local source trees</div></div><div class="kpi-card"><span class="label">Review candidates</span><div class="kpi-value">' + escapeHtml(compactNumber(candidates)) + '</div><div class="kpi-note">Never automatic deletions</div></div></div><section class="panel"><div class="panel-head"><h2>WORKER CAPABILITY PROFILES</h2><span class="subhead">test → observe → retest on change</span></div><div class="panel-body"><div class="agent-cards">' + (profiles.length ? profiles.map(profileCard).join("") : '<div class="empty-cell">No worker profile has been published yet. The evidence engine will add profiles after its first configured manager run.</div>') + '</div></div></section><section class="panel"><div class="panel-head"><h2>CONSTRAINT AUDITS</h2><span class="subhead">candidate language for human review</span></div><div class="panel-body"><div class="agent-cards">' + (audits.length ? audits.map(auditCard).join("") : '<div class="empty-cell">No configured audit has completed yet. Audit summaries publish counts only; file paths and excerpts remain local.</div>') + '</div></div></section><div class="ops-note"><strong>How this improves autonomy.</strong><br>Machine Manager does not turn a model saying “I can’t” into permanent architecture. It tests the actual worker, records the result, and adds a project-level control only when the evidence shows one is needed.</div>';
+    }
+
     function renderActivity() {
       const allEvents = dataSets().events;
       const filteredEvents = recentEvents(null, state.eventFilter);
@@ -1369,6 +1408,7 @@
       if (route === "evaluations") return renderEvaluations();
       if (route === "research") return renderResearch();
       if (route === "autonomy") return renderAutonomy();
+      if (route === "evidence") return renderEvidence();
       if (route === "activity") return renderActivity();
       if (route === "operations") return renderOperations();
       return renderOverview();

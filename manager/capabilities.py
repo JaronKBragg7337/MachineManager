@@ -58,6 +58,8 @@ class CapabilityRegistry:
         transparent_outreach_enabled: bool = False,
         developer_tools_enabled: bool = False,
         gpu_idle_use_enabled: bool = False,
+        evidence_ledger_enabled: bool = False,
+        constraint_audit_enabled: bool = False,
     ) -> "CapabilityRegistry":
         registry = cls()
         registry.register("process-supervision", "Start, observe, recover, and stop bounded worker processes.")
@@ -71,4 +73,6 @@ class CapabilityRegistry:
         registry.register("transparent-outreach", "Prepare AI-disclosed first contact and permanently suppress opted-out recipients.", enabled=transparent_outreach_enabled)
         registry.register("developer-tooling", "Install and use normal developer tooling when a capable worker needs it.", enabled=developer_tools_enabled)
         registry.register("idle-gpu-work", "Use available GPU capacity for declared work when the protected worker is idle.", enabled=gpu_idle_use_enabled)
+        registry.register("capability-evidence-ledger", "Record tested and observed worker capabilities by model/runtime version.", enabled=evidence_ledger_enabled)
+        registry.register("constraint-audit", "Find candidate approval and policy language for evidence-based review without changing source automatically.", enabled=constraint_audit_enabled)
         return registry

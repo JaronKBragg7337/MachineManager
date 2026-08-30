@@ -14,6 +14,7 @@ from typing import Any, Mapping
 from .agents import AgentCoordinator
 from .autonomy import OperatingCharter
 from .capabilities import CapabilityRegistry
+from .evidence import EvidenceCoordinator
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
 from .probes import gpu_resource_ok, keyhunt_progress_probe, nvidia_smi_probe
@@ -347,6 +348,7 @@ def main() -> int:
     local_publisher: TelemetryPublisher | None = None
     remote_publisher: GitHubPagesPublisher | None = None
     capabilities: CapabilityRegistry | None = None
+    evidence: EvidenceCoordinator | None = None
     public_events: list[Any] = []
     public_scenarios: list[Any] = []
     seen_event_ids: set[str] = set()
@@ -398,6 +400,39 @@ def main() -> int:
             raise ValueError("config.agents must be an array")
         agents = AgentCoordinator(agents_raw)
         scheduler = WorkScheduler(store)
+        try:
+            evidence = EvidenceCoordinator(
+                store,
+                config.get("evidence"),
+                base=base,
+                actor=str(config.get("actor", "local-manager")),
+                objective_id=primary_objective_id,
+                job_id=primary_job_id,
+            )
+        except (TypeError, ValueError) as exc:
+            # Evidence is additive. A malformed optional audit configuration must
+            # never take down the protected worker or the core supervisor.
+            store.append_event(
+                {
+                    "timestamp": utc_now(),
+                    "event_id": f"evt-evidence-config-{time.time_ns()}",
+                    "objective_id": primary_objective_id,
+                    "job_id": primary_job_id,
+                    "worker_id": "",
+                    "actor": str(config.get("actor", "local-manager")),
+                    "event_type": "evidence_configuration_deferred",
+                    "previous_state": "UNKNOWN",
+                    "new_state": "DEFERRED",
+                    "metrics": {},
+                    "action": "load_evidence_config",
+                    "outcome": "core_supervision_continues",
+                    "artifact_refs": [],
+                    "error": type(exc).__name__,
+                    "duration": None,
+                }
+            )
+            _append_manager_log(manager_log_path, f"Evidence configuration deferred: {type(exc).__name__}")
+            evidence = None
         public_events, public_scenarios = load_public_records(dashboard_dir)
         local_publisher = TelemetryPublisher(dashboard_dir) if dashboard_dir else None
 
@@ -420,6 +455,8 @@ def main() -> int:
             transparent_outreach_enabled=charter.allow_outreach and charter.honor_outreach_opt_out,
             developer_tools_enabled=charter.allow_tool_installation,
             gpu_idle_use_enabled=charter.allow_gpu_when_protected_worker_idle,
+            evidence_ledger_enabled=bool(evidence and evidence.enabled),
+            constraint_audit_enabled=bool(evidence and evidence.targets),
         )
         interval = max(0.1, float(config.get("poll_interval_s", 15)))
         objective = str(config.get("objective", primary_objective_id))
@@ -438,9 +475,14 @@ def main() -> int:
                     snapshot["gpu"] = dict(metrics)
                     break
             agents.tick(snapshot, events=store.recent_events(limit=20))
+            if evidence is not None:
+                for event in evidence.tick():
+                    store.append_event(event)
             snapshot["agents"] = agents.snapshot()
             snapshot["capabilities"] = capabilities.snapshot()
             snapshot["autonomy"] = charter.public_summary()
+            snapshot["worker_profiles"] = evidence.public_profiles() if evidence else []
+            snapshot["constraint_audits"] = evidence.public_audits() if evidence else []
             snapshot["queue"] = scheduler.snapshot()
             _persist_runtime(manager, agents, store, seen_event_ids)
             public_events = merge_public_events(
@@ -487,6 +529,8 @@ def main() -> int:
                 stopped["agents"] = agents.snapshot()
                 stopped["capabilities"] = capabilities.snapshot()
                 stopped["autonomy"] = charter.public_summary()
+                stopped["worker_profiles"] = evidence.public_profiles() if evidence else []
+                stopped["constraint_audits"] = evidence.public_audits() if evidence else []
                 stopped["queue"] = scheduler.snapshot()
                 public_events = merge_public_events(
                     public_events,
@@ -500,6 +544,8 @@ def main() -> int:
                 )
         if agents is not None:
             agents.close()
+        if evidence is not None:
+            evidence.close()
         if lock is not None:
             lock.release()
         store.close()

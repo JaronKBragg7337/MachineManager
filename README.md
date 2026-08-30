@@ -24,6 +24,8 @@ Dashboard: [Open the public Machine Manager control center](https://jaronkbragg7
 
 Operating mandate: [Read the Machine Manager Operating Charter](docs/OPERATING_CHARTER.md)
 
+Evidence model: [Read the capability evidence and constraint-review guide](docs/CAPABILITY_EVIDENCE.md)
+
 The repository page remains the source/documentation view. The Pages site is the operational dashboard.
 
 ## Hierarchy
@@ -45,6 +47,7 @@ Specialist Workers
 - Multi-signal health evaluation (process + resource activity + progress + logs)
 - Reference Scenario Suite: Grok performs competent behavior → local Manager is evaluated against it
 - Shared event/telemetry pipeline
+- Evidence-backed worker capability profiles and non-destructive constraint audits
 - Visual control center (GitHub Pages dashboard)
 - Search progress and AI-run timeline with public-safe aggregate evidence
 - Workers are dynamically registerable; each can have its own minimal GitHub identity
@@ -99,8 +102,8 @@ This is a public receiving address only. Never store private keys or seed phrase
 The current public control center is the [Machine Manager operations view](https://jaronkbragg7337.github.io/MachineManager/dashboard/).
 
 It is a public, read-only view of sanitized telemetry with separate views for
-Overview, Jobs, Workers, Search, Agents, Evaluations, Research, Activity, and
-Operations. The local runtime is now a general manager rather than a
+Overview, Jobs, Workers, Search, Agents, Evaluations, Research, Autonomy,
+Evidence, Activity, and Operations. The local runtime is now a general manager rather than a
 Puzzle #71-only script: it supports a
 durable multi-job registry, bounded retries, worker adoption after manager
 restart, a persistent work queue, capability discovery, scheduled local

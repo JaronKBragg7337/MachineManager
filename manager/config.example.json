@@ -21,6 +21,45 @@
     "respect_program_terms": true,
     "first_contact_disclosure": "Hello — I’m an AI assistant acting on Jaron’s behalf."
   },
+  "evidence": {
+    "audit_interval_s": 86400,
+    "worker_profiles": [
+      {
+        "id": "machine-manager-runtime",
+        "provider": "local",
+        "model": "Machine Manager",
+        "model_version": "0.2",
+        "verified_model_version": "0.2",
+        "last_verified": "2026-08-30T00:00:00Z",
+        "capabilities": [
+          {
+            "id": "process-supervision",
+            "status": "TESTED_PASS",
+            "summary": "Synthetic reliability scenarios exercise health checks and bounded recovery.",
+            "evidence_id": "scenario-suite-v1",
+            "observed_at": "2026-08-30T00:00:00Z"
+          },
+          {
+            "id": "sanitized-publication",
+            "status": "TESTED_PASS",
+            "summary": "Only allowlisted telemetry fields are sent to the public dashboard.",
+            "evidence_id": "telemetry-tests-v1",
+            "observed_at": "2026-08-30T00:00:00Z"
+          }
+        ]
+      }
+    ],
+    "constraint_audits": [
+      {
+        "id": "machine-manager-source",
+        "label": "Machine Manager source",
+        "path": "..",
+        "enabled": true,
+        "max_files": 1200,
+        "max_findings": 250
+      }
+    ]
+  },
   "public_upload": {
     "enabled": false,
     "owner": "JaronKBragg7337",

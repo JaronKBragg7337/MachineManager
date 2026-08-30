@@ -35,6 +35,8 @@ def snapshot_from_status(
         "updated": status.get("timestamp"),
         "workers": [{"id": worker_id, "type": worker_type, "state": state, "owner": "local-manager"}],
         "jobs": [{"id": job_id, "objective_id": objective_id, "state": state}],
+        "worker_profiles": status.get("worker_profiles", []),
+        "constraint_audits": status.get("constraint_audits", []),
         "gpu": {
             "util_pct": gpu_input.get("util", gpu_input.get("util_pct")),
             "mem_used_mib": gpu_input.get("mem_used", gpu_input.get("mem_used_mib")),

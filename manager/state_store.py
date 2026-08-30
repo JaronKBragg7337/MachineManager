@@ -88,6 +88,23 @@ class StateStore:
                     payload TEXT NOT NULL,
                     PRIMARY KEY (channel, recipient_hash)
                 );
+                CREATE TABLE IF NOT EXISTS worker_profiles (
+                    worker_id TEXT PRIMARY KEY,
+                    provider TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    fingerprint TEXT NOT NULL,
+                    state TEXT NOT NULL,
+                    updated TEXT NOT NULL,
+                    payload TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS constraint_audits (
+                    target_id TEXT PRIMARY KEY,
+                    state TEXT NOT NULL,
+                    updated TEXT NOT NULL,
+                    payload TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS constraint_audits_updated_idx
+                    ON constraint_audits(updated, target_id);
                 """
             )
 
@@ -319,6 +336,91 @@ class StateStore:
                 (str(channel), str(recipient_hash)),
             ).fetchone()
         return self._object(row["payload"]) if row else None
+
+    def upsert_worker_profile(self, profile: Mapping[str, Any]) -> None:
+        """Persist a local evidence profile without exposing it to telemetry directly."""
+        worker_id = str(profile.get("id", "")).strip()
+        if not worker_id:
+            raise ValueError("worker profile id is required")
+        payload = dict(profile)
+        with self._lock, self._connection:
+            self._connection.execute(
+                """
+                INSERT INTO worker_profiles
+                    (worker_id, provider, model, fingerprint, state, updated, payload)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(worker_id) DO UPDATE SET
+                    provider=excluded.provider,
+                    model=excluded.model,
+                    fingerprint=excluded.fingerprint,
+                    state=excluded.state,
+                    updated=excluded.updated,
+                    payload=excluded.payload
+                """,
+                (
+                    worker_id,
+                    str(payload.get("provider", "unknown")),
+                    str(payload.get("model", "unknown")),
+                    str(payload.get("fingerprint", "")),
+                    str(payload.get("state", "UNKNOWN")),
+                    str(payload.get("last_verified", payload.get("updated", ""))),
+                    self._json(payload),
+                ),
+            )
+
+    def get_worker_profile(self, worker_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            row = self._connection.execute(
+                "SELECT payload FROM worker_profiles WHERE worker_id = ?",
+                (str(worker_id),),
+            ).fetchone()
+        return self._object(row["payload"]) if row else None
+
+    def list_worker_profiles(self) -> list[dict[str, Any]]:
+        with self._lock:
+            rows = self._connection.execute(
+                "SELECT payload FROM worker_profiles ORDER BY worker_id"
+            ).fetchall()
+        return [self._object(row["payload"]) for row in rows]
+
+    def upsert_constraint_audit(self, audit: Mapping[str, Any]) -> None:
+        """Persist local audit findings; callers publish only a sanitized summary."""
+        target_id = str(audit.get("target_id", "")).strip()
+        if not target_id:
+            raise ValueError("constraint audit target_id is required")
+        payload = dict(audit)
+        with self._lock, self._connection:
+            self._connection.execute(
+                """
+                INSERT INTO constraint_audits (target_id, state, updated, payload)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(target_id) DO UPDATE SET
+                    state=excluded.state,
+                    updated=excluded.updated,
+                    payload=excluded.payload
+                """,
+                (
+                    target_id,
+                    str(payload.get("state", "UNKNOWN")),
+                    str(payload.get("scanned_at", payload.get("updated", ""))),
+                    self._json(payload),
+                ),
+            )
+
+    def get_constraint_audit(self, target_id: str) -> dict[str, Any] | None:
+        with self._lock:
+            row = self._connection.execute(
+                "SELECT payload FROM constraint_audits WHERE target_id = ?",
+                (str(target_id),),
+            ).fetchone()
+        return self._object(row["payload"]) if row else None
+
+    def list_constraint_audits(self) -> list[dict[str, Any]]:
+        with self._lock:
+            rows = self._connection.execute(
+                "SELECT payload FROM constraint_audits ORDER BY target_id"
+            ).fetchall()
+        return [self._object(row["payload"]) for row in rows]
 
     def enqueue_task(
         self,
