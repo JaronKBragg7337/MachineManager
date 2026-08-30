@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T20:07:49.190Z",
+        "observed_at": "2026-08-30T20:12:55.894Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -21,8 +21,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 1008.2,
-        "sample_count": 64,
+        "uptime_s": 1315.0,
+        "sample_count": 81,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T20:07:49.190Z",
+        "observed_at": "2026-08-30T20:12:55.894Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -44,8 +44,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 1008.2,
-        "sample_count": 64,
+        "uptime_s": 1315.0,
+        "sample_count": 81,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "escalate",
-      "last_reason": "Retry limit reached with missing progress signals; human intervention required.",
-      "last_duration_s": 3.219,
-      "tasks_completed": 4,
-      "last_run": "2026-08-30T20:06:58.111Z",
-      "next_run": "2026-08-30T20:11:58.111Z"
+      "last_reason": "Retry limit reached with missing progress signal; escalating to senior specialist for manual intervention.",
+      "last_duration_s": 6.297,
+      "tasks_completed": 5,
+      "last_run": "2026-08-30T20:12:04.826Z",
+      "next_run": "2026-08-30T20:17:04.826Z"
     }
   ],
   "capabilities": [
@@ -346,7 +346,7 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T20:07:49.190Z",
+    "observed_at": "2026-08-30T20:12:55.894Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -355,10 +355,10 @@
     "keys_per_second": 742080000,
     "matches_found": 0,
     "keys_tested": 810842849280,
-    "uptime_s": 1008.2,
-    "sample_count": 64,
+    "uptime_s": 1315.0,
+    "sample_count": 81,
     "hashrate_mkey_s": 742.08
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T20:07:51.696Z"
+  "updated": "2026-08-30T20:12:58.490Z"
 }
