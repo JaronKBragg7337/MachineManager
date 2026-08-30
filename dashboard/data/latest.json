@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T02:53:21.469Z",
+        "observed_at": "2026-08-30T02:58:28.619Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -22,8 +22,8 @@
         "keys_tested": 1372946694144,
         "batch_number": 433,
         "matches_found": 0,
-        "uptime_s": 3089.0,
-        "sample_count": 194
+        "uptime_s": 3396.2,
+        "sample_count": 212
       }
     }
   ],
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T02:53:21.469Z",
+        "observed_at": "2026-08-30T02:58:28.619Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -45,8 +45,8 @@
         "keys_tested": 1372946694144,
         "batch_number": 433,
         "matches_found": 0,
-        "uptime_s": 3089.0,
-        "sample_count": 194
+        "uptime_s": 3396.2,
+        "sample_count": 212
       }
     }
   ],
@@ -59,11 +59,11 @@
       "state": "WORKING",
       "enabled": true,
       "last_action": "restart",
-      "last_reason": "Retry limit reached with missing progress signals; attempting restart to reset worker state.",
-      "last_duration_s": 6.671,
-      "tasks_completed": 10,
-      "last_run": "2026-08-30T02:48:35.315Z",
-      "next_run": "2026-08-30T02:53:35.315Z"
+      "last_reason": "Retry limit reached on Bitcoin Puzzle #71 with no progress signal; attempting restart to reset worker state.",
+      "last_duration_s": 6.5,
+      "tasks_completed": 11,
+      "last_run": "2026-08-30T02:53:44.134Z",
+      "next_run": "2026-08-30T02:58:44.134Z"
     }
   ],
   "capabilities": [
@@ -108,13 +108,13 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 42.0,
+    "temp_c": 40.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T02:53:21.469Z",
+    "observed_at": "2026-08-30T02:58:28.619Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -124,9 +124,9 @@
     "keys_tested": 1372946694144,
     "batch_number": 433,
     "matches_found": 0,
-    "uptime_s": 3089.0,
-    "sample_count": 194
+    "uptime_s": 3396.2,
+    "sample_count": 212
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T02:53:23.205Z"
+  "updated": "2026-08-30T02:58:30.418Z"
 }
