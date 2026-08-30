@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T18:48:23.166Z",
+        "observed_at": "2026-08-30T18:51:27.576Z",
         "reported": true,
         "active": true,
         "healthy": true,
+        "uptime_s": 0.9,
         "matches_found": 0,
-        "keys_per_second": 795530000,
-        "sample_count": 767,
-        "uptime_s": 8962.0,
-        "hashrate_mkey_s": 795.53,
+        "hashrate_mkey_s": 799.2,
+        "keys_per_second": 799200000,
+        "sample_count": 1,
         "coverage_pct": 0,
-        "keys_tested": 7072754171904,
-        "batch_number": 2178
+        "batch_number": 2230,
+        "keys_tested": 7240861876224
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T18:48:23.166Z",
+        "observed_at": "2026-08-30T18:51:27.576Z",
         "reported": true,
         "active": true,
         "healthy": true,
+        "uptime_s": 0.9,
         "matches_found": 0,
-        "keys_per_second": 795530000,
-        "sample_count": 767,
-        "uptime_s": 8962.0,
-        "hashrate_mkey_s": 795.53,
+        "hashrate_mkey_s": 799.2,
+        "keys_per_second": 799200000,
+        "sample_count": 1,
         "coverage_pct": 0,
-        "keys_tested": 7072754171904,
-        "batch_number": 2178
+        "batch_number": 2230,
+        "keys_tested": 7240861876224
       }
     }
   ],
@@ -58,12 +58,12 @@
       "model": "qwen3.5:4b",
       "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System healthy, objective running, and resources within safe limits.",
-      "last_duration_s": 5.922,
-      "tasks_completed": 38,
-      "last_run": "2026-08-30T18:43:36.478Z",
-      "next_run": "2026-08-30T18:48:36.478Z"
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -130,6 +130,11 @@
     {
       "id": "transparent-outreach",
       "description": "Prepare AI-disclosed first contact and permanently suppress opted-out recipients.",
+      "enabled": true
+    },
+    {
+      "id": "workstream-ledger",
+      "description": "Publish configured worker missions with observed state instead of an unexplained queue count.",
       "enabled": true
     }
   ],
@@ -234,43 +239,118 @@
       }
     }
   ],
+  "workstreams": [
+    {
+      "id": "machine-manager-constraint-audit",
+      "objective_id": "machine-manager-governance",
+      "title": "Machine Manager constraint audit",
+      "lane": "Capability evidence",
+      "owner": "evidence-coordinator",
+      "state": "REVIEW",
+      "summary": "Maps Machine Manager source into evidence-review leads without changing project rules.",
+      "next_action": "Run one bounded test for each prioritized lead cluster.",
+      "source_kind": "constraint_audit",
+      "metrics": {
+        "candidate_count": 18,
+        "files_scanned": 45,
+        "more_pending": false
+      },
+      "updated": "2026-08-30T18:51:28.439Z"
+    },
+    {
+      "id": "active-workspace-constraint-audit",
+      "objective_id": "cross-project-governance",
+      "title": "Active workspace constraint audit",
+      "lane": "Cross-project evidence",
+      "owner": "evidence-coordinator",
+      "state": "REVIEW",
+      "summary": "Maps the registered active-project workspace into review leads without changing source files.",
+      "next_action": "Group leads by operation and test one representative path at a time.",
+      "source_kind": "constraint_audit",
+      "metrics": {
+        "candidate_count": 9,
+        "files_scanned": 2084,
+        "more_pending": false
+      },
+      "updated": "2026-08-30T18:51:28.451Z"
+    },
+    {
+      "id": "audit-triage-20260830",
+      "objective_id": "cross-project-governance",
+      "title": "Constraint audit triage",
+      "lane": "Specialist review",
+      "owner": "codex-audit-triage",
+      "state": "COMPLETE",
+      "summary": "A bounded specialist grouped 27 review leads into evidence-test clusters; no source rules were changed.",
+      "next_action": "Start with data-boundary regression tests, then test autonomy and approval clusters separately.",
+      "source_kind": "static",
+      "metrics": {},
+      "updated": "2026-08-30T18:51:28.451Z"
+    },
+    {
+      "id": "revenue-lane-scout-20260830",
+      "objective_id": "revenue-discovery",
+      "title": "Revenue-lane source scout",
+      "lane": "Opportunity research",
+      "owner": "codex-opportunity-scout",
+      "state": "COMPLETE",
+      "summary": "A source-backed scout reviewed four public work platforms and recorded service-owned handoffs instead of assuming they were blockers.",
+      "next_action": "Choose one current, eligible task and run a scope, terms, acceptance, and payout-path assessment.",
+      "source_kind": "static",
+      "metrics": {},
+      "updated": "2026-08-30T18:51:28.451Z"
+    },
+    {
+      "id": "first-revenue-task-assessment",
+      "objective_id": "revenue-discovery",
+      "title": "First revenue task assessment",
+      "lane": "Opportunity delivery",
+      "owner": "opportunity-runner",
+      "state": "QUEUED",
+      "summary": "No platform account, claim, application, or submission has been created for this mission.",
+      "next_action": "Inspect one exact public task and register only the concrete service handoff it actually requires.",
+      "source_kind": "static",
+      "metrics": {},
+      "updated": "2026-08-30T18:51:28.452Z"
+    }
+  ],
   "autonomy": {
-    "paid_work": true,
-    "transparent_outreach": true,
-    "developer_tools": true,
     "outreach_opt_out": true,
-    "public_submissions": true,
+    "developer_tools": true,
+    "transparent_outreach": true,
     "account_enrollment": true,
     "terms_aware_execution": true,
     "procurement_when_funded": true,
     "gpu_idle_use": true,
-    "handoff_style": "service-required",
-    "mode": "EXECUTE_AND_REPORT"
+    "paid_work": true,
+    "public_submissions": true,
+    "mode": "EXECUTE_AND_REPORT",
+    "handoff_style": "service-required"
   },
   "queue": {},
   "gpu": {
-    "util_pct": 90.0,
+    "util_pct": 68.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 63.0,
-    "power_w": 81.61
+    "temp_c": 60.0,
+    "power_w": 81.03
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T18:48:23.166Z",
+    "observed_at": "2026-08-30T18:51:27.576Z",
     "reported": true,
     "active": true,
     "healthy": true,
+    "uptime_s": 0.9,
     "matches_found": 0,
-    "keys_per_second": 795530000,
-    "sample_count": 767,
-    "uptime_s": 8962.0,
-    "hashrate_mkey_s": 795.53,
+    "hashrate_mkey_s": 799.2,
+    "keys_per_second": 799200000,
+    "sample_count": 1,
     "coverage_pct": 0,
-    "keys_tested": 7072754171904,
-    "batch_number": 2178
+    "batch_number": 2230,
+    "keys_tested": 7240861876224
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T18:48:23.214Z"
+  "updated": "2026-08-30T18:51:28.438Z"
 }
