@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T20:23:09.465Z",
+        "observed_at": "2026-08-30T20:28:16.776Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -21,8 +21,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 1928.5,
-        "sample_count": 115,
+        "uptime_s": 2235.8,
+        "sample_count": 132,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-30T20:23:09.465Z",
+        "observed_at": "2026-08-30T20:28:16.776Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -44,8 +44,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 1928.5,
-        "sample_count": 115,
+        "uptime_s": 2235.8,
+        "sample_count": 132,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "restart",
-      "last_reason": "Retry limit reached with no progress signal; attempting restart to reset worker state and resource allocation.",
-      "last_duration_s": 6.359,
-      "tasks_completed": 7,
-      "last_run": "2026-08-30T20:22:18.272Z",
-      "next_run": "2026-08-30T20:27:18.272Z"
+      "last_reason": "Retry limit reached with no progress signal; attempting restart to reset worker state.",
+      "last_duration_s": 6.063,
+      "tasks_completed": 8,
+      "last_run": "2026-08-30T20:27:25.676Z",
+      "next_run": "2026-08-30T20:32:25.676Z"
     }
   ],
   "capabilities": [
@@ -346,7 +346,7 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-30T20:23:09.465Z",
+    "observed_at": "2026-08-30T20:28:16.776Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -355,10 +355,10 @@
     "keys_per_second": 742080000,
     "matches_found": 0,
     "keys_tested": 810842849280,
-    "uptime_s": 1928.5,
-    "sample_count": 115,
+    "uptime_s": 2235.8,
+    "sample_count": 132,
     "hashrate_mkey_s": 742.08
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-30T20:23:11.990Z"
+  "updated": "2026-08-30T20:28:19.290Z"
 }
