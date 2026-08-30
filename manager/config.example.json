@@ -55,6 +55,7 @@
         "label": "Machine Manager source",
         "path": "..",
         "enabled": true,
+        "interval_s": 86400,
         "max_files": 1200,
         "max_findings": 250
       }

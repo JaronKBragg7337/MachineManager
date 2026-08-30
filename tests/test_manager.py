@@ -366,6 +366,35 @@ class TelemetryTests(unittest.TestCase):
             self.assertTrue(any(item.excerpt == "[redacted]" for item in report.findings))
             self.assertEqual(source.read_text(encoding="utf-8"), original)
 
+    def test_constraint_audit_resumes_after_a_bounded_source_window(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw) / "project"
+            root.mkdir()
+            for index in range(5):
+                (root / f"rule-{index}.md").write_text(
+                    "Never publish automatically without approval.\n",
+                    encoding="utf-8",
+                )
+            target = AuditTarget.from_mapping(
+                {"id": "windowed-project", "label": "Windowed project", "path": str(root), "max_files": 2},
+                base=root,
+            )
+            auditor = ConstraintAuditor(target)
+            first = auditor.run()
+            second = auditor.run(start_after=first.next_cursor)
+            third = auditor.run(start_after=second.next_cursor)
+            first_paths = {item.relative_path for item in first.findings}
+            second_paths = {item.relative_path for item in second.findings}
+            third_paths = {item.relative_path for item in third.findings}
+            self.assertTrue(first.more_pending)
+            self.assertTrue(second.more_pending)
+            self.assertFalse(third.more_pending)
+            self.assertFalse(third.next_cursor)
+            self.assertTrue(first_paths.isdisjoint(second_paths))
+            self.assertTrue(first_paths.isdisjoint(third_paths))
+            self.assertTrue(second_paths.isdisjoint(third_paths))
+            self.assertEqual(len(first_paths | second_paths | third_paths), 5)
+
     def test_evidence_coordinator_persists_profiles_and_retest_events(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
@@ -761,7 +790,7 @@ class TelemetryTests(unittest.TestCase):
                     "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "command": "do not publish"}],
                     "agents": [{"id": "agent-1", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_duration_s": 0.4}],
                     "worker_profiles": [{"id": "profile-1", "provider": "test", "model": "safe", "model_version": "v1", "state": "READY", "retest_required": False, "private_path": "C:\\Users\\lilli\\private", "capabilities": [{"id": "safe-capability", "status": "TESTED_PASS", "summary": "token=not-for-publication", "private_note": "do not publish"}]}],
-                    "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
+                    "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "more_pending": True, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
                     "gpu": {"util_pct": 80, "power_w": 70, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
@@ -795,6 +824,7 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("C:\\", json.dumps(latest))
             self.assertEqual(latest["worker_profiles"][0]["capabilities"][0]["summary"], "[redacted]")
             self.assertEqual(latest["constraint_audits"][0]["categories"], {"approval_gate": 2})
+            self.assertTrue(latest["constraint_audits"][0]["more_pending"])
             self.assertNotIn("C:\\", json.dumps(events))
             self.assertNotIn("pid", json.dumps(events))
             self.assertEqual(events[0]["metrics"]["keys_tested"], 99)

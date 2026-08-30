@@ -318,6 +318,7 @@ class TelemetryPublisher:
                     "files_skipped": max(0, int(_number(audit.get("files_skipped")) or 0)),
                     "candidate_count": max(0, int(_number(audit.get("candidate_count")) or 0)),
                     "truncated": bool(audit.get("truncated", False)),
+                    "more_pending": bool(audit.get("more_pending", False)),
                     "categories": categories,
                 }
             )

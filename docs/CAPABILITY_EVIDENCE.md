@@ -98,6 +98,7 @@ Add a local target to the ignored runtime config, not to public telemetry:
         "label": "Project Alpha",
         "path": "C:\\Projects\\ProjectAlpha",
         "enabled": true,
+        "interval_s": 3600,
         "max_files": 1200,
         "max_findings": 250
       }
@@ -107,8 +108,11 @@ Add a local target to the ignored runtime config, not to public telemetry:
 ```
 
 The manager runs due audits in a low-priority background thread so worker
-health checks are not paused. Failed or unavailable audit targets become a
-recorded event; they do not stop a protected workload.
+health checks are not paused. When a target has more files than its configured
+window, the next scheduled pass resumes after the last local source file it
+processed. It wraps to the beginning only after the full target has been
+covered. Failed or unavailable audit targets become a recorded event; they do
+not stop a protected workload.
 
 ## New worker onboarding
 

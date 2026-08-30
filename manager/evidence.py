@@ -24,7 +24,7 @@ import time
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any, Mapping
 
 from .state_store import StateStore
 
@@ -246,6 +246,7 @@ class AuditTarget:
     max_files: int = 1200
     max_file_bytes: int = 512_000
     max_findings: int = 250
+    interval_s: float | None = None
 
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any], *, base: Path) -> "AuditTarget":
@@ -256,6 +257,12 @@ class AuditTarget:
         root = Path(os.path.expandvars(raw_path))
         if not root.is_absolute():
             root = base / root
+        raw_interval = value.get("interval_s")
+        interval_s = (
+            None
+            if raw_interval is None
+            else max(60.0, min(float(raw_interval), 604_800.0))
+        )
         return cls(
             target_id=target_id,
             label=_safe_text(value.get("label", target_id), max_len=100) or target_id,
@@ -264,6 +271,7 @@ class AuditTarget:
             max_files=max(1, min(int(value.get("max_files", 1200)), 10_000)),
             max_file_bytes=max(1_000, min(int(value.get("max_file_bytes", 512_000)), 5_000_000)),
             max_findings=max(1, min(int(value.get("max_findings", 250)), 2_000)),
+            interval_s=interval_s,
         )
 
 
@@ -355,6 +363,8 @@ class ConstraintAuditReport:
     files_scanned: int
     files_skipped: int
     truncated: bool
+    more_pending: bool
+    next_cursor: str
     findings: tuple[ConstraintFinding, ...]
 
     def local_record(self) -> dict[str, Any]:
@@ -367,6 +377,8 @@ class ConstraintAuditReport:
             "files_scanned": self.files_scanned,
             "files_skipped": self.files_skipped,
             "truncated": self.truncated,
+            "more_pending": self.more_pending,
+            "next_cursor": self.next_cursor,
             "candidate_count": len(self.findings),
             "categories": self.category_counts(),
             "findings": [item.local_record() for item in self.findings],
@@ -389,15 +401,17 @@ class ConstraintAuditor:
     def __init__(self, target: AuditTarget) -> None:
         self.target = target
 
-    def _iter_files(self) -> Iterable[Path]:
+    def _candidate_files(self) -> list[tuple[str, Path]]:
         root = self.target.root
+        files: list[tuple[str, Path]] = []
         for current, directories, filenames in os.walk(root, followlinks=False):
             directories[:] = [
                 item
                 for item in directories
                 if item.casefold() not in EXCLUDED_DIRECTORIES
             ]
-            for name in filenames:
+            directories.sort(key=str.casefold)
+            for name in sorted(filenames, key=str.casefold):
                 path = Path(current) / name
                 if path.is_symlink() or name.casefold() in EXCLUDED_FILENAMES:
                     continue
@@ -405,24 +419,33 @@ class ConstraintAuditor:
                     continue
                 if path.name.startswith(".") or path.name.casefold().endswith(".env"):
                     continue
-                yield path
+                files.append((path.relative_to(root).as_posix(), path))
+        return sorted(files, key=lambda item: item[0].casefold())
 
     @staticmethod
     def _excerpt(line: str) -> str:
         compact = " ".join(line.replace("\x00", " ").split())[:240]
         return "[redacted]" if SENSITIVE_CONTENT.search(compact) else compact
 
-    def run(self) -> ConstraintAuditReport:
+    def run(self, *, start_after: str = "") -> ConstraintAuditReport:
         if not self.target.root.is_dir():
             raise FileNotFoundError(f"audit target is unavailable: {self.target.target_id}")
+        candidate_files = self._candidate_files()
+        cursor = str(start_after or "").replace("\\", "/")
+        start_index = 0
+        if cursor:
+            while start_index < len(candidate_files) and candidate_files[start_index][0].casefold() <= cursor.casefold():
+                start_index += 1
+            if start_index >= len(candidate_files):
+                start_index = 0
+        window = candidate_files[start_index : start_index + self.target.max_files]
         findings: list[ConstraintFinding] = []
         files_scanned = 0
         files_skipped = 0
         truncated = False
-        for path in self._iter_files():
-            if files_scanned >= self.target.max_files:
-                truncated = True
-                break
+        last_processed = ""
+        for relative_path, path in window:
+            last_processed = relative_path
             try:
                 if path.stat().st_size > self.target.max_file_bytes:
                     files_skipped += 1
@@ -432,7 +455,6 @@ class ConstraintAuditor:
                 files_skipped += 1
                 continue
             files_scanned += 1
-            relative_path = path.relative_to(self.target.root).as_posix()
             for line_number, line in enumerate(content.splitlines(), start=1):
                 for rule in CONSTRAINT_RULES:
                     if not rule.pattern.search(line):
@@ -453,6 +475,15 @@ class ConstraintAuditor:
                     break
             if truncated:
                 break
+        processed_all_window = not truncated
+        more_pending = (
+            bool(last_processed)
+            and (
+                (start_index + len(window) < len(candidate_files))
+                or not processed_all_window
+            )
+        )
+        next_cursor = last_processed if more_pending else ""
         state = "NEEDS_EVIDENCE_REVIEW" if findings else "NO_CANDIDATES"
         return ConstraintAuditReport(
             audit_id=f"audit-{self.target.target_id}-{int(time.time() * 1000)}",
@@ -463,6 +494,8 @@ class ConstraintAuditor:
             files_scanned=files_scanned,
             files_skipped=files_skipped,
             truncated=truncated,
+            more_pending=more_pending,
+            next_cursor=next_cursor,
             findings=tuple(findings),
         )
 
@@ -587,7 +620,8 @@ class EvidenceCoordinator:
             return False
         previous = self.store.get_constraint_audit(target.target_id)
         previous_time = _parse_timestamp((previous or {}).get("scanned_at"))
-        return previous_time is None or now - previous_time >= self.audit_interval_s
+        interval = target.interval_s if target.interval_s is not None else self.audit_interval_s
+        return previous_time is None or now - previous_time >= interval
 
     def tick(self, *, now: float | None = None) -> list[dict[str, Any]]:
         """Schedule due audits without ever blocking worker supervision."""
@@ -625,6 +659,7 @@ class EvidenceCoordinator:
                         "files_skipped": report.files_skipped,
                         "candidate_count": len(report.findings),
                         "truncated": report.truncated,
+                        "more_pending": report.more_pending,
                     },
                     artifact_ref=f"constraint-audit:{target.target_id}",
                 )
@@ -632,7 +667,12 @@ class EvidenceCoordinator:
         for target in self.targets:
             if not self._audit_due(target, now=now):
                 continue
-            self._pending[target.target_id] = self._executor.submit(ConstraintAuditor(target).run)
+            previous = self.store.get_constraint_audit(target.target_id) or {}
+            start_after = str(previous.get("next_cursor", ""))
+            self._pending[target.target_id] = self._executor.submit(
+                ConstraintAuditor(target).run,
+                start_after=start_after,
+            )
             events.append(
                 self._event(
                     event_type="constraint_audit_started",
@@ -691,6 +731,7 @@ class EvidenceCoordinator:
                     "files_skipped": max(0, int(record.get("files_skipped", 0) or 0)),
                     "candidate_count": max(0, int(record.get("candidate_count", 0) or 0)),
                     "truncated": bool(record.get("truncated", False)),
+                    "more_pending": bool(record.get("more_pending", False)),
                     "categories": categories,
                 }
             )
