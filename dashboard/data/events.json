@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-31T01:40:27.156Z",
-    "event_id": "evt-evidence-constraint_audit_completed-",
-    "actor": "local-manager-v2",
-    "type": "constraint_audit_completed",
-    "state": "NO_CANDIDATES",
-    "message": "scan_constraints \u00b7 review_candidates_recorded",
-    "action": "scan_constraints",
-    "outcome": "review_candidates_recorded",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-31T01:40:27.168Z",
     "event_id": "evt-workstream-active-workspace-constrai",
     "actor": "evidence-coordinator",
@@ -13962,6 +13950,22 @@
       "tasks_completed": 57,
       "fallback": false,
       "duration_s": 6.422
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:23:02.440Z",
+    "event_id": "agent-local-manager-brain-17881609824401",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Workers and jobs are synchronized to READY state with no resource constraints; continue execution.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 58,
+      "fallback": false,
+      "duration_s": 6.172
     },
     "error": false
   }
