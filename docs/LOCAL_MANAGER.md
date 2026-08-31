@@ -124,6 +124,12 @@ Local publication and public publication are separate steps:
 4. The dashboard refreshes the public files and marks them stale after five
    minutes without a new snapshot.
 
+On Windows, a short filesystem lock on a dashboard JSON file is retried with a
+bounded delay. If a public snapshot still cannot be written, the failure is
+recorded in local-only runtime diagnostics and its remote upload is skipped.
+The supervisor and protected worker keep running; telemetry output is not
+allowed to terminate the manager.
+
 Enable the uploader only after creating a dedicated fine-grained GitHub token
 with access limited to this repository's contents. Put the value in a local
 ignored environment file referenced by env_file; never put it in JSON,
@@ -167,9 +173,13 @@ Install a user-level Task Scheduler entry from a PowerShell session:
 powershell -ExecutionPolicy Bypass -File scripts/install_machine_manager.ps1 -RepoPath C:/path/to/MachineManager -ConfigPath C:/path/to/local-manager-config.json -PythonPath C:/path/to/python.exe
 ```
 
-The task starts at interactive logon, restarts the manager after failure, and
-keeps a local `var/manager.log` error trail,
-allows battery operation, and ignores duplicate instances through the manager
-lock. It does not make a powered-off or sleeping laptop into an always-on
-server. True 24/7 operation requires an awake, connected machine or an
-always-on host for the worker and/or public telemetry service.
+The task starts a small local watchdog at interactive logon. The watchdog
+relaunches a failed manager child after a bounded delay; the manager lock and
+worker PID lease prevent duplicate supervision and allow a healthy worker to be
+adopted after a manager-process failure. Task Scheduler remains the outer
+restart layer for the watchdog itself. The task allows battery operation and
+keeps a local runtime error trail.
+
+It does not make a powered-off or sleeping laptop into an always-on server.
+True 24/7 operation requires an awake, connected machine or an always-on host
+for the worker and/or public telemetry service.

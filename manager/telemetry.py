@@ -8,12 +8,67 @@ import math
 import os
 import re
 import tempfile
+import time
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 
+class TelemetryWriteError(OSError):
+    """A public telemetry file could not be safely replaced after retries."""
+
+
 def utc_now() -> str:
     return dt.datetime.now(dt.timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def _is_transient_replace_error(error: OSError) -> bool:
+    return isinstance(error, PermissionError) or getattr(error, "winerror", None) in {5, 32}
+
+
+def atomic_json_write(
+    destination: Path,
+    value: Any,
+    *,
+    replace_attempts: int = 5,
+    retry_delay_s: float = 0.1,
+) -> None:
+    """Write JSON without exposing a partial file during replacement.
+
+    Windows can briefly deny a replacement while an indexer, synchronizer, or
+    another local reader has the destination open. Retry only those transient
+    replacement errors; persistent output failure remains a bounded, typed
+    error for the caller to handle without stopping protected work.
+    """
+
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    attempts = max(1, int(replace_attempts))
+    delay = max(0.0, float(retry_delay_s))
+    fd, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.",
+        suffix=".tmp",
+        dir=destination.parent,
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+            json.dump(value, handle, indent=2, ensure_ascii=True)
+            handle.write("\n")
+        for attempt in range(attempts):
+            try:
+                os.replace(temporary_name, destination)
+                return
+            except OSError as error:
+                if not _is_transient_replace_error(error):
+                    raise
+                if attempt + 1 >= attempts:
+                    raise TelemetryWriteError(
+                        f"could not replace {destination.name} after {attempts} attempts"
+                    ) from error
+                if delay:
+                    time.sleep(delay * (attempt + 1))
+    finally:
+        if os.path.exists(temporary_name):
+            os.unlink(temporary_name)
 
 
 def _text(value: Any, *, default: str = "", max_len: int = 160) -> str:
@@ -197,22 +252,30 @@ def _safe_autonomy(value: Mapping[str, Any] | None) -> dict[str, str | bool]:
 class TelemetryPublisher:
     """Write only the dashboard's compact, public-safe JSON contract."""
 
-    def __init__(self, dashboard_dir: Path) -> None:
+    def __init__(
+        self,
+        dashboard_dir: Path,
+        *,
+        replace_attempts: int = 5,
+        retry_delay_s: float = 0.1,
+    ) -> None:
+        if int(replace_attempts) < 1:
+            raise ValueError("replace_attempts must be positive")
+        if float(retry_delay_s) < 0:
+            raise ValueError("retry_delay_s cannot be negative")
         self.dashboard_dir = Path(dashboard_dir)
         self.data_dir = self.dashboard_dir / "data"
         self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.replace_attempts = int(replace_attempts)
+        self.retry_delay_s = float(retry_delay_s)
 
     def _atomic_json(self, name: str, value: Any) -> None:
-        destination = self.data_dir / name
-        fd, temporary_name = tempfile.mkstemp(prefix=f".{name}.", suffix=".tmp", dir=self.data_dir)
-        try:
-            with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
-                json.dump(value, handle, indent=2, ensure_ascii=True)
-                handle.write("\n")
-            os.replace(temporary_name, destination)
-        finally:
-            if os.path.exists(temporary_name):
-                os.unlink(temporary_name)
+        atomic_json_write(
+            self.data_dir / name,
+            value,
+            replace_attempts=self.replace_attempts,
+            retry_delay_s=self.retry_delay_s,
+        )
 
     def _workers(self, workers: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         return [

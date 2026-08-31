@@ -6,7 +6,6 @@ import argparse
 import json
 import os
 import re
-import tempfile
 import time
 import traceback
 from pathlib import Path
@@ -23,7 +22,7 @@ from .public_upload import GitHubPagesPublisher, PublicUploadError
 from .scheduler import WorkScheduler
 from .state_store import StateStore
 from .supervisor import WorkerSpec
-from .telemetry import TelemetryPublisher, utc_now
+from .telemetry import TelemetryPublisher, atomic_json_write, utc_now
 from .workstreams import WorkstreamRegistry
 
 
@@ -98,20 +97,7 @@ def resolve_path(value: str | None, *, base: Path) -> Path | None:
 
 
 def write_status(path: Path, status: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary_name = tempfile.mkstemp(
-        prefix=f".{path.name}.",
-        suffix=".tmp",
-        dir=path.parent,
-    )
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
-            json.dump(status, handle, indent=2, ensure_ascii=True)
-            handle.write("\n")
-        os.replace(temporary_name, path)
-    finally:
-        if os.path.exists(temporary_name):
-            os.unlink(temporary_name)
+    atomic_json_write(path, status)
 
 
 def load_public_records(dashboard_dir: Path | None) -> tuple[list[Any], list[Any]]:
@@ -364,6 +350,46 @@ def _append_manager_log(path: Path | None, message: str) -> None:
         handle.write(f"[{utc_now()}] {message.rstrip()}\n")
 
 
+def _record_noncritical_output_failure(
+    manager_log_path: Path | None,
+    *,
+    output: str,
+    error: Exception,
+) -> None:
+    """Report a local output problem without allowing it to stop supervision."""
+
+    message = f"{output} deferred: {type(error).__name__}"
+    _print_safe(message)
+    try:
+        _append_manager_log(manager_log_path, message)
+    except OSError:
+        # A blocked diagnostic log must not turn a non-critical output issue
+        # into a manager crash.
+        pass
+
+
+def _publish_local_snapshot(
+    publisher: TelemetryPublisher,
+    snapshot: Mapping[str, Any],
+    *,
+    events: list[Any],
+    scenarios: list[Any],
+    manager_log_path: Path | None,
+) -> bool:
+    """Publish a public-safe snapshot, returning false when it is deferred."""
+
+    try:
+        publisher.publish(snapshot, events=events, scenarios=scenarios)
+    except Exception as error:
+        _record_noncritical_output_failure(
+            manager_log_path,
+            output="Local telemetry",
+            error=error,
+        )
+        return False
+    return True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
@@ -424,6 +450,7 @@ def main() -> int:
     objective = ""
     public_event_limit = 500
     last_public_marker: str | None = None
+    requested_stop = False
     try:
         try:
             lock = InstanceLock(lock_path).acquire()
@@ -630,15 +657,25 @@ def main() -> int:
                 limit=public_event_limit,
             )
 
+            local_snapshot_ready = True
             if status_path:
-                write_status(status_path, snapshot)
+                try:
+                    write_status(status_path, snapshot)
+                except Exception as error:
+                    _record_noncritical_output_failure(
+                        manager_log_path,
+                        output="Local status",
+                        error=error,
+                    )
             if local_publisher:
-                local_publisher.publish(
+                local_snapshot_ready = _publish_local_snapshot(
+                    local_publisher,
                     snapshot,
                     events=public_events,
                     scenarios=public_scenarios,
+                    manager_log_path=manager_log_path,
                 )
-            if remote_publisher:
+            if remote_publisher and local_snapshot_ready:
                 try:
                     public_marker = _public_state_marker(snapshot)
                     immediate_public_update = public_marker != last_public_marker
@@ -649,22 +686,38 @@ def main() -> int:
             if status_path and remote_publisher:
                 status_copy = dict(snapshot)
                 status_copy["public_upload"] = remote_publisher.status()
-                write_status(status_path, status_copy)
+                try:
+                    write_status(status_path, status_copy)
+                except Exception as error:
+                    _record_noncritical_output_failure(
+                        manager_log_path,
+                        output="Local status",
+                        error=error,
+                    )
             if args.once:
+                requested_stop = True
                 break
             time.sleep(interval)
     except KeyboardInterrupt:
+        requested_stop = True
         _print_safe("Machine Manager stopping.")
-        _append_manager_log(manager_log_path, "Machine Manager stopped by KeyboardInterrupt.")
+        try:
+            _append_manager_log(manager_log_path, "Machine Manager stopped by KeyboardInterrupt.")
+        except OSError:
+            pass
     except Exception as exc:
         _print_safe(f"Machine Manager stopped: {type(exc).__name__}")
-        _append_manager_log(manager_log_path, traceback.format_exc())
+        try:
+            _append_manager_log(manager_log_path, traceback.format_exc())
+        except OSError:
+            pass
         raise
     finally:
         if manager is not None and agents is not None and capabilities is not None and scheduler is not None:
-            manager.cancel_all()
+            if requested_stop:
+                manager.cancel_all()
             _persist_runtime(manager, agents, store, seen_event_ids)
-            if local_publisher and scheduler is not None:
+            if local_publisher and requested_stop:
                 stopped = manager.snapshot(objective=objective)
                 stopped["objective_id"] = primary_objective_id
                 stopped["updated"] = utc_now()
@@ -679,10 +732,12 @@ def main() -> int:
                     store.recent_events(limit=public_event_limit),
                     limit=public_event_limit,
                 )
-                local_publisher.publish(
+                _publish_local_snapshot(
+                    local_publisher,
                     stopped,
                     events=public_events,
                     scenarios=public_scenarios,
+                    manager_log_path=manager_log_path,
                 )
         if agents is not None:
             agents.close()

@@ -11,9 +11,10 @@ from unittest.mock import patch
 from pathlib import Path
 
 from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor, _expected_image_name
-from manager.telemetry import TelemetryPublisher
+from manager.telemetry import TelemetryPublisher, TelemetryWriteError
 from manager.run import (
     _pending_operator_resume,
+    _publish_local_snapshot,
     _public_state_marker,
     load_public_records,
     manager_from_config,
@@ -968,6 +969,68 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(events[0]["metrics"]["keys_tested"], 99)
             self.assertFalse(events[0]["error"] is False)
             self.assertEqual(latest["workers"][0]["state"], "RUNNING")
+
+    def test_publisher_retries_a_transient_dashboard_file_lock(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            publisher = TelemetryPublisher(
+                dashboard,
+                replace_attempts=2,
+                retry_delay_s=0,
+            )
+            original_replace = os.replace
+            calls = 0
+
+            def replace_after_one_lock(source: str, destination: str) -> None:
+                nonlocal calls
+                calls += 1
+                if calls == 1:
+                    raise PermissionError(5, "Access is denied", str(destination))
+                original_replace(source, destination)
+
+            with patch(
+                "manager.telemetry.os.replace",
+                side_effect=replace_after_one_lock,
+            ):
+                publisher.publish({"status": "HEALTHY", "workers": [], "jobs": [], "gpu": {}})
+
+            self.assertEqual(calls, 4)
+            self.assertTrue((dashboard / "data" / "latest.json").is_file())
+
+    def test_publisher_reports_a_persistent_dashboard_file_lock(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            publisher = TelemetryPublisher(
+                dashboard,
+                replace_attempts=2,
+                retry_delay_s=0,
+            )
+            with patch(
+                "manager.telemetry.os.replace",
+                side_effect=PermissionError(5, "Access is denied"),
+            ):
+                with self.assertRaises(TelemetryWriteError):
+                    publisher._atomic_json("latest.json", {"status": "HEALTHY"})
+            self.assertEqual(list((dashboard / "data").glob("*.tmp")), [])
+
+    def test_runner_defers_a_dashboard_write_failure_without_raising(self) -> None:
+        class LockedPublisher:
+            def publish(self, *args: object, **kwargs: object) -> None:
+                raise PermissionError(5, "Access is denied")
+
+        with tempfile.TemporaryDirectory() as raw:
+            log_path = Path(raw) / "manager.log"
+            published = _publish_local_snapshot(
+                LockedPublisher(),  # type: ignore[arg-type]
+                {"status": "HEALTHY"},
+                events=[],
+                scenarios=[],
+                manager_log_path=log_path,
+            )
+            self.assertFalse(published)
+            diagnostic = log_path.read_text(encoding="utf-8")
+            self.assertIn("Local telemetry deferred: PermissionError", diagnostic)
+            self.assertNotIn("Access is denied", diagnostic)
 
     def test_publisher_preserves_legacy_event_fields(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

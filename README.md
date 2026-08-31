@@ -46,6 +46,7 @@ The repository-level Python runtime in [`manager/`](manager/) currently provides
 - Durable SQLite state for jobs, attempts, retries, events, queued work, worker adoption after a manager restart, and singleton protection against duplicate managers.
 - Bounded recovery: retry budgets prevent an endless restart loop; exhausted jobs enter `ESCALATED` with their history intact.
 - A recorded one-time operator-resume mechanism for a specific escalated job, rather than silently erasing a failed history. See [the recovery guide](docs/LOCAL_MANAGER.md#one-time-operator-resume-after-escalation).
+- Resilient public telemetry: transient dashboard-file locks retry locally, and a persistent telemetry failure defers that snapshot instead of terminating protected work.
 - Synthetic workers and reliability tests for healthy work, live-but-stalled work, crashes, escalation, event contracts, and public-telemetry boundaries.
 - Bounded local specialist slots that can give safe, compact operational advice while the manager retains control of worker lifecycle and retry policy.
 
