@@ -1,36 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:29:56.388Z",
-    "event_id": "evt-f1c411ba547d",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "VERIFYING",
-    "message": "startup_grace",
-    "action": "",
-    "outcome": "startup_grace",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": false,
-      "healthy": false,
-      "util_pct": 0.0,
-      "mem_used_mib": 0.0,
-      "mem_total_mib": 8188.0,
-      "temp_c": 44.0,
-      "power_w": 590.01,
-      "sample_count": 1,
-      "worker_uptime_s": 0.6,
-      "progress_reported": true,
-      "hashrate_mkey_s": 742.08,
-      "keys_per_second": 742080000,
-      "coverage_pct": 0,
-      "batch_number": 261,
-      "keys_tested": 810842849280,
-      "matches_found": 0
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T02:34:36.065Z",
     "event_id": "evt-0610365277e4",
     "actor": "local-manager-v2",
@@ -13964,6 +13933,22 @@
       "tasks_completed": 68,
       "fallback": false,
       "duration_s": 6.203
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T08:19:34.404Z",
+    "event_id": "agent-local-manager-brain-17881643744048",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit completed with no new candidates; system is synchronized and ready for the next search iteration.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 69,
+      "fallback": false,
+      "duration_s": 6.375
     },
     "error": false
   }
