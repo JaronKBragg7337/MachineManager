@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T00:48:53.310Z",
-    "event_id": "agent-local-manager-brain-17881373333118",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit completed with evidence recorded; workstream is in REVIEW state and ready for next decision cycle.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 59,
-      "fallback": false,
-      "duration_s": 6.391
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T02:49:43.213Z",
     "event_id": "evt-ac4367a1dbc6",
     "actor": "local-manager-v2",
@@ -13970,6 +13954,22 @@
       "tasks_completed": 48,
       "fallback": false,
       "duration_s": 6.188
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T06:36:47.747Z",
+    "event_id": "agent-local-manager-brain-17881582077473",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 49,
+      "fallback": false,
+      "duration_s": 6.094
     },
     "error": false
   }
