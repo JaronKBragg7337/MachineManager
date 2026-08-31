@@ -1,37 +1,6 @@
 [
   {
     "ts": "2026-08-31T02:50:43.602Z",
-    "event_id": "evt-9aeb0998f350",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "action": "",
-    "outcome": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true,
-      "util_pct": 89.0,
-      "mem_used_mib": 2367.0,
-      "mem_total_mib": 8188.0,
-      "temp_c": 61.0,
-      "power_w": 82.05,
-      "sample_count": 82,
-      "worker_uptime_s": 1247.8,
-      "progress_reported": true,
-      "hashrate_mkey_s": 794.84,
-      "keys_per_second": 794840000,
-      "coverage_pct": 0,
-      "batch_number": 296,
-      "keys_tested": 960730497024,
-      "matches_found": 0
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-31T02:50:43.602Z",
     "event_id": "agent-local-manager-brain-17881446436029",
     "actor": "local-manager-brain",
     "type": "agent_decision",
@@ -12689,6 +12658,22 @@
       "tasks_completed": 71,
       "fallback": false,
       "duration_s": 6.219
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T14:20:12.952Z",
+    "event_id": "agent-local-manager-brain-17881860129523",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Workers and jobs are in READY state with no active constraints; GPU is idle but within thermal limits, allowing resumption of the Bitcoin search.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 139,
+      "fallback": false,
+      "duration_s": 6.89
     },
     "error": false
   }
