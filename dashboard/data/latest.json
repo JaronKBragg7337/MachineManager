@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T14:03:28.753Z",
+        "observed_at": "2026-08-31T14:08:37.231Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 37234.6,
-        "sample_count": 2470,
+        "uptime_s": 37543.1,
+        "sample_count": 2488,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T14:03:28.753Z",
+        "observed_at": "2026-08-31T14:08:37.231Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 37234.6,
-        "sample_count": 2470,
+        "uptime_s": 37543.1,
+        "sample_count": 2488,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "No active constraints or errors detected; system is ready for the next puzzle iteration.",
-      "last_duration_s": 6.344,
-      "tasks_completed": 135,
-      "last_run": "2026-08-31T13:59:34.031Z",
-      "next_run": "2026-08-31T14:04:34.031Z"
+      "last_reason": "Constraint audit completed with no candidates; agents recommend continuation of Bitcoin Puzzle #71 search.",
+      "last_duration_s": 6.266,
+      "tasks_completed": 136,
+      "last_run": "2026-08-31T14:04:43.833Z",
+      "next_run": "2026-08-31T14:09:43.833Z"
     }
   ],
   "capabilities": [
@@ -346,19 +346,19 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T14:03:28.753Z",
+    "observed_at": "2026-08-31T14:08:37.231Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 37234.6,
-    "sample_count": 2470,
+    "uptime_s": 37543.1,
+    "sample_count": 2488,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T14:03:30.518Z"
+  "updated": "2026-08-31T14:08:38.973Z"
 }
