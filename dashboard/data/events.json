@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-31T01:40:27.168Z",
-    "event_id": "evt-workstream-active-workspace-constrai",
-    "actor": "evidence-coordinator",
-    "type": "workstream_state_changed",
-    "state": "WAITING",
-    "message": "synchronize_workstream \u00b7 state_synchronized",
-    "action": "synchronize_workstream",
-    "outcome": "state_synchronized",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-31T01:45:36.728Z",
     "event_id": "agent-local-manager-brain-17881407367285",
     "actor": "local-manager-brain",
@@ -13966,6 +13954,22 @@
       "tasks_completed": 58,
       "fallback": false,
       "duration_s": 6.172
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:28:11.360Z",
+    "event_id": "agent-local-manager-brain-17881612913602",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in escalated state with GPU resources available and no active errors; continuing the Bitcoin Puzzle search aligns with current objectives.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 59,
+      "fallback": false,
+      "duration_s": 6.562
     },
     "error": false
   }
