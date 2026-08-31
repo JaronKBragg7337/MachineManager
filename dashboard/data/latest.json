@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T04:22:48.755Z",
+        "observed_at": "2026-08-31T04:27:56.429Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 2394.4,
-        "sample_count": 440,
+        "uptime_s": 2702.1,
+        "sample_count": 458,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T04:22:48.755Z",
+        "observed_at": "2026-08-31T04:27:56.429Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 2394.4,
-        "sample_count": 440,
+        "uptime_s": 2702.1,
+        "sample_count": 458,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -60,10 +60,10 @@
       "enabled": true,
       "last_action": "restart",
       "last_reason": "Retry limit reached with missing progress signals; attempting restart to reset worker state.",
-      "last_duration_s": 6.14,
-      "tasks_completed": 22,
-      "last_run": "2026-08-31T04:18:03.587Z",
-      "next_run": "2026-08-31T04:23:03.587Z"
+      "last_duration_s": 6.156,
+      "tasks_completed": 23,
+      "last_run": "2026-08-31T04:23:11.220Z",
+      "next_run": "2026-08-31T04:28:11.220Z"
     }
   ],
   "capabilities": [
@@ -346,19 +346,19 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T04:22:48.755Z",
+    "observed_at": "2026-08-31T04:27:56.429Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 2394.4,
-    "sample_count": 440,
+    "uptime_s": 2702.1,
+    "sample_count": 458,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T04:22:50.514Z"
+  "updated": "2026-08-31T04:27:58.201Z"
 }

@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-30T22:37:52.011Z",
-    "event_id": "evt-workstream-active-workspace-constrai",
-    "actor": "evidence-coordinator",
-    "type": "workstream_state_changed",
-    "state": "REVIEW",
-    "message": "synchronize_workstream \u00b7 state_synchronized",
-    "action": "synchronize_workstream",
-    "outcome": "state_synchronized",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-30T22:40:37.193Z",
     "event_id": "agent-local-manager-brain-17881296371938",
     "actor": "local-manager-brain",
@@ -13966,6 +13954,22 @@
       "batch_number": 399,
       "keys_tested": 1257636888576,
       "matches_found": 0
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:23:11.220Z",
+    "event_id": "agent-local-manager-brain-17881501912207",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Retry limit reached with missing progress signals; attempting restart to reset worker state.",
+    "action": "restart",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 23,
+      "fallback": false,
+      "duration_s": 6.156
     },
     "error": false
   }
