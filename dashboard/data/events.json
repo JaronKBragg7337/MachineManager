@@ -1,69 +1,5 @@
 [
   {
-    "ts": "2026-08-30T22:50:51.486Z",
-    "event_id": "agent-local-manager-brain-17881302514865",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit flagged as needing evidence review; current state is escalated and requires human intervention to resolve pending candidates.",
-    "action": "escalate",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 36,
-      "fallback": false,
-      "duration_s": 6.547
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-30T22:55:59.768Z",
-    "event_id": "agent-local-manager-brain-17881305597683",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit flagged as needing evidence review; machine status is escalated pending human decision.",
-    "action": "escalate",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 37,
-      "fallback": false,
-      "duration_s": 6.235
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-30T23:01:06.639Z",
-    "event_id": "agent-local-manager-brain-17881308666394",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit flagged as needing evidence review; machine status escalated pending human decision.",
-    "action": "escalate",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 38,
-      "fallback": false,
-      "duration_s": 6.313
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-30T23:06:13.884Z",
-    "event_id": "agent-local-manager-brain-17881311738840",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Audit completed with evidence recorded; state synchronized and agents ready for next step.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 39,
-      "fallback": false,
-      "duration_s": 6.187
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-30T23:11:21.395Z",
     "event_id": "agent-local-manager-brain-17881314813951",
     "actor": "local-manager-brain",
@@ -13971,6 +13907,58 @@
       "keys_tested": 1257636888576,
       "matches_found": 0
     },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:38:36.528Z",
+    "event_id": "agent-local-manager-brain-17881511165285",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Retry limit reached with no progress signal; attempting restart to reset worker state and resource allocation.",
+    "action": "restart",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 26,
+      "fallback": false,
+      "duration_s": 6.25
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:41:25.573Z",
+    "event_id": "evt-evidence-constraint_audit_started-17",
+    "actor": "local-manager-v2",
+    "type": "constraint_audit_started",
+    "state": "RUNNING",
+    "message": "scan_constraints \u00b7 audit_scheduled",
+    "action": "scan_constraints",
+    "outcome": "audit_scheduled",
+    "metrics": {},
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:42:16.067Z",
+    "event_id": "evt-evidence-constraint_audit_completed-",
+    "actor": "local-manager-v2",
+    "type": "constraint_audit_completed",
+    "state": "NEEDS_EVIDENCE_REVIEW",
+    "message": "scan_constraints \u00b7 review_candidates_recorded",
+    "action": "scan_constraints",
+    "outcome": "review_candidates_recorded",
+    "metrics": {},
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:42:16.078Z",
+    "event_id": "evt-workstream-active-workspace-constrai",
+    "actor": "evidence-coordinator",
+    "type": "workstream_state_changed",
+    "state": "REVIEW",
+    "message": "synchronize_workstream \u00b7 state_synchronized",
+    "action": "synchronize_workstream",
+    "outcome": "state_synchronized",
+    "metrics": {},
     "error": false
   }
 ]

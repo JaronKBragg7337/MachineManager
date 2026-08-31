@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T04:38:13.035Z",
+        "observed_at": "2026-08-31T04:42:14.355Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 3318.7,
-        "sample_count": 494,
+        "uptime_s": 3560.0,
+        "sample_count": 508,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T04:38:13.035Z",
+        "observed_at": "2026-08-31T04:42:14.355Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 3318.7,
-        "sample_count": 494,
+        "uptime_s": 3560.0,
+        "sample_count": 508,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -56,14 +56,14 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
       "last_action": "restart",
-      "last_reason": "Retry limit reached with no progress signal; attempting restart to reset worker state.",
-      "last_duration_s": 6.062,
-      "tasks_completed": 25,
-      "last_run": "2026-08-31T04:33:27.420Z",
-      "next_run": "2026-08-31T04:38:27.420Z"
+      "last_reason": "Retry limit reached with no progress signal; attempting restart to reset worker state and resource allocation.",
+      "last_duration_s": 6.25,
+      "tasks_completed": 26,
+      "last_run": "2026-08-31T04:38:36.528Z",
+      "next_run": "2026-08-31T04:43:36.528Z"
     }
   ],
   "capabilities": [
@@ -207,14 +207,18 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NO_CANDIDATES",
-      "scanned_at": "2026-08-31T03:41:12.444Z",
-      "files_scanned": 2997,
-      "files_skipped": 3,
-      "candidate_count": 0,
+      "state": "NEEDS_EVIDENCE_REVIEW",
+      "scanned_at": "2026-08-31T04:42:15.249Z",
+      "files_scanned": 2989,
+      "files_skipped": 11,
+      "candidate_count": 16,
       "truncated": false,
       "more_pending": true,
-      "categories": {}
+      "categories": {
+        "approval_gate": 5,
+        "autonomy_limit": 7,
+        "scope_boundary": 4
+      }
     },
     {
       "id": "machine-manager-source",
@@ -258,16 +262,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "WAITING",
+      "state": "REVIEW",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 0,
-        "files_scanned": 2997,
+        "candidate_count": 16,
+        "files_scanned": 2989,
         "more_pending": true
       },
-      "updated": "2026-08-31T03:41:20.339Z"
+      "updated": "2026-08-31T04:42:16.078Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -340,25 +344,25 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 41.0,
+    "temp_c": 42.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T04:38:13.035Z",
+    "observed_at": "2026-08-31T04:42:14.355Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 3318.7,
-    "sample_count": 494,
+    "uptime_s": 3560.0,
+    "sample_count": 508,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T04:38:14.791Z"
+  "updated": "2026-08-31T04:42:16.067Z"
 }
