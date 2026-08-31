@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T13:02:43.927Z",
+        "observed_at": "2026-08-31T13:07:52.117Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 33589.8,
-        "sample_count": 2258,
+        "uptime_s": 33898.0,
+        "sample_count": 2276,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T13:02:43.927Z",
+        "observed_at": "2026-08-31T13:07:52.117Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 33589.8,
-        "sample_count": 2258,
+        "uptime_s": 33898.0,
+        "sample_count": 2276,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "escalate",
-      "last_reason": "Constraint audit flagged NEEDS_EVIDENCE_REVIEW; pending human review before proceeding.",
-      "last_duration_s": 6.422,
-      "tasks_completed": 124,
-      "last_run": "2026-08-31T13:02:45.676Z",
-      "next_run": "2026-08-31T13:07:45.676Z"
+      "last_reason": "Constraint audit requires evidence review and job state is escalated pending resolution.",
+      "last_duration_s": 6.109,
+      "tasks_completed": 125,
+      "last_run": "2026-08-31T13:07:53.889Z",
+      "next_run": "2026-08-31T13:12:53.889Z"
     }
   ],
   "capabilities": [
@@ -350,19 +350,19 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T13:02:43.927Z",
+    "observed_at": "2026-08-31T13:07:52.117Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 33589.8,
-    "sample_count": 2258,
+    "uptime_s": 33898.0,
+    "sample_count": 2276,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T13:02:45.676Z"
+  "updated": "2026-08-31T13:07:53.888Z"
 }
