@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T00:23:05.399Z",
-    "event_id": "agent-local-manager-brain-17881357853994",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in escalated state with active workers and jobs; GPU utilization is zero but temperature is stable at 42\u00b0C, indicating no immediate thermal or resourc",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 54,
-      "fallback": false,
-      "duration_s": 7.266
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T00:28:14.657Z",
     "event_id": "agent-local-manager-brain-17881360946576",
     "actor": "local-manager-brain",
@@ -13958,6 +13942,22 @@
       "tasks_completed": 40,
       "fallback": false,
       "duration_s": 6.766
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T05:55:41.543Z",
+    "event_id": "agent-local-manager-brain-17881557415438",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit completed with no candidates; machine is idle and ready for next puzzle task.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 41,
+      "fallback": false,
+      "duration_s": 6.25
     },
     "error": false
   }
