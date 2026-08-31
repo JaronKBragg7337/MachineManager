@@ -1,29 +1,29 @@
 {
   "manager_version": "0.2",
-  "status": "ESCALATED",
+  "status": "STARTING",
   "objective": "Bitcoin Puzzle #71 continuous search",
   "objective_id": "p71",
   "workers": [
     {
       "id": "keyhunt-001",
       "type": "KeyHunt",
-      "state": "ESCALATED",
+      "state": "VERIFYING",
       "owner": "local-manager-v2",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T15:30:02.416Z",
+        "observed_at": "2026-08-31T23:53:29.119Z",
         "reported": true,
         "active": false,
         "healthy": false,
-        "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 42428.3,
-        "sample_count": 2771,
         "keys_per_second": 770990000,
-        "hashrate_mkey_s": 770.99,
+        "coverage_pct": 0,
+        "sample_count": 1,
         "keys_tested": 1311340756992,
-        "batch_number": 416
+        "batch_number": 416,
+        "hashrate_mkey_s": 770.99,
+        "uptime_s": 1.7
       }
     }
   ],
@@ -31,22 +31,22 @@
     {
       "id": "job-p71-001",
       "objective_id": "p71",
-      "state": "ESCALATED",
+      "state": "VERIFYING",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T15:30:02.416Z",
+        "observed_at": "2026-08-31T23:53:29.119Z",
         "reported": true,
         "active": false,
         "healthy": false,
-        "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 42428.3,
-        "sample_count": 2771,
         "keys_per_second": 770990000,
-        "hashrate_mkey_s": 770.99,
+        "coverage_pct": 0,
+        "sample_count": 1,
         "keys_tested": 1311340756992,
-        "batch_number": 416
+        "batch_number": 416,
+        "hashrate_mkey_s": 770.99,
+        "uptime_s": 1.7
       }
     }
   ],
@@ -56,14 +56,14 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System is synchronized and ready for continuous Bitcoin puzzle search.",
-      "last_duration_s": 5.922,
-      "tasks_completed": 152,
-      "last_run": "2026-08-31T15:27:15.413Z",
-      "next_run": "2026-08-31T15:32:15.413Z"
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -328,42 +328,42 @@
     }
   ],
   "autonomy": {
-    "developer_tools": true,
-    "public_submissions": true,
-    "transparent_outreach": true,
-    "terms_aware_execution": true,
-    "procurement_when_funded": true,
     "account_enrollment": true,
+    "terms_aware_execution": true,
+    "transparent_outreach": true,
+    "public_submissions": true,
+    "outreach_opt_out": true,
     "paid_work": true,
     "gpu_idle_use": true,
-    "outreach_opt_out": true,
-    "handoff_style": "service-required",
-    "mode": "EXECUTE_AND_REPORT"
+    "developer_tools": true,
+    "procurement_when_funded": true,
+    "mode": "EXECUTE_AND_REPORT",
+    "handoff_style": "service-required"
   },
   "queue": {},
   "gpu": {
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 39.0,
+    "temp_c": 40.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T15:30:02.416Z",
+    "observed_at": "2026-08-31T23:53:29.119Z",
     "reported": true,
     "active": false,
     "healthy": false,
-    "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 42428.3,
-    "sample_count": 2771,
     "keys_per_second": 770990000,
-    "hashrate_mkey_s": 770.99,
+    "coverage_pct": 0,
+    "sample_count": 1,
     "keys_tested": 1311340756992,
-    "batch_number": 416
+    "batch_number": 416,
+    "hashrate_mkey_s": 770.99,
+    "uptime_s": 1.7
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T15:30:04.159Z"
+  "updated": "2026-08-31T23:53:30.840Z"
 }
