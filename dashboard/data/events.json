@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T00:33:23.525Z",
-    "event_id": "agent-local-manager-brain-17881364035268",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in escalated state with active workers and jobs; GPU utilization is zero but temperature is stable, indicating no immediate resource constraints requi",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 56,
-      "fallback": false,
-      "duration_s": 6.594
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T00:38:11.337Z",
     "event_id": "evt-evidence-constraint_audit_started-17",
     "actor": "local-manager-v2",
@@ -13958,6 +13942,22 @@
       "tasks_completed": 42,
       "fallback": false,
       "duration_s": 6.329
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T06:05:58.817Z",
+    "event_id": "agent-local-manager-brain-17881563588179",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit completed with no candidates; awaiting synchronized workstream state before proceeding.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 43,
+      "fallback": false,
+      "duration_s": 6.219
     },
     "error": false
   }
