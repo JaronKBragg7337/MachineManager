@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-30T23:37:54.780Z",
-    "event_id": "evt-evidence-constraint_audit_started-17",
-    "actor": "local-manager-v2",
-    "type": "constraint_audit_started",
-    "state": "RUNNING",
-    "message": "scan_constraints \u00b7 audit_scheduled",
-    "action": "scan_constraints",
-    "outcome": "audit_scheduled",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-30T23:38:12.391Z",
     "event_id": "evt-evidence-constraint_audit_completed-",
     "actor": "local-manager-v2",
@@ -13958,6 +13946,22 @@
       "batch_number": 399,
       "keys_tested": 1257636888576,
       "matches_found": 0
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T05:14:34.088Z",
+    "event_id": "agent-local-manager-brain-17881532740881",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with completed audits and synchronized workstreams; no immediate intervention required.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 33,
+      "fallback": false,
+      "duration_s": 6.422
     },
     "error": false
   }
