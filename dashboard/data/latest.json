@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T09:05:34.754Z",
+        "observed_at": "2026-08-31T09:10:42.862Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 19360.5,
-        "sample_count": 1430,
+        "uptime_s": 19668.6,
+        "sample_count": 1448,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T09:05:34.754Z",
+        "observed_at": "2026-08-31T09:10:42.862Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 19360.5,
-        "sample_count": 1430,
+        "uptime_s": 19668.6,
+        "sample_count": 1448,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -59,11 +59,11 @@
       "state": "WORKING",
       "enabled": true,
       "last_action": "escalate",
-      "last_reason": "Constraint audit flagged NEEDS_EVIDENCE_REVIEW and workers remain in ESCALATED state without resolution.",
-      "last_duration_s": 6.625,
-      "tasks_completed": 77,
-      "last_run": "2026-08-31T09:00:49.170Z",
-      "next_run": "2026-08-31T09:05:49.170Z"
+      "last_reason": "Constraint audit requires evidence review and job state is escalated pending resolution.",
+      "last_duration_s": 6.109,
+      "tasks_completed": 78,
+      "last_run": "2026-08-31T09:05:57.414Z",
+      "next_run": "2026-08-31T09:10:57.414Z"
     }
   ],
   "capabilities": [
@@ -344,25 +344,25 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 40.0,
+    "temp_c": 41.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T09:05:34.754Z",
+    "observed_at": "2026-08-31T09:10:42.862Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 19360.5,
-    "sample_count": 1430,
+    "uptime_s": 19668.6,
+    "sample_count": 1448,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T09:05:36.509Z"
+  "updated": "2026-08-31T09:10:44.603Z"
 }
