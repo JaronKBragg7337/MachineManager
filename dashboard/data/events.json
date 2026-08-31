@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T00:43:42.662Z",
-    "event_id": "agent-local-manager-brain-17881370226629",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit completed with evidence recorded; workstream is synchronized and ready for the next search cycle.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 58,
-      "fallback": false,
-      "duration_s": 10.438
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T00:48:53.310Z",
     "event_id": "agent-local-manager-brain-17881373333118",
     "actor": "local-manager-brain",
@@ -13970,6 +13954,22 @@
       "tasks_completed": 47,
       "fallback": false,
       "duration_s": 6.14
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T06:31:39.876Z",
+    "event_id": "agent-local-manager-brain-17881578998765",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in escalated state with GPU resources available and no pending errors; proceeding with continuous search.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 48,
+      "fallback": false,
+      "duration_s": 6.188
     },
     "error": false
   }
