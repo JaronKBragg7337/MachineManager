@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T00:28:14.657Z",
-    "event_id": "agent-local-manager-brain-17881360946576",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in escalated state with GPU idle; no immediate intervention required.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 55,
-      "fallback": false,
-      "duration_s": 5.953
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T00:33:23.525Z",
     "event_id": "agent-local-manager-brain-17881364035268",
     "actor": "local-manager-brain",
@@ -13958,6 +13942,22 @@
       "tasks_completed": 41,
       "fallback": false,
       "duration_s": 6.25
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T06:00:49.806Z",
+    "event_id": "agent-local-manager-brain-17881560498069",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit returned no candidates and GPU utilization is zero, indicating the search has stalled without viable targets.",
+    "action": "pause",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 42,
+      "fallback": false,
+      "duration_s": 6.329
     },
     "error": false
   }
