@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-30T23:42:08.362Z",
-    "event_id": "agent-local-manager-brain-17881333283628",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in a stable escalated state with no active constraints or errors; continuing the Bitcoin Puzzle search aligns with the objective.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 46,
-      "fallback": false,
-      "duration_s": 6.703
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-30T23:47:14.882Z",
     "event_id": "agent-local-manager-brain-17881336348829",
     "actor": "local-manager-brain",
@@ -13970,6 +13954,22 @@
       "tasks_completed": 35,
       "fallback": false,
       "duration_s": 6.391
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T05:30:00.660Z",
+    "event_id": "agent-local-manager-brain-17881542006601",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 36,
+      "fallback": false,
+      "duration_s": 6.094
     },
     "error": false
   }
