@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T00:39:39.264Z",
+        "observed_at": "2026-08-31T00:40:00.864Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -21,8 +21,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 17318.2,
-        "sample_count": 966,
+        "uptime_s": 17339.9,
+        "sample_count": 967,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T00:39:39.264Z",
+        "observed_at": "2026-08-31T00:40:00.864Z",
         "reported": true,
         "active": false,
         "healthy": false,
@@ -44,8 +44,8 @@
         "keys_per_second": 742080000,
         "matches_found": 0,
         "keys_tested": 810842849280,
-        "uptime_s": 17318.2,
-        "sample_count": 966,
+        "uptime_s": 17339.9,
+        "sample_count": 967,
         "hashrate_mkey_s": 742.08
       }
     }
@@ -207,14 +207,18 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NO_CANDIDATES",
-      "scanned_at": "2026-08-30T23:38:10.054Z",
-      "files_scanned": 2997,
-      "files_skipped": 3,
-      "candidate_count": 0,
+      "state": "NEEDS_EVIDENCE_REVIEW",
+      "scanned_at": "2026-08-31T00:39:45.475Z",
+      "files_scanned": 2989,
+      "files_skipped": 11,
+      "candidate_count": 16,
       "truncated": false,
       "more_pending": true,
-      "categories": {}
+      "categories": {
+        "approval_gate": 5,
+        "autonomy_limit": 7,
+        "scope_boundary": 4
+      }
     },
     {
       "id": "machine-manager-source",
@@ -258,16 +262,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "WAITING",
+      "state": "REVIEW",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 0,
-        "files_scanned": 2997,
+        "candidate_count": 16,
+        "files_scanned": 2989,
         "more_pending": true
       },
-      "updated": "2026-08-30T23:38:12.402Z"
+      "updated": "2026-08-31T00:40:03.444Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -340,13 +344,13 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 45.0,
+    "temp_c": 44.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T00:39:39.264Z",
+    "observed_at": "2026-08-31T00:40:00.864Z",
     "reported": true,
     "active": false,
     "healthy": false,
@@ -355,10 +359,10 @@
     "keys_per_second": 742080000,
     "matches_found": 0,
     "keys_tested": 810842849280,
-    "uptime_s": 17318.2,
-    "sample_count": 966,
+    "uptime_s": 17339.9,
+    "sample_count": 967,
     "hashrate_mkey_s": 742.08
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T00:39:41.622Z"
+  "updated": "2026-08-31T00:40:03.325Z"
 }
