@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-30T23:11:21.395Z",
-    "event_id": "agent-local-manager-brain-17881314813951",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "All workers and jobs are in escalated state with no resource constraints or errors; continue execution.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 40,
-      "fallback": false,
-      "duration_s": 6.375
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-30T23:16:28.860Z",
     "event_id": "agent-local-manager-brain-17881317888607",
     "actor": "local-manager-brain",
@@ -13959,6 +13943,22 @@
     "action": "synchronize_workstream",
     "outcome": "state_synchronized",
     "metrics": {},
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:43:44.391Z",
+    "event_id": "agent-local-manager-brain-17881514243916",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit completed with evidence review pending; machine is idle and awaiting further instructions.",
+    "action": "pause",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 27,
+      "fallback": false,
+      "duration_s": 6.266
+    },
     "error": false
   }
 ]
