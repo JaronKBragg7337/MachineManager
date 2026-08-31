@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-30T23:38:12.402Z",
-    "event_id": "evt-workstream-active-workspace-constrai",
-    "actor": "evidence-coordinator",
-    "type": "workstream_state_changed",
-    "state": "WAITING",
-    "message": "synchronize_workstream \u00b7 state_synchronized",
-    "action": "synchronize_workstream",
-    "outcome": "state_synchronized",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-30T23:42:08.362Z",
     "event_id": "agent-local-manager-brain-17881333283628",
     "actor": "local-manager-brain",
@@ -13966,6 +13954,22 @@
       "tasks_completed": 34,
       "fallback": false,
       "duration_s": 6.313
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T05:24:52.690Z",
+    "event_id": "agent-local-manager-brain-17881538926903",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in escalated state with GPU active and workers running; no credential or file access required.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 35,
+      "fallback": false,
+      "duration_s": 6.391
     },
     "error": false
   }
