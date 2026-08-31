@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-30T23:47:14.882Z",
-    "event_id": "agent-local-manager-brain-17881336348829",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in a stable escalated state with no active resource constraints or errors; continuing the continuous search aligns with the current objective.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 47,
-      "fallback": false,
-      "duration_s": 6.875
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-30T23:52:23.530Z",
     "event_id": "agent-local-manager-brain-17881339435306",
     "actor": "local-manager-brain",
@@ -13970,6 +13954,22 @@
       "tasks_completed": 36,
       "fallback": false,
       "duration_s": 6.094
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T05:35:09.021Z",
+    "event_id": "agent-local-manager-brain-17881545090213",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 37,
+      "fallback": false,
+      "duration_s": 6.172
     },
     "error": false
   }
