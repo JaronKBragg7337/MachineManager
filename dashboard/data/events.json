@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T01:35:17.275Z",
-    "event_id": "agent-local-manager-brain-17881401172759",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 68,
-      "fallback": false,
-      "duration_s": 6.125
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T01:39:51.493Z",
     "event_id": "evt-evidence-constraint_audit_started-17",
     "actor": "local-manager-v2",
@@ -13958,6 +13942,22 @@
       "tasks_completed": 54,
       "fallback": false,
       "duration_s": 6.562
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:07:37.105Z",
+    "event_id": "agent-local-manager-brain-17881600571059",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit flagged as needing evidence review; pending human validation before resuming search.",
+    "action": "escalate",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 55,
+      "fallback": false,
+      "duration_s": 6.297
     },
     "error": false
   }
