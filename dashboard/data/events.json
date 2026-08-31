@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-30T22:40:37.193Z",
-    "event_id": "agent-local-manager-brain-17881296371938",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit completed with evidence recorded; system is ready to proceed.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 34,
-      "fallback": false,
-      "duration_s": 6.078
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T03:44:35.351Z",
     "event_id": "evt-f91cec929b46",
     "actor": "local-manager-v2",
@@ -13970,6 +13954,22 @@
       "tasks_completed": 23,
       "fallback": false,
       "duration_s": 6.156
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:28:18.765Z",
+    "event_id": "agent-local-manager-brain-17881504987652",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Retry limit reached with missing progress signals; attempting restart to reset worker state.",
+    "action": "restart",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 24,
+      "fallback": false,
+      "duration_s": 6.11
     },
     "error": false
   }
