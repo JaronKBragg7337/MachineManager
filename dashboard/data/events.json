@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:29:55.528Z",
-    "event_id": "evt-2a01644c8a33",
-    "actor": "local-manager-v2",
-    "type": "state_change",
-    "state": "STARTING",
-    "message": "start",
-    "action": "start",
-    "outcome": "",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-31T02:29:55.772Z",
     "event_id": "evt-1668efaa79b2",
     "actor": "local-manager-v2",
@@ -13958,6 +13946,22 @@
       "tasks_completed": 66,
       "fallback": false,
       "duration_s": 6.468
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T08:09:17.430Z",
+    "event_id": "agent-local-manager-brain-17881637574308",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit completed with no candidates; awaiting synchronized workstream state before proceeding.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 67,
+      "fallback": false,
+      "duration_s": 6.125
     },
     "error": false
   }
