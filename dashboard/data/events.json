@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-31T00:40:03.473Z",
-    "event_id": "evt-workstream-active-workspace-constrai",
-    "actor": "evidence-coordinator",
-    "type": "workstream_state_changed",
-    "state": "REVIEW",
-    "message": "synchronize_workstream \u00b7 state_synchronized",
-    "action": "synchronize_workstream",
-    "outcome": "state_synchronized",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-31T00:43:42.662Z",
     "event_id": "agent-local-manager-brain-17881370226629",
     "actor": "local-manager-brain",
@@ -13966,6 +13954,22 @@
       "tasks_completed": 46,
       "fallback": false,
       "duration_s": 6.953
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T06:26:31.519Z",
+    "event_id": "agent-local-manager-brain-17881575915197",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 47,
+      "fallback": false,
+      "duration_s": 6.14
     },
     "error": false
   }
