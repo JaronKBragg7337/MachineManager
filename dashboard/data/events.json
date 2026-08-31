@@ -1,36 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:37:26.163Z",
-    "event_id": "evt-f4b0f673e362",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "action": "",
-    "outcome": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true,
-      "util_pct": 76.0,
-      "mem_used_mib": 2367.0,
-      "mem_total_mib": 8188.0,
-      "temp_c": 60.0,
-      "power_w": 80.35,
-      "sample_count": 30,
-      "worker_uptime_s": 450.4,
-      "progress_reported": true,
-      "hashrate_mkey_s": 793.56,
-      "keys_per_second": 793560000,
-      "coverage_pct": 0,
-      "batch_number": 103,
-      "keys_tested": 336215408640,
-      "matches_found": 0
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T08:45:02.950Z",
     "event_id": "evt-evidence-constraint_audit_completed-",
     "actor": "local-manager-v2",
@@ -13505,6 +13474,22 @@
       "tasks_completed": 93,
       "fallback": false,
       "duration_s": 6.703
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T10:28:17.926Z",
+    "event_id": "agent-local-manager-brain-17881720979265",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 94,
+      "fallback": false,
+      "duration_s": 6.156
     },
     "error": false
   }
