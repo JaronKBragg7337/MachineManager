@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:16:26.344Z",
-    "event_id": "agent-local-manager-brain-17881425863442",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit completed with no new candidates; system is synchronized and ready to proceed.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 76,
-      "fallback": false,
-      "duration_s": 6.219
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T02:34:20.989Z",
     "event_id": "evt-ef8de66483d0",
     "actor": "local-manager-v2",
@@ -13959,6 +13943,22 @@
     "action": "synchronize_workstream",
     "outcome": "state_synchronized",
     "metrics": {},
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:48:44.948Z",
+    "event_id": "agent-local-manager-brain-17881625249483",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no resource constraints or errors; continuing the Bitcoin Puzzle search aligns with current objectives.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 63,
+      "fallback": false,
+      "duration_s": 6.718
+    },
     "error": false
   }
 ]
