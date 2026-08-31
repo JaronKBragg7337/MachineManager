@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:50:43.602Z",
-    "event_id": "agent-local-manager-brain-17881446436029",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System healthy, objective running, no errors or resource constraints detected.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 5,
-      "fallback": false,
-      "duration_s": 4.016
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T10:02:35.867Z",
     "event_id": "agent-local-manager-brain-17881705558679",
     "actor": "local-manager-brain",
@@ -12674,6 +12658,22 @@
       "tasks_completed": 139,
       "fallback": false,
       "duration_s": 6.89
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T14:25:23.711Z",
+    "event_id": "agent-local-manager-brain-17881863237119",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Machine status escalated with zero GPU utilization and memory usage, indicating a complete halt despite recent agent readiness events.",
+    "action": "restart",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 140,
+      "fallback": false,
+      "duration_s": 6.485
     },
     "error": false
   }
