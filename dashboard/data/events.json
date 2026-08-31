@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:29:55.461Z",
-    "event_id": "evt-operator-resume-1788143395461760000",
-    "actor": "operator",
-    "type": "operator_resume_authorized",
-    "state": "QUEUED",
-    "message": "resume_escalated_job \u00b7 operator_authorized_one_time_recovery",
-    "action": "resume_escalated_job",
-    "outcome": "operator_authorized_one_time_recovery",
-    "metrics": {
-      "attempt": 33,
-      "restart_count": 0,
-      "max_restarts": 3
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T02:29:55.528Z",
     "event_id": "evt-2a01644c8a33",
     "actor": "local-manager-v2",
@@ -13958,6 +13942,22 @@
       "tasks_completed": 65,
       "fallback": false,
       "duration_s": 6.016
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T08:04:09.277Z",
+    "event_id": "agent-local-manager-brain-17881634492779",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit returned no candidates and GPU utilization is zero, indicating the search phase has stalled without viable targets.",
+    "action": "pause",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 66,
+      "fallback": false,
+      "duration_s": 6.468
     },
     "error": false
   }
