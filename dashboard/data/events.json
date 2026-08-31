@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T01:40:27.153Z",
-    "event_id": "agent-local-manager-brain-17881404271532",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 69,
-      "fallback": false,
-      "duration_s": 6.171
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T01:40:27.156Z",
     "event_id": "evt-evidence-constraint_audit_completed-",
     "actor": "local-manager-v2",
@@ -13962,6 +13946,22 @@
       "tasks_completed": 56,
       "fallback": false,
       "duration_s": 6.141
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:17:53.811Z",
+    "event_id": "agent-local-manager-brain-17881606738117",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "All workers and jobs are in escalated state with no resource constraints or errors; proceeding with continuous search.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 57,
+      "fallback": false,
+      "duration_s": 6.422
     },
     "error": false
   }
