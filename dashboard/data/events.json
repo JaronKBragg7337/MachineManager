@@ -1,19 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:29:55.772Z",
-    "event_id": "evt-1668efaa79b2",
-    "actor": "local-manager-v2",
-    "type": "worker_started",
-    "state": "VERIFYING",
-    "message": "start \u00b7 spawned",
-    "action": "start",
-    "outcome": "spawned",
-    "metrics": {
-      "attempt": 34
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T02:29:56.388Z",
     "event_id": "evt-f1c411ba547d",
     "actor": "local-manager-v2",
@@ -13962,6 +13948,22 @@
       "tasks_completed": 67,
       "fallback": false,
       "duration_s": 6.125
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T08:14:26.074Z",
+    "event_id": "agent-local-manager-brain-17881640660740",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "No GPU candidates found and workers are escalated; pausing to prevent resource exhaustion.",
+    "action": "pause",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 68,
+      "fallback": false,
+      "duration_s": 6.203
     },
     "error": false
   }
