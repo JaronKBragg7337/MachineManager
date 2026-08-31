@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T06:13:54.244Z",
+        "observed_at": "2026-08-31T06:19:02.951Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 9059.9,
-        "sample_count": 829,
+        "uptime_s": 9368.6,
+        "sample_count": 847,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T06:13:54.244Z",
+        "observed_at": "2026-08-31T06:19:02.951Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 9059.9,
-        "sample_count": 829,
+        "uptime_s": 9368.6,
+        "sample_count": 847,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is in a stable escalated state with no active resource constraints or errors; continuing the continuous search objective.",
-      "last_duration_s": 6.484,
-      "tasks_completed": 44,
-      "last_run": "2026-08-31T06:11:06.895Z",
-      "next_run": "2026-08-31T06:16:06.895Z"
+      "last_reason": "Constraint audit completed with no new candidates; system is synchronized and ready for the next search iteration.",
+      "last_duration_s": 6.375,
+      "tasks_completed": 45,
+      "last_run": "2026-08-31T06:16:16.163Z",
+      "next_run": "2026-08-31T06:21:16.163Z"
     }
   ],
   "capabilities": [
@@ -340,25 +340,25 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 42.0,
+    "temp_c": 41.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T06:13:54.244Z",
+    "observed_at": "2026-08-31T06:19:02.951Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 9059.9,
-    "sample_count": 829,
+    "uptime_s": 9368.6,
+    "sample_count": 847,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T06:13:55.989Z"
+  "updated": "2026-08-31T06:19:04.688Z"
 }
