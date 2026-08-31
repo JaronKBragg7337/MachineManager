@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-31T01:45:36.728Z",
-    "event_id": "agent-local-manager-brain-17881407367285",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "No candidate workers found for Bitcoin Puzzle #71; continuing search would yield no results.",
-    "action": "pause",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 70,
-      "fallback": false,
-      "duration_s": 6.406
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T01:50:45.391Z",
     "event_id": "agent-local-manager-brain-17881410453912",
     "actor": "local-manager-brain",
@@ -13970,6 +13954,22 @@
       "tasks_completed": 59,
       "fallback": false,
       "duration_s": 6.562
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:33:19.678Z",
+    "event_id": "agent-local-manager-brain-17881615996783",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 60,
+      "fallback": false,
+      "duration_s": 6.265
     },
     "error": false
   }
