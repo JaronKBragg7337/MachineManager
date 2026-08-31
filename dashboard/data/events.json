@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-30T23:26:44.843Z",
-    "event_id": "agent-local-manager-brain-17881324048434",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in a stable escalated state with consistent agent recommendations and no critical resource failures.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 43,
-      "fallback": false,
-      "duration_s": 6.172
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-30T23:31:52.357Z",
     "event_id": "agent-local-manager-brain-17881327123577",
     "actor": "local-manager-brain",
@@ -13958,6 +13942,22 @@
       "batch_number": 399,
       "keys_tested": 1257636888576,
       "matches_found": 0
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T04:59:08.627Z",
+    "event_id": "agent-local-manager-brain-17881523486279",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit flagged NEEDS_EVIDENCE_REVIEW and machine status is ESCALATED; requires human intervention for evidence review.",
+    "action": "escalate",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 30,
+      "fallback": false,
+      "duration_s": 6.86
     },
     "error": false
   }
