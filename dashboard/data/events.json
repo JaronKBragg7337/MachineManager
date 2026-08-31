@@ -1,36 +1,5 @@
 [
   {
-    "ts": "2026-08-31T02:53:33.639Z",
-    "event_id": "evt-60a8a2e08c0d",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "action": "",
-    "outcome": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true,
-      "util_pct": 75.0,
-      "mem_used_mib": 2367.0,
-      "mem_total_mib": 8188.0,
-      "temp_c": 57.0,
-      "power_w": 80.47,
-      "sample_count": 93,
-      "worker_uptime_s": 1417.9,
-      "progress_reported": true,
-      "hashrate_mkey_s": 794.88,
-      "keys_per_second": 794880000,
-      "coverage_pct": 0,
-      "batch_number": 330,
-      "keys_tested": 1072517087232,
-      "matches_found": 0
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T04:04:08.376Z",
     "event_id": "evt-fe118e3d3a3a",
     "actor": "local-manager-v2",
@@ -12512,6 +12481,22 @@
       "tasks_completed": 147,
       "fallback": false,
       "duration_s": 6.438
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T15:06:33.074Z",
+    "event_id": "agent-local-manager-brain-17881887930748",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit flagged as needing evidence review; machine status is escalated pending human decision.",
+    "action": "escalate",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 148,
+      "fallback": false,
+      "duration_s": 6.281
     },
     "error": false
   }
