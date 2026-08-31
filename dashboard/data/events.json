@@ -1,69 +1,5 @@
 [
   {
-    "ts": "2026-08-31T01:55:54.658Z",
-    "event_id": "agent-local-manager-brain-17881413546589",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit completed with no candidates; machine is idle but objective requires continuous search, so resume operation.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 72,
-      "fallback": false,
-      "duration_s": 6.469
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-31T02:01:02.871Z",
-    "event_id": "agent-local-manager-brain-17881416628714",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit returned no candidates and workstream is waiting; continuing risks resource waste.",
-    "action": "pause",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 73,
-      "fallback": false,
-      "duration_s": 6.235
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-31T02:06:08.048Z",
-    "event_id": "agent-local-manager-brain-17881419680484",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "Constraint audit completed with no new candidates; system is synchronized and ready to proceed with the continuous search objective.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 74,
-      "fallback": false,
-      "duration_s": 3.734
-    },
-    "error": false
-  },
-  {
-    "ts": "2026-08-31T02:11:16.433Z",
-    "event_id": "agent-local-manager-brain-17881422764330",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "No GPU candidates found and workers are escalated; pausing to prevent resource exhaustion.",
-    "action": "pause",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 75,
-      "fallback": false,
-      "duration_s": 6.219
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T02:16:26.344Z",
     "event_id": "agent-local-manager-brain-17881425863442",
     "actor": "local-manager-brain",
@@ -13971,6 +13907,58 @@
       "fallback": false,
       "duration_s": 5.937
     },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:43:35.952Z",
+    "event_id": "evt-evidence-constraint_audit_started-17",
+    "actor": "local-manager-v2",
+    "type": "constraint_audit_started",
+    "state": "RUNNING",
+    "message": "scan_constraints \u00b7 audit_scheduled",
+    "action": "scan_constraints",
+    "outcome": "audit_scheduled",
+    "metrics": {},
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:43:35.952Z",
+    "event_id": "agent-local-manager-brain-17881622159528",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 62,
+      "fallback": false,
+      "duration_s": 6.062
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:44:09.672Z",
+    "event_id": "evt-evidence-constraint_audit_completed-",
+    "actor": "local-manager-v2",
+    "type": "constraint_audit_completed",
+    "state": "NO_CANDIDATES",
+    "message": "scan_constraints \u00b7 review_candidates_recorded",
+    "action": "scan_constraints",
+    "outcome": "review_candidates_recorded",
+    "metrics": {},
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:44:09.682Z",
+    "event_id": "evt-workstream-active-workspace-constrai",
+    "actor": "evidence-coordinator",
+    "type": "workstream_state_changed",
+    "state": "WAITING",
+    "message": "synchronize_workstream \u00b7 state_synchronized",
+    "action": "synchronize_workstream",
+    "outcome": "state_synchronized",
+    "metrics": {},
     "error": false
   }
 ]
