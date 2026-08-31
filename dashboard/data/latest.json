@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T12:02:14.841Z",
+        "observed_at": "2026-08-31T12:07:24.204Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 29960.7,
-        "sample_count": 2047,
+        "uptime_s": 30270.0,
+        "sample_count": 2065,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T12:02:14.841Z",
+        "observed_at": "2026-08-31T12:07:24.204Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 29960.7,
-        "sample_count": 2047,
+        "uptime_s": 30270.0,
+        "sample_count": 2065,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "Constraint audit completed with no candidates; system is synchronized and ready to resume search.",
-      "last_duration_s": 3.39,
-      "tasks_completed": 112,
-      "last_run": "2026-08-31T12:00:52.139Z",
-      "next_run": "2026-08-31T12:05:52.139Z"
+      "last_reason": "Constraint audit completed with no candidates; agents recommend continuation of Bitcoin Puzzle #71 search.",
+      "last_duration_s": 6.453,
+      "tasks_completed": 113,
+      "last_run": "2026-08-31T12:06:01.487Z",
+      "next_run": "2026-08-31T12:11:01.487Z"
     }
   ],
   "capabilities": [
@@ -340,25 +340,25 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 40.0,
+    "temp_c": 41.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T12:02:14.841Z",
+    "observed_at": "2026-08-31T12:07:24.204Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 29960.7,
-    "sample_count": 2047,
+    "uptime_s": 30270.0,
+    "sample_count": 2065,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T12:02:16.592Z"
+  "updated": "2026-08-31T12:07:25.952Z"
 }
