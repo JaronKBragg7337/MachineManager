@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-08-30T23:31:52.357Z",
-    "event_id": "agent-local-manager-brain-17881327123577",
-    "actor": "local-manager-brain",
-    "type": "agent_decision",
-    "state": "READY",
-    "message": "System is in escalated state with GPU active and workers running; no credential or file access required.",
-    "action": "continue",
-    "outcome": "recommendation",
-    "metrics": {
-      "tasks_completed": 44,
-      "fallback": false,
-      "duration_s": 6.234
-    },
-    "error": false
-  },
-  {
     "ts": "2026-08-31T03:06:01.586Z",
     "event_id": "agent-local-manager-brain-17881455615868",
     "actor": "local-manager-brain",
@@ -13958,6 +13942,22 @@
       "tasks_completed": 30,
       "fallback": false,
       "duration_s": 6.86
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T05:04:16.805Z",
+    "event_id": "agent-local-manager-brain-17881526568055",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Constraint audit flagged as needing evidence review; pending human validation before resuming search.",
+    "action": "escalate",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 31,
+      "fallback": false,
+      "duration_s": 6.172
     },
     "error": false
   }
