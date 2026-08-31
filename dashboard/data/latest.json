@@ -12,14 +12,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T07:34:59.322Z",
+        "observed_at": "2026-08-31T07:40:07.217Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 13925.0,
-        "sample_count": 1113,
+        "uptime_s": 14232.9,
+        "sample_count": 1131,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -35,14 +35,14 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-08-31T07:34:59.322Z",
+        "observed_at": "2026-08-31T07:40:07.217Z",
         "reported": true,
         "active": false,
         "healthy": false,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 13925.0,
-        "sample_count": 1113,
+        "uptime_s": 14232.9,
+        "sample_count": 1131,
         "keys_per_second": 770990000,
         "hashrate_mkey_s": 770.99,
         "keys_tested": 1311340756992,
@@ -59,11 +59,11 @@
       "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is in a stable escalated state with no critical errors or resource constraints requiring intervention.",
-      "last_duration_s": 6.265,
-      "tasks_completed": 60,
-      "last_run": "2026-08-31T07:33:19.678Z",
-      "next_run": "2026-08-31T07:38:19.678Z"
+      "last_reason": "System is in escalated state with GPU idle; no immediate intervention required.",
+      "last_duration_s": 5.937,
+      "tasks_completed": 61,
+      "last_run": "2026-08-31T07:38:27.772Z",
+      "next_run": "2026-08-31T07:43:27.772Z"
     }
   ],
   "capabilities": [
@@ -345,25 +345,25 @@
     "util_pct": 0.0,
     "mem_used_mib": 0.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 41.0,
+    "temp_c": 40.0,
     "power_w": 590.01
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-08-31T07:34:59.322Z",
+    "observed_at": "2026-08-31T07:40:07.217Z",
     "reported": true,
     "active": false,
     "healthy": false,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 13925.0,
-    "sample_count": 1113,
+    "uptime_s": 14232.9,
+    "sample_count": 1131,
     "keys_per_second": 770990000,
     "hashrate_mkey_s": 770.99,
     "keys_tested": 1311340756992,
     "batch_number": 416
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-08-31T07:35:01.071Z"
+  "updated": "2026-08-31T07:40:08.951Z"
 }
