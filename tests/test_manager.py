@@ -13,6 +13,7 @@ from pathlib import Path
 from manager.supervisor import JobState, WorkerSpec, WorkerSupervisor, _expected_image_name
 from manager.telemetry import TelemetryPublisher
 from manager.run import (
+    _pending_operator_resume,
     _public_state_marker,
     load_public_records,
     manager_from_config,
@@ -576,6 +577,63 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(preserved_snapshot["restart_count"], 3)
             self.assertEqual(resumed_snapshot["attempt"], 7)
             self.assertEqual(resumed_snapshot["restart_count"], 0)
+
+    def test_operator_resume_resets_only_the_acknowledged_escalated_job_once(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            directory = Path(raw)
+            database = directory / "state.sqlite3"
+            config = {
+                "jobs": [
+                    {
+                        "job_id": "job-a",
+                        "objective_id": "objective-a",
+                        "max_restarts": 3,
+                        "worker": {"id": "worker-a", "command": [sys.executable, "-c", "pass"]},
+                    },
+                    {
+                        "job_id": "job-b",
+                        "objective_id": "objective-b",
+                        "max_restarts": 3,
+                        "worker": {"id": "worker-b", "command": [sys.executable, "-c", "pass"]},
+                    },
+                ],
+                "operator_resume": {"id": "resume-test-001", "job_id": "job-a"},
+            }
+            with StateStore(database) as store:
+                for job_id in ("job-a", "job-b"):
+                    store.upsert_job(
+                        {
+                            "job_id": job_id,
+                            "objective_id": f"objective-{job_id[-1]}",
+                            "state": "ESCALATED",
+                            "attempt": 7,
+                            "restart_count": 3,
+                            "updated": "2026-08-30T00:00:00Z",
+                        }
+                    )
+                request_id = _pending_operator_resume(
+                    config,
+                    store,
+                    job_id="job-a",
+                    prior_state="ESCALATED",
+                )
+                resumed, _, _ = manager_from_config(
+                    config,
+                    config_path=directory / "manager.json",
+                    state_store=store,
+                    reset_retry_budget_for={"job-a"},
+                )
+                store.set_meta(f"operator_resume:{request_id}", "applied")
+                consumed = _pending_operator_resume(
+                    config,
+                    store,
+                    job_id="job-a",
+                    prior_state="ESCALATED",
+                )
+            self.assertEqual(request_id, "resume-test-001")
+            self.assertEqual(resumed.jobs["job-a"].supervisor.snapshot()["restart_count"], 0)
+            self.assertEqual(resumed.jobs["job-b"].supervisor.snapshot()["restart_count"], 3)
+            self.assertIsNone(consumed)
 
     def test_state_store_persists_events_jobs_and_tasks(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

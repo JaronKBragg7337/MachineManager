@@ -139,6 +139,26 @@ include the required Codex attribution trailer. Without the token, the local
 manager continues to work and the public page intentionally shows the last
 known snapshot as stale.
 
+## One-time operator resume after escalation
+
+Repeated worker failure intentionally becomes `ESCALATED` instead of restarting
+forever. When the operator explicitly approves one new recovery attempt, add a
+local-only acknowledgement to the ignored runtime config:
+
+```json
+"operator_resume": {
+  "id": "resume-20260831-001",
+  "job_id": "job-p71-001"
+}
+```
+
+On its next start, the manager consumes that acknowledgement only if the named
+job is already `ESCALATED`. It preserves the historical attempt count, clears
+only that job's retry budget, records an `operator_resume_authorized` event,
+and will not consume the same identifier again. A different acknowledgement is
+required for any later escalation. This is not a substitute for normal bounded
+recovery or a way to erase prior failures.
+
 ## Windows restart behavior
 
 Install a user-level Task Scheduler entry from a PowerShell session:

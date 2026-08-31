@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import tempfile
 import time
 import traceback
@@ -240,8 +241,10 @@ def manager_from_config(
     config_path: Path,
     state_store: StateStore | None = None,
     reset_retry_budget: bool = False,
+    reset_retry_budget_for: set[str] | None = None,
 ) -> tuple[MachineManager, str, str]:
     entries = _job_entries(config)
+    reset_job_ids = set(reset_retry_budget_for or ())
     manager = MachineManager(actor=str(config.get("actor", "local-manager")))
     primary_objective_id = entries[0]["objective_id"]
     primary_job_id = entries[0]["job_id"]
@@ -254,10 +257,38 @@ def manager_from_config(
             max_restarts=entry["max_restarts"],
             initial_attempt=int((prior or {}).get("attempt", 0) or 0),
             initial_restart_count=0
-            if reset_retry_budget
+            if reset_retry_budget or entry["job_id"] in reset_job_ids
             else int((prior or {}).get("restart_count", 0) or 0),
         )
     return manager, primary_objective_id, primary_job_id
+
+
+_OPERATOR_RESUME_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.:-]{0,99}")
+
+
+def _pending_operator_resume(
+    config: Mapping[str, Any],
+    store: StateStore,
+    *,
+    job_id: str,
+    prior_state: str,
+) -> str | None:
+    """Return one unconsumed operator acknowledgement for an escalated job.
+
+    This does not mark the request consumed. The caller does that only after it
+    has successfully rebuilt the manager with the requested one-job reset.
+    """
+
+    raw = config.get("operator_resume")
+    if not isinstance(raw, Mapping) or str(prior_state).upper() != "ESCALATED":
+        return None
+    request_id = str(raw.get("id", "")).strip()
+    requested_job_id = str(raw.get("job_id", job_id)).strip()
+    if not _OPERATOR_RESUME_ID.fullmatch(request_id) or requested_job_id != job_id:
+        return None
+    if store.get_meta(f"operator_resume:{request_id}"):
+        return None
+    return request_id
 
 
 def _persist_runtime(
@@ -401,13 +432,23 @@ def main() -> int:
             return 0
 
         host_boot_changed = update_host_boot_marker(store)
+        configured_primary_job_id = _job_entries(config)[0]["job_id"]
+        prior_primary_job = store.get_job(configured_primary_job_id) or {}
+        operator_resume_id = _pending_operator_resume(
+            config,
+            store,
+            job_id=configured_primary_job_id,
+            prior_state=str(prior_primary_job.get("state", "UNKNOWN")),
+        )
         manager, primary_objective_id, primary_job_id = manager_from_config(
             config,
             config_path=config_path,
             state_store=store,
             reset_retry_budget=host_boot_changed or args.resume_after_host_boot,
+            reset_retry_budget_for={configured_primary_job_id} if operator_resume_id else None,
         )
-        prior_primary_job = store.get_job(primary_job_id) or {}
+        if primary_job_id != configured_primary_job_id:
+            raise RuntimeError("configured primary job changed during manager setup")
         if host_boot_changed or args.resume_after_host_boot:
             store.append_event(
                 {
@@ -428,6 +469,31 @@ def main() -> int:
                     "action": "resume_after_host_boot",
                     "outcome": "retry_budget_reset",
                     "artifact_refs": [],
+                    "error": None,
+                    "duration": None,
+                }
+            )
+        if operator_resume_id:
+            store.set_meta(f"operator_resume:{operator_resume_id}", utc_now())
+            store.append_event(
+                {
+                    "timestamp": utc_now(),
+                    "event_id": f"evt-operator-resume-{time.time_ns()}",
+                    "objective_id": primary_objective_id,
+                    "job_id": primary_job_id,
+                    "worker_id": "",
+                    "actor": "operator",
+                    "event_type": "operator_resume_authorized",
+                    "previous_state": str(prior_primary_job.get("state", "UNKNOWN")),
+                    "new_state": "QUEUED",
+                    "metrics": {
+                        "attempt": int(prior_primary_job.get("attempt", 0) or 0),
+                        "restart_count": 0,
+                        "max_restarts": manager.jobs[primary_job_id].supervisor.max_restarts,
+                    },
+                    "action": "resume_escalated_job",
+                    "outcome": "operator_authorized_one_time_recovery",
+                    "artifact_refs": [f"operator-resume:{operator_resume_id}"],
                     "error": None,
                     "duration": None,
                 }
