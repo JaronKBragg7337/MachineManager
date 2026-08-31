@@ -1,17 +1,5 @@
 [
   {
-    "ts": "2026-08-31T01:39:51.493Z",
-    "event_id": "evt-evidence-constraint_audit_started-17",
-    "actor": "local-manager-v2",
-    "type": "constraint_audit_started",
-    "state": "RUNNING",
-    "message": "scan_constraints \u00b7 audit_scheduled",
-    "action": "scan_constraints",
-    "outcome": "audit_scheduled",
-    "metrics": {},
-    "error": false
-  },
-  {
     "ts": "2026-08-31T01:40:27.153Z",
     "event_id": "agent-local-manager-brain-17881404271532",
     "actor": "local-manager-brain",
@@ -13958,6 +13946,22 @@
       "tasks_completed": 55,
       "fallback": false,
       "duration_s": 6.297
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-08-31T07:12:45.083Z",
+    "event_id": "agent-local-manager-brain-17881603650836",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Audit completed with evidence recorded; state synchronized and agents ready for next step.",
+    "action": "continue",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 56,
+      "fallback": false,
+      "duration_s": 6.141
     },
     "error": false
   }
