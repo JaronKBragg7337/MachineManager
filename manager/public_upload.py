@@ -222,6 +222,9 @@ class GitHubPagesPublisher:
             ancestor = git("merge-base", "--is-ancestor", local_sha, remote_sha)
             if ancestor.returncode != 0:
                 return "deferred"
+            indexed = git("read-tree", remote_sha)
+            if indexed.returncode != 0:
+                return "deferred"
             if local_sha != remote_sha:
                 updated = git("update-ref", f"refs/heads/{self.branch}", remote_sha, local_sha)
                 if updated.returncode != 0:

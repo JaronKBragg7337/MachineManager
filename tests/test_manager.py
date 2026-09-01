@@ -987,6 +987,8 @@ class TelemetryTests(unittest.TestCase):
                     return SimpleNamespace(returncode=0, stdout="", stderr="")
                 if action[:1] == ["merge-base"]:
                     return SimpleNamespace(returncode=0, stdout="", stderr="")
+                if action[:1] == ["read-tree"]:
+                    return SimpleNamespace(returncode=0, stdout="", stderr="")
                 if action[:1] == ["show-ref"]:
                     return SimpleNamespace(returncode=1, stdout="", stderr="")
                 if action[:1] == ["update-ref"]:
