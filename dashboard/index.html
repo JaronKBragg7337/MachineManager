@@ -433,6 +433,17 @@
     .progress-detail-row strong { color: var(--text); font: 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; text-align: right; }
     .progress-note { margin-top: 15px; padding: 13px 14px; border-left: 2px solid var(--violet); color: var(--muted); background: rgba(164, 138, 255, .06); font-size: 11px; line-height: 1.55; }
     .progress-note strong { color: var(--text); }
+    .evidence-chart { padding: 14px; border: 1px solid var(--line-soft); border-radius: 11px; background: rgba(3, 16, 32, .5); }
+    .evidence-chart-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; color: var(--muted); font-size: 10px; }
+    .evidence-chart-meta strong { color: var(--text); font-size: 12px; }
+    .evidence-chart-svg { display: block; width: 100%; height: auto; min-height: 190px; overflow: visible; }
+    .evidence-chart-grid { stroke: rgba(86, 137, 181, .22); stroke-width: 1; stroke-dasharray: 3 6; }
+    .evidence-chart-line { fill: none; stroke: var(--cyan); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgba(55, 222, 235, .36)); }
+    .evidence-chart-dot { fill: var(--cyan); stroke: #061a2d; stroke-width: 2; }
+    .evidence-chart-label { fill: var(--muted-2); font: 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .evidence-chart-label.emphasis { fill: var(--text); }
+    .evidence-chart-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; color: var(--muted-2); font-size: 10px; line-height: 1.4; }
+    .evidence-chart-foot strong { color: var(--cyan); }
 
     /* Mission Control: a data-driven spatial view of the active runtime. */
     .mission-layout { display: grid; grid-template-columns: minmax(0, 1.38fr) minmax(310px, .72fr); gap: 16px; }
@@ -1220,12 +1231,52 @@
       return '<section class="panel"><div class="panel-head"><h2>HOW A REAL RESULT BECOMES TRUSTWORTHY</h2><span class="subhead">No fake completion claim</span></div><div class="panel-body"><div class="result-path"><div class="result-step ' + (active ? "current" : "") + '"><span>01 · Work</span><strong>Candidate batches tested</strong><small>Aggregate work is observed; raw candidate material stays local.</small></div><div class="result-step ' + (active ? "current" : "") + '"><span>02 · Compare</span><strong>Target address check</strong><small>Normal outcome: no target match reported.</small></div><div class="result-step ' + (hasSignal ? "current" : "waiting") + '"><span>03 · Verify</span><strong>Independent re-derivation</strong><small>' + escapeHtml(hasSignal ? "A signal requires a separate confirmation." : "Opens only if a potential signal appears.") + '</small></div><div class="result-step ' + (hasSignal ? "current" : "waiting") + '"><span>04 · Alert</span><strong>Verified-result record</strong><small>A real result is never exposed as a raw key on this public page.</small></div></div><div class="truth-note"><strong>What you are seeing:</strong> real system activity and safe aggregate work evidence. A moving visual is tied to a manager record, not a made-up progress animation.</div></div></section>';
     }
 
-    function renderSearchSamples() {
-      const samples = recentEvents(40, "work").filter(function (event) {
+    function searchProgressSamples() {
+      return recentEvents(80, "work").filter(function (event) {
         const type = String(event.type || "").toLowerCase();
         const metrics = event.metrics || {};
         return (type.includes("health") || type.includes("progress")) && (metrics.batch_number !== undefined || metrics.keys_tested !== undefined);
-      }).slice(0, 12);
+      }).slice(0, 24).reverse();
+    }
+
+    function renderSearchHistory(samples) {
+      const withKeys = samples.filter(function (event) { return numberValue((event.metrics || {}).keys_tested) !== null; });
+      const metricKey = withKeys.length ? "keys_tested" : "batch_number";
+      const metricLabel = withKeys.length ? "Cumulative candidate checks" : "Worker batch number";
+      const pointsData = samples.map(function (event) {
+        const value = numberValue((event.metrics || {})[metricKey]);
+        return value === null ? null : { event: event, value: value };
+      }).filter(Boolean);
+      if (!pointsData.length) return "";
+      const width = 720;
+      const height = 220;
+      const left = 18;
+      const right = 18;
+      const top = 28;
+      const bottom = 34;
+      const plotWidth = width - left - right;
+      const plotHeight = height - top - bottom;
+      const values = pointsData.map(function (point) { return point.value; });
+      const min = Math.min.apply(null, values);
+      const max = Math.max.apply(null, values);
+      const range = max - min || Math.max(Math.abs(max) * 0.08, 1);
+      const yFor = function (value) { return top + (max - value) / range * plotHeight; };
+      const xFor = function (index) { return pointsData.length === 1 ? left + plotWidth / 2 : left + index / (pointsData.length - 1) * plotWidth; };
+      const coordinates = pointsData.map(function (point, index) { return { x: xFor(index), y: yFor(point.value), point: point }; });
+      const path = coordinates.map(function (coordinate, index) { return (index ? "L" : "M") + coordinate.x.toFixed(2) + " " + coordinate.y.toFixed(2); }).join(" ");
+      const dots = coordinates.map(function (coordinate) { return '<circle class="evidence-chart-dot" cx="' + coordinate.x.toFixed(2) + '" cy="' + coordinate.y.toFixed(2) + '" r="4"><title>' + escapeHtml(formatDate(coordinate.point.event.ts, true) + ": " + compactNumber(coordinate.point.value)) + '</title></circle>'; }).join("");
+      const middleIndex = Math.floor((coordinates.length - 1) / 2);
+      const xLabels = [0, middleIndex, coordinates.length - 1].filter(function (index, position, list) { return list.indexOf(index) === position; }).map(function (index, position) {
+        const coordinate = coordinates[index];
+        const anchor = position === 0 ? "start" : position === 2 || (position === 1 && coordinates.length < 3) ? "end" : "middle";
+        return '<text class="evidence-chart-label" x="' + coordinate.x.toFixed(2) + '" y="' + (height - 10) + '" text-anchor="' + anchor + '">' + escapeHtml(formatDate(coordinate.point.event.ts, true)) + '</text>';
+      }).join("");
+      const latest = coordinates[coordinates.length - 1].point.value;
+      return '<section class="panel"><div class="panel-head"><h2>SEARCH OBSERVATION TREND</h2><span class="subhead">' + escapeHtml(String(pointsData.length)) + ' observations</span></div><div class="panel-body"><div class="evidence-chart"><div class="evidence-chart-meta"><strong>' + escapeHtml(metricLabel) + '</strong><span>Recent published observations</span></div><svg class="evidence-chart-svg" viewBox="0 0 720 220" role="img" aria-label="' + escapeHtml(metricLabel + " across recent worker observations") + '"><line class="evidence-chart-grid" x1="' + left + '" y1="' + top + '" x2="' + (width - right) + '" y2="' + top + '"></line><line class="evidence-chart-grid" x1="' + left + '" y1="' + (top + plotHeight / 2) + '" x2="' + (width - right) + '" y2="' + (top + plotHeight / 2) + '"></line><line class="evidence-chart-grid" x1="' + left + '" y1="' + (top + plotHeight) + '" x2="' + (width - right) + '" y2="' + (top + plotHeight) + '"></line><text class="evidence-chart-label emphasis" x="' + left + '" y="16" text-anchor="start">' + escapeHtml(compactNumber(max)) + '</text><text class="evidence-chart-label" x="' + left + '" y="' + (height - bottom + 2) + '" text-anchor="start">' + escapeHtml(compactNumber(min)) + '</text><path class="evidence-chart-line" d="' + path + '"></path>' + dots + xLabels + '</svg><div class="evidence-chart-foot"><span>Latest: <strong>' + escapeHtml(compactNumber(latest)) + '</strong></span><span>Each point is one sanitized manager observation; counters may reset after a worker restart.</span></div></div></div></section>';
+    }
+
+    function renderSearchSamples() {
+      const samples = searchProgressSamples();
       if (!samples.length) {
         return '<section class="panel"><div class="panel-head"><h2>RECENT AGGREGATE SAMPLES</h2><span class="subhead">No batch records</span></div><div class="panel-body"><div class="empty-cell">No aggregate batch samples are in the current public snapshot yet.</div></div></section>';
       }
@@ -1242,7 +1293,7 @@
         const result = matches === null ? "--" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "None";
         return '<tr><td class="mono">' + escapeHtml(formatDate(event.ts, true)) + '</td><td class="mono">' + escapeHtml(batch === null ? "--" : "#" + Math.round(batch)) + '</td><td class="mono">' + escapeHtml(keys === null ? "--" : compactNumber(keys)) + '</td><td class="mono">' + escapeHtml(rate) + '</td><td>' + escapeHtml(result) + '</td><td>' + badge(event.state || "UNKNOWN") + '</td></tr>';
       }).join("");
-      return '<section class="panel"><div class="panel-head"><h2>RECENT AGGREGATE SAMPLES</h2><span class="subhead">' + escapeHtml(String(samples.length)) + ' published observations</span></div><div class="panel-body"><p class="ops-note" style="margin-top:0"><strong>What each row means:</strong> one sanitized observation of cumulative checks and the worker’s current batch. This is evidence of real search work, not a list of individual candidate values.</p><div class="table-wrap"><table><thead><tr><th>Observed</th><th>Batch</th><th>Checks</th><th>Rate</th><th>Matches</th><th>State</th></tr></thead><tbody>' + rows + '</tbody></table></div></div></section>';
+      return renderSearchHistory(samples) + '<section class="panel"><div class="panel-head"><h2>RECENT AGGREGATE SAMPLES</h2><span class="subhead">' + escapeHtml(String(samples.length)) + ' published observations</span></div><div class="panel-body"><p class="ops-note" style="margin-top:0"><strong>What each row means:</strong> one sanitized observation of cumulative checks and the worker’s current batch. This is evidence of real search work, not a list of individual candidate values.</p><div class="table-wrap"><table><thead><tr><th>Observed</th><th>Batch</th><th>Checks</th><th>Rate</th><th>Matches</th><th>State</th></tr></thead><tbody>' + rows + '</tbody></table></div></div></section>';
     }
 
     function renderWorkJournal(latest, sets, worker, progress) {
