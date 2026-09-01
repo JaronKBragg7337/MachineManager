@@ -41,7 +41,9 @@ vm.runInContext(
     "idleCpuText: cpuActivityText(idleFixture.system, idleFixture.gpu)," +
     "idleCpuCard: cpuActivityCard(idleFixture.system, idleFixture.gpu)," +
     "numericLabel: resourceMeterLabel(\"86\", 86)," +
-    "reviewPlan: auditReviewPlan([{category: \"approval_gate\", candidate_count: 2, recommended_test: \"Run a harmless delegated action.\"}])" +
+    "reviewPlan: auditReviewPlan([{category: \"approval_gate\", candidate_count: 2, recommended_test: \"Run a harmless delegated action.\"}])," +
+    "reviewPlanSingular: auditReviewPlan([{category: \"scope_boundary\", candidate_count: 1, recommended_test: \"Run a bounded scope test.\"}])," +
+    "plannedCount: auditReviewCount([{review_plan: [{category: \"approval_gate\"}, {category: \"scope_boundary\"}]}, {review_plan: []}])" +
     "};",
   executionContext,
   { filename: path.join(root, "dashboard", "index.html") },
@@ -63,5 +65,8 @@ assert.ok(!output.idleCpuCard.includes('<span class="muted">0%</span>'));
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
 assert.match(output.reviewPlan, /approval gate · 2 candidates/);
 assert.match(output.reviewPlan, /Run a harmless delegated action/);
+assert.match(output.reviewPlanSingular, /scope boundary · 1 candidate/);
+assert.ok(!output.reviewPlanSingular.includes("1 candidates"));
+assert.strictEqual(output.plannedCount, 2);
 
 console.log("dashboard readout fixture: OK");

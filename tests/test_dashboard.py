@@ -38,6 +38,8 @@ class DashboardContractTests(unittest.TestCase):
             "latest 32 public task records",
             "kind-balanced window interleaves recent records",
             "function auditReviewPlan(plan)",
+            "function auditReviewCount(audits)",
+            "planned category tests",
             "Recommended evidence tests:",
         ):
             self.assertIn(marker, self.dashboard)
