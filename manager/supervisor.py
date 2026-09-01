@@ -278,11 +278,14 @@ class WorkerSupervisor:
         max_restarts: int = 3,
         initial_attempt: int = 0,
         initial_restart_count: int = 0,
+        retry_reset_after_s: float = 3600.0,
     ) -> None:
         if max_restarts < 0:
             raise ValueError("max_restarts cannot be negative")
         if initial_attempt < 0 or initial_restart_count < 0:
             raise ValueError("initial counters cannot be negative")
+        if retry_reset_after_s <= 0:
+            raise ValueError("retry_reset_after_s must be positive")
         self.spec = spec
         self.objective_id = objective_id
         self.job_id = job_id
@@ -292,12 +295,40 @@ class WorkerSupervisor:
         self.process: Any = None
         self.attempt = initial_attempt
         self.restart_count = initial_restart_count
+        self.retry_reset_after_s = float(retry_reset_after_s)
         self.events: list[dict[str, Any]] = []
         self.last_health: HealthSignals | None = None
         self._started_monotonic: float | None = None
         self._stream_handles: list[Any] = []
         self._observation_count = 0
         self._last_observed_at: str | None = None
+        self._retry_budget_reset = initial_restart_count == 0
+
+    def _maybe_reset_retry_budget(self, health: HealthSignals) -> None:
+        """Forget old retries after a continuous, verified healthy interval."""
+        if self._retry_budget_reset or self.restart_count <= 0:
+            return
+        if self._started_monotonic is None:
+            return
+        stable_uptime_s = max(0.0, time.monotonic() - self._started_monotonic)
+        if not health.healthy or stable_uptime_s < self.retry_reset_after_s:
+            return
+        previous_restart_count = self.restart_count
+        self.restart_count = 0
+        self._retry_budget_reset = True
+        self._emit(
+            event_type="retry_budget_reset",
+            previous_state=self.state,
+            new_state=self.state,
+            metrics={
+                "previous_restart_count": previous_restart_count,
+                "restart_count": 0,
+                "stable_uptime_s": round(stable_uptime_s, 1),
+                "reset_after_s": self.retry_reset_after_s,
+            },
+            action="reset_retry_budget",
+            outcome="stable_operation",
+        )
 
     def _emit(
         self,
@@ -447,6 +478,7 @@ class WorkerSupervisor:
             self.process = None
             return False
         self.attempt += 1
+        self._retry_budget_reset = self.restart_count == 0
         self._started_monotonic = time.monotonic()
         self._transition(
             JobState.VERIFYING,
@@ -485,6 +517,7 @@ class WorkerSupervisor:
             self._terminate_process()
             raise
         self.attempt += 1
+        self._retry_budget_reset = self.restart_count == 0
         self._started_monotonic = time.monotonic()
         self._transition(
             JobState.VERIFYING,
@@ -627,6 +660,7 @@ class WorkerSupervisor:
         self._last_observed_at = utc_now()
         health = self._read_health()
         self.last_health = health
+        self._maybe_reset_retry_budget(health)
         progress = self._progress_snapshot(health)
         event_metrics = dict(health.as_dict())
         event_metrics.update(dict(health.metrics))

@@ -157,6 +157,7 @@ def _job_entries(config: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "objective_id": str(config.get("objective_id", "objective-001")),
                 "objective": str(config.get("objective", config.get("objective_id", "objective-001"))),
                 "max_restarts": int(config.get("max_restarts", 3)),
+                "retry_reset_after_s": float(config.get("retry_reset_after_s", 3600)),
                 "worker": dict(worker),
             }
         ]
@@ -179,6 +180,9 @@ def _job_entries(config: Mapping[str, Any]) -> list[dict[str, Any]]:
                 "objective_id": objective_id,
                 "objective": str(raw_job.get("objective", objective_id)),
                 "max_restarts": int(raw_job.get("max_restarts", config.get("max_restarts", 3))),
+                "retry_reset_after_s": float(
+                    raw_job.get("retry_reset_after_s", config.get("retry_reset_after_s", 3600))
+                ),
                 "worker": dict(worker),
             }
         )
@@ -241,6 +245,7 @@ def manager_from_config(
             objective_id=entry["objective_id"],
             job_id=entry["job_id"],
             max_restarts=entry["max_restarts"],
+            retry_reset_after_s=entry["retry_reset_after_s"],
             initial_attempt=int((prior or {}).get("attempt", 0) or 0),
             initial_restart_count=0
             if reset_retry_budget or entry["job_id"] in reset_job_ids

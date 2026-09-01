@@ -25,7 +25,7 @@ from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_
 from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, OutreachBlockedError, OutreachRegistry
 from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
-from manager.probes import keyhunt_progress_probe
+from manager.probes import gpu_resource_ok, keyhunt_progress_probe
 from manager.state_store import StateStore
 
 
@@ -57,6 +57,28 @@ def synthetic_spec(directory: Path, mode: str, *, max_age: float = 0.12) -> Work
 
 
 class SupervisorTests(unittest.TestCase):
+    def test_gpu_resource_probe_tolerates_transient_zero_utilization(self) -> None:
+        self.assertTrue(
+            gpu_resource_ok(
+                {"util_pct": 0, "power_w": 78, "mem_used_mib": 2367}
+            )
+        )
+        self.assertTrue(
+            gpu_resource_ok(
+                {"util_pct": 13, "power_w": 78, "mem_used_mib": 2367}
+            )
+        )
+        self.assertFalse(
+            gpu_resource_ok(
+                {"util_pct": 0, "power_w": 35, "mem_used_mib": 2367}
+            )
+        )
+        self.assertFalse(
+            gpu_resource_ok(
+                {"util_pct": 0, "power_w": 590, "mem_used_mib": 0}
+            )
+        )
+
     def test_expected_image_name_resolves_posix_symlink_target(self) -> None:
         with patch("manager.supervisor.os.name", "posix"):
             with patch("manager.supervisor.shutil.which", return_value="/opt/python/bin/python"):
@@ -160,6 +182,33 @@ class SupervisorTests(unittest.TestCase):
                 self.assertFalse(supervisor.recover())
                 self.assertEqual(supervisor.state, JobState.ESCALATED)
                 self.assertEqual(supervisor.restart_count, 1)
+            finally:
+                supervisor.cancel()
+
+    def test_stable_healthy_run_resets_old_retry_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            directory = Path(raw)
+            supervisor = WorkerSupervisor(
+                synthetic_spec(directory, "run"),
+                objective_id="synthetic-stable-reset",
+                job_id="job-stable-reset",
+                initial_restart_count=2,
+                retry_reset_after_s=0.05,
+            )
+            try:
+                self.assertTrue(supervisor.start())
+                deadline = time.time() + 3
+                health = supervisor.observe()
+                while not health.healthy and time.time() < deadline:
+                    time.sleep(0.05)
+                    health = supervisor.observe()
+                self.assertTrue(health.healthy, health.as_dict())
+                supervisor._started_monotonic = time.monotonic() - 0.1
+                supervisor.observe()
+                self.assertEqual(supervisor.restart_count, 0)
+                self.assertTrue(
+                    any(event["event_type"] == "retry_budget_reset" for event in supervisor.events)
+                )
             finally:
                 supervisor.cancel()
 

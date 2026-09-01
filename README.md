@@ -44,7 +44,8 @@ The repository-level Python runtime in [`manager/`](manager/) currently provides
 - Explicit job states: `QUEUED`, `STARTING`, `VERIFYING`, `RUNNING`, `COMPLETE`, `STALLED`, `FAILED`, `RETRYING`, `ESCALATED`, and `CANCELLED`.
 - Multi-signal health checks: a worker must be alive and, when configured, show fresh progress plus a passing resource probe. A process alone is not treated as proof of useful work.
 - Durable SQLite state for jobs, attempts, retries, events, queued work, worker adoption after a manager restart, and singleton protection against duplicate managers.
-- Bounded recovery: retry budgets prevent an endless restart loop; exhausted jobs enter `ESCALATED` with their history intact.
+- Bounded recovery: retry budgets prevent an endless restart loop; exhausted jobs enter `ESCALATED` with their history intact. A configurable `retry_reset_after_s` clears old retries only after continuous verified health, so a long-lived worker gets a fresh budget without hiding repeated failures in the same run.
+- GPU evidence tolerance: the NVIDIA probe accepts a brief zero-utilization sample when dedicated worker memory and active power still prove CUDA activity, while idle/no-memory readings remain unhealthy.
 - A recorded one-time operator-resume mechanism for a specific escalated job, rather than silently erasing a failed history. See [the recovery guide](docs/LOCAL_MANAGER.md#one-time-operator-resume-after-escalation).
 - Resilient public telemetry: transient dashboard-file locks retry locally, and a persistent telemetry failure defers that snapshot instead of terminating protected work.
 - Synthetic workers and reliability tests for healthy work, live-but-stalled work, crashes, escalation, event contracts, and public-telemetry boundaries.

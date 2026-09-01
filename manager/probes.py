@@ -39,10 +39,30 @@ def nvidia_smi_probe() -> dict[str, Any]:
         return {"probe_error": type(exc).__name__}
 
 
-def gpu_resource_ok(metrics: dict[str, Any], *, min_util_pct: float = 15, min_power_w: float = 20) -> bool:
-    """Treat a GPU as active only when utilization and power are non-idle."""
+def gpu_resource_ok(
+    metrics: dict[str, Any],
+    *,
+    min_util_pct: float = 15,
+    min_power_w: float = 20,
+    min_active_power_w: float = 40,
+    min_mem_used_mib: float = 512,
+) -> bool:
+    """Treat a GPU as active while tolerating a transient zero-util sample.
+
+    Some NVIDIA driver samples briefly report zero utilization while a CUDA
+    worker still owns its working memory and draws active power. The fallback
+    accepts that narrow pattern, while an idle device with no dedicated memory
+    remains unhealthy even if its power reading is noisy.
+    """
     try:
-        return float(metrics.get("util_pct", 0)) >= min_util_pct and float(metrics.get("power_w", 0)) >= min_power_w
+        util = float(metrics.get("util_pct", 0))
+        power = float(metrics.get("power_w", 0))
+        memory = float(metrics.get("mem_used_mib", 0))
+        if power < min_power_w:
+            return False
+        if util >= min_util_pct:
+            return True
+        return power >= min_active_power_w and memory >= min_mem_used_mib
     except (TypeError, ValueError):
         return False
 

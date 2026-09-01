@@ -26,7 +26,18 @@ healthy merely because it exists. When configured, the supervisor requires:
 3. a passing external resource probe, such as GPU utilization and power.
 
 Retries are bounded by `max_restarts`. Once the budget is exhausted, the job
-enters `ESCALATED` instead of restarting forever.
+enters `ESCALATED` instead of restarting forever. A job may set
+`retry_reset_after_s` (3600 seconds by default) to clear its old retry count
+after that worker has remained continuously healthy for the configured
+interval. The reset is recorded as a `retry_budget_reset` event; it does not
+erase the earlier failure history or make repeated failures in the same stable
+window disappear.
+
+For NVIDIA workloads, the default resource decision uses utilization and power
+when both are available, and tolerates a short zero-utilization sample when
+dedicated GPU memory and active power still identify a working CUDA process.
+An idle device with no worker memory remains unhealthy even if a driver power
+sample is noisy.
 
 ## Synthetic worker
 

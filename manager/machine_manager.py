@@ -33,6 +33,7 @@ class MachineManager:
         max_restarts: int = 3,
         initial_attempt: int = 0,
         initial_restart_count: int = 0,
+        retry_reset_after_s: float = 3600.0,
     ) -> ManagedJob:
         if job_id in self.jobs:
             raise ValueError(f"job already registered: {job_id}")
@@ -47,6 +48,7 @@ class MachineManager:
                 max_restarts=max_restarts,
                 initial_attempt=initial_attempt,
                 initial_restart_count=initial_restart_count,
+                retry_reset_after_s=retry_reset_after_s,
             ),
         )
         self.jobs[job_id] = job
