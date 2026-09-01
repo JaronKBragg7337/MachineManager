@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T16:47:14.075Z",
+        "observed_at": "2026-09-01T16:49:29.597Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 409.1,
-        "keys_tested": 33679321595904,
-        "sample_count": 25,
+        "uptime_s": 544.6,
+        "keys_tested": 33781696167936,
+        "sample_count": 33,
         "matches_found": 0,
         "coverage_pct": 0,
-        "hashrate_mkey_s": 746.61,
-        "keys_per_second": 746610000,
-        "batch_number": 10980
+        "hashrate_mkey_s": 750.09,
+        "keys_per_second": 750090000,
+        "batch_number": 11014
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T16:47:14.075Z",
+        "observed_at": "2026-09-01T16:49:29.597Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 409.1,
-        "keys_tested": 33679321595904,
-        "sample_count": 25,
+        "uptime_s": 544.6,
+        "keys_tested": 33781696167936,
+        "sample_count": 33,
         "matches_found": 0,
         "coverage_pct": 0,
-        "hashrate_mkey_s": 746.61,
-        "keys_per_second": 746610000,
-        "batch_number": 10980
+        "hashrate_mkey_s": 750.09,
+        "keys_per_second": 750090000,
+        "batch_number": 11014
       }
     }
   ],
@@ -957,7 +957,7 @@
       "interval_s": 21600.0,
       "sequence": 2,
       "next_run_at": "2026-09-01T19:48:51.437Z",
-      "next_in_s": 10896.395233392715,
+      "next_in_s": 10760.890620946884,
       "last_task_id": "recurring-machine-manager-capability-research-000002",
       "last_status": "COMPLETE"
     },
@@ -969,7 +969,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 56262.899554014206,
+      "next_in_s": 56127.394941568375,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -981,29 +981,29 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 13433.361070156097,
+      "next_in_s": 13297.856457710266,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
     "util_pct": 75.0,
-    "util_pct_recent_max": 81.0,
-    "util_pct_recent_avg": 75.2,
+    "util_pct_recent_max": 77.0,
+    "util_pct_recent_avg": 74.8,
     "util_pct_sample_count": 5,
     "util_pct_zero_samples": 0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 60.0,
-    "power_w": 79.65,
+    "temp_c": 64.0,
+    "power_w": 81.95,
     "resource_active": true,
     "activity_state": "ACTIVE",
     "activity_basis": "driver_utilization"
   },
   "system": {
-    "cpu_pct": 6.5,
-    "cpu_pct_recent_max": 6.5,
-    "cpu_pct_recent_avg": 6.0,
+    "cpu_pct": 6.0,
+    "cpu_pct_recent_max": 6.0,
+    "cpu_pct_recent_avg": 5.7,
     "cpu_pct_sample_count": 5,
     "cpu_pct_zero_samples": 0.0,
     "load_state": "ACTIVE",
@@ -1012,19 +1012,19 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T16:47:14.075Z",
+    "observed_at": "2026-09-01T16:49:29.597Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 409.1,
-    "keys_tested": 33679321595904,
-    "sample_count": 25,
+    "uptime_s": 544.6,
+    "keys_tested": 33781696167936,
+    "sample_count": 33,
     "matches_found": 0,
     "coverage_pct": 0,
-    "hashrate_mkey_s": 746.61,
-    "keys_per_second": 746610000,
-    "batch_number": 10980
+    "hashrate_mkey_s": 750.09,
+    "keys_per_second": 750090000,
+    "batch_number": 11014
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T16:47:15.032Z"
+  "updated": "2026-09-01T16:49:30.536Z"
 }
