@@ -140,6 +140,40 @@
             "observed_at": "2026-08-30T00:00:00Z"
           }
         ]
+      },
+      {
+        "id": "local-manager-brain",
+        "provider": "ollama",
+        "model": "qwen3.5:4b",
+        "model_version": "installed-2026-08",
+        "verified_model_version": "installed-2026-08",
+        "last_verified": "2026-08-30T00:00:00Z",
+        "capabilities": [
+          {
+            "id": "health-review-json",
+            "status": "OBSERVED",
+            "summary": "The configured local reviewer provides bounded health decisions with a deterministic fallback.",
+            "evidence_id": "live-manager-observation",
+            "observed_at": "2026-08-30T00:00:00Z"
+          }
+        ]
+      },
+      {
+        "id": "local-evidence-brain",
+        "provider": "ollama",
+        "model": "llama3.2:3b",
+        "model_version": "installed-2026-08",
+        "verified_model_version": "installed-2026-08",
+        "last_verified": "2026-08-30T00:00:00Z",
+        "capabilities": [
+          {
+            "id": "evidence-review-json",
+            "status": "OBSERVED",
+            "summary": "The configured local evidence reviewer provides bounded research and work recommendations with a deterministic fallback.",
+            "evidence_id": "live-manager-observation",
+            "observed_at": "2026-08-30T00:00:00Z"
+          }
+        ]
       }
     ],
     "constraint_audits": [
