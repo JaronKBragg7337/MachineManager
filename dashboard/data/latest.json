@@ -1,26 +1,26 @@
 {
   "manager_version": "0.2",
-  "status": "STARTING",
+  "status": "HEALTHY",
   "objective": "Bitcoin Puzzle #71 continuous search",
   "objective_id": "p71",
   "workers": [
     {
       "id": "keyhunt-001",
       "type": "KeyHunt",
-      "state": "VERIFYING",
+      "state": "RUNNING",
       "owner": "local-manager-v2",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T04:16:05.820Z",
+        "observed_at": "2026-09-01T04:16:28.265Z",
         "reported": true,
-        "active": false,
-        "healthy": false,
-        "sample_count": 1,
+        "active": true,
+        "healthy": true,
+        "sample_count": 2,
         "hashrate_mkey_s": 782.28,
         "coverage_pct": 0,
         "keys_per_second": 782280000,
-        "uptime_s": 1.7,
+        "uptime_s": 22.5,
         "batch_number": 3083,
         "matches_found": 0,
         "keys_tested": 9960331149312
@@ -31,19 +31,19 @@
     {
       "id": "job-p71-001",
       "objective_id": "p71",
-      "state": "VERIFYING",
+      "state": "RUNNING",
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T04:16:05.820Z",
+        "observed_at": "2026-09-01T04:16:28.265Z",
         "reported": true,
-        "active": false,
-        "healthy": false,
-        "sample_count": 1,
+        "active": true,
+        "healthy": true,
+        "sample_count": 2,
         "hashrate_mkey_s": 782.28,
         "coverage_pct": 0,
         "keys_per_second": 782280000,
-        "uptime_s": 1.7,
+        "uptime_s": 22.5,
         "batch_number": 3083,
         "matches_found": 0,
         "keys_tested": 9960331149312
@@ -56,14 +56,14 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
-      "last_action": "",
-      "last_reason": "",
-      "last_duration_s": null,
-      "tasks_completed": 0,
-      "last_run": "",
-      "next_run": ""
+      "last_action": "continue",
+      "last_reason": "System is in STARTING state with workers verifying constraints and GPU resources available; no errors or failures detected.",
+      "last_duration_s": 4.109,
+      "tasks_completed": 1,
+      "last_run": "2026-09-01T04:16:28.313Z",
+      "next_run": "2026-09-01T04:21:28.313Z"
     }
   ],
   "capabilities": [
@@ -337,28 +337,28 @@
   },
   "queue": {},
   "gpu": {
-    "util_pct": 0.0,
-    "mem_used_mib": 0.0,
+    "util_pct": 81.0,
+    "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 48.0,
-    "power_w": 590.01
+    "temp_c": 61.0,
+    "power_w": 82.69
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T04:16:05.820Z",
+    "observed_at": "2026-09-01T04:16:28.265Z",
     "reported": true,
-    "active": false,
-    "healthy": false,
-    "sample_count": 1,
+    "active": true,
+    "healthy": true,
+    "sample_count": 2,
     "hashrate_mkey_s": 782.28,
     "coverage_pct": 0,
     "keys_per_second": 782280000,
-    "uptime_s": 1.7,
+    "uptime_s": 22.5,
     "batch_number": 3083,
     "matches_found": 0,
     "keys_tested": 9960331149312
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T04:16:07.541Z"
+  "updated": "2026-09-01T04:16:28.312Z"
 }
