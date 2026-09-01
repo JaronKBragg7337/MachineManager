@@ -58,3 +58,36 @@ The next real decision is not "turn on every platform." It is to choose one
 specific, currently open, eligible task and run an ordinary engineering
 assessment: scope, expected deliverable, terms, acceptance path, payout path,
 and whether a human-owned sign-in or verification step is actually requested.
+
+## Unattended public scout
+
+Machine Manager can run this assessment as a recurring `research` task. The
+worker reads only the listed public URLs, writes its detailed evidence artifact
+locally, and publishes aggregate source and completion metrics. The public
+dashboard shows the task lifecycle and next scheduled run; source excerpts and
+model output remain local.
+
+The scout is deliberately an opportunity-finding lane, not an account or
+payout worker. A later objective may proceed only after a specific opportunity
+has a clear deliverable, eligibility, acceptance path, and human-owned handoff
+for any sign-in, identity, wallet, or payout step.
+
+Example local configuration:
+
+```json
+{
+  "id": "revenue-lane-scout",
+  "kind": "research",
+  "objective_id": "revenue-opportunities",
+  "interval_s": 86400,
+  "enabled": true,
+  "payload": {
+    "question": "Find one currently visible, publicly documented software-revenue opportunity or explain why none can yet be selected; compare eligibility, deliverable, terms, and the next human-owned handoff.",
+    "sources": [
+      {"title": "Superteam Earn agent listings", "url": "https://superteam.fun/earn/agents/"},
+      {"title": "IssueHunt terms", "url": "https://oss.issuehunt.io/terms"},
+      {"title": "Algora terms", "url": "https://algora.io/legal/terms"}
+    ]
+  }
+}
+```

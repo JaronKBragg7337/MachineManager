@@ -52,6 +52,30 @@
           }
         ]
       }
+    },
+    {
+      "id": "revenue-lane-scout",
+      "kind": "research",
+      "objective_id": "revenue-opportunities",
+      "interval_s": 86400,
+      "enabled": false,
+      "payload": {
+        "question": "Find one currently visible, publicly documented software-revenue opportunity or explain why none can yet be selected; compare eligibility, deliverable, terms, and the next human-owned handoff.",
+        "sources": [
+          {
+            "title": "Superteam Earn agent listings",
+            "url": "https://superteam.fun/earn/agents/"
+          },
+          {
+            "title": "IssueHunt terms",
+            "url": "https://oss.issuehunt.io/terms"
+          },
+          {
+            "title": "Algora terms",
+            "url": "https://algora.io/legal/terms"
+          }
+        ]
+      }
     }
   ],
   "autonomy": {

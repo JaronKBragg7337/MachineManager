@@ -104,7 +104,7 @@ Read more in:
 
 The Bitcoin proving ground is one job, not the entire mission. New work becomes a separate objective with a declared worker, observable state, bounded resources, evidence requirements, and a clear completion or escalation path.
 
-Public-safe [work lanes](docs/WORK_LANES.md) make ongoing research, audits, and specialist work visible without falsely presenting a queued or review task as an active worker. The initial [revenue-lane research](docs/REVENUE_LANES.md) records source-backed opportunities that can later become properly scoped objectives.
+Public-safe [work lanes](docs/WORK_LANES.md) make ongoing research, audits, and specialist work visible without falsely presenting a queued or review task as an active worker. The initial [revenue-lane research](docs/REVENUE_LANES.md) records source-backed opportunities that can later become properly scoped objectives; the same bounded research worker can run that scout on a recurring cadence without credentials.
 
 ## Run and verify locally
 
