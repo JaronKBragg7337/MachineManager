@@ -1024,7 +1024,28 @@ class TelemetryTests(unittest.TestCase):
             }
         )
         agent = LocalOllamaAgent(spec)
-        snapshot = {"status": "HEALTHY", "objective": "synthetic", "workers": [], "jobs": []}
+        snapshot = {
+            "status": "HEALTHY",
+            "objective": "synthetic",
+            "workers": [],
+            "jobs": [],
+            "constraint_audits": [
+                {
+                    "id": "audit-1",
+                    "state": "NEEDS_EVIDENCE_REVIEW",
+                    "candidate_count": 2,
+                    "categories": {"approval_gate": 2},
+                    "review_plan": [
+                        {
+                            "category": "approval_gate",
+                            "test_id": "approval-gate-check",
+                            "recommended_test": "Run a harmless delegated action.",
+                        }
+                    ],
+                    "path": r"C:\private\do-not-send",
+                }
+            ],
+        }
         with patch("manager.agents.urllib.request.urlopen", return_value=FakeResponse()) as opener:
             decision = agent.ask(snapshot, [])
         request = opener.call_args.args[0]
@@ -1034,6 +1055,9 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(body["format"], "json")
         self.assertFalse(body["think"])
         self.assertEqual(body["options"]["num_predict"], 80)
+        self.assertIn("approval-gate-check", body["prompt"])
+        self.assertIn("Run a harmless delegated action.", body["prompt"])
+        self.assertNotIn(r"C:\private\do-not-send", body["prompt"])
 
     def test_ollama_agent_preserves_allowed_loopback_url(self) -> None:
         spec = AgentSpec.from_mapping(

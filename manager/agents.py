@@ -118,6 +118,40 @@ class LocalOllamaAgent:
         self.spec = spec
 
     def _prompt(self, snapshot: Mapping[str, Any], events: Iterable[Mapping[str, Any]]) -> str:
+        evidence_reviews = []
+        raw_reviews = snapshot.get("constraint_audits", [])
+        if isinstance(raw_reviews, Iterable) and not isinstance(raw_reviews, (str, bytes, Mapping)):
+            for review in raw_reviews:
+                if not isinstance(review, Mapping) or len(evidence_reviews) >= 8:
+                    continue
+                categories = review.get("categories", {})
+                safe_categories = {}
+                if isinstance(categories, Mapping):
+                    for key, value in categories.items():
+                        if isinstance(value, (int, float)) and not isinstance(value, bool):
+                            safe_categories[_safe_text(key, max_len=40)] = max(0, int(value))
+                plan = review.get("review_plan", [])
+                safe_plan = []
+                if isinstance(plan, Iterable) and not isinstance(plan, (str, bytes, Mapping)):
+                    for item in plan:
+                        if not isinstance(item, Mapping) or len(safe_plan) >= 8:
+                            continue
+                        safe_plan.append(
+                            {
+                                "category": _safe_text(item.get("category"), max_len=40),
+                                "test_id": _safe_text(item.get("test_id"), max_len=80),
+                                "recommended_test": _safe_text(item.get("recommended_test"), max_len=220),
+                            }
+                        )
+                evidence_reviews.append(
+                    {
+                        "id": _safe_text(review.get("id"), max_len=80),
+                        "state": _safe_text(review.get("state"), max_len=40),
+                        "candidate_count": max(0, int(review.get("candidate_count", 0) or 0)),
+                        "categories": safe_categories,
+                        "review_plan": safe_plan,
+                    }
+                )
         safe_snapshot = {
             "status": _safe_text(snapshot.get("status"), max_len=30),
             "objective": _safe_text(snapshot.get("objective"), max_len=120),
@@ -139,6 +173,7 @@ class LocalOllamaAgent:
                 if isinstance(job, Mapping)
             ],
             "gpu": dict(snapshot.get("gpu", {})) if isinstance(snapshot.get("gpu"), Mapping) else {},
+            "evidence_reviews": evidence_reviews,
             "recent_events": [
                 {
                     "type": _safe_text(event.get("event_type", event.get("type")), max_len=60),
@@ -153,7 +188,9 @@ class LocalOllamaAgent:
             "You are a bounded Machine Manager specialist. Review the sanitized "
             "machine snapshot below. Respond with JSON only, exactly in the form "
             '{"action":"continue|restart|escalate|queue_follow_up|pause","reason":"short reason"}. '
-            "Do not request credentials, shell commands, private data, or arbitrary file changes. "
+            "Use the evidence review plans to choose a bounded follow-up when useful, but do not "
+            "claim a test ran unless the snapshot or recent events show its result. Do not request "
+            "credentials, shell commands, private data, or arbitrary file changes. "
             f"Snapshot: {json.dumps(safe_snapshot, ensure_ascii=True, separators=(',', ':'))}"
         )
 

@@ -65,6 +65,7 @@ The repository-level Python runtime in [`manager/`](manager/) currently provides
 - Bounded local specialist slots that can give safe, compact operational advice while the manager retains control of worker lifecycle and retry policy.
 - The public capability surface is derived from the handlers actually loaded at runtime, including durable queue dispatch, research, repository verification, and authenticated revenue discovery.
 - Public agent views show whether a specialist is currently working, its bounded run timing, completed task count, and next run without publishing prompts or unrestricted reasoning.
+- The local specialist receives the same sanitized evidence-review plans shown publicly, so its bounded recommendation loop can prioritize a real review lead without receiving local paths, excerpts, or private findings.
 - Constraint-audit leads become visible review plans: each detected category carries a stable evidence-test ID and a concrete next test, reconstructed safely from sanitized counts after restart rather than remaining an unexplained candidate total.
 - A fixture-backed dashboard runtime check executes the actual resource-readout helpers so transient low driver samples cannot regress into misleading `0%` badges.
 
