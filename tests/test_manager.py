@@ -1353,7 +1353,7 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("private_path", json.dumps(latest))
             self.assertNotIn("findings", json.dumps(latest))
             self.assertNotIn("C:\\", json.dumps(latest))
-            self.assertEqual(latest["worker_profiles"][0]["capabilities"][0]["summary"], "[redacted]")
+            self.assertEqual(latest["worker_profiles"][0]["capabilities"][0]["summary"], "token: [redacted]")
             self.assertEqual(latest["constraint_audits"][0]["categories"], {"approval_gate": 2})
             self.assertTrue(latest["constraint_audits"][0]["more_pending"])
             self.assertNotIn("C:\\", json.dumps(events))

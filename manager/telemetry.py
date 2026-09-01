@@ -12,6 +12,8 @@ import time
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from .redaction import redact_text
+
 
 class TelemetryWriteError(OSError):
     """A public telemetry file could not be safely replaced after retries."""
@@ -72,11 +74,7 @@ def atomic_json_write(
 
 
 def _text(value: Any, *, default: str = "", max_len: int = 160) -> str:
-    value = default if value is None else str(value)
-    value = value.replace("\r", " ").replace("\n", " ").strip()[:max_len]
-    if re.search(r"(?i)(?:[A-Za-z]:[\\/]|/Users/|/home/|\\\\|token\s*[:=]|secret\s*[:=]|password\s*[:=])", value):
-        return "[redacted]"
-    return value
+    return redact_text(value, default=default, max_len=max_len)
 
 
 def _number(value: Any) -> int | float | None:

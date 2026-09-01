@@ -109,7 +109,7 @@ class WorkstreamRegistryTests(unittest.TestCase):
             )
             latest = json.loads((root / "dashboard" / "data" / "latest.json").read_text(encoding="utf-8"))
             stream = latest["workstreams"][0]
-            self.assertEqual(stream["summary"], "[redacted]")
+            self.assertEqual(stream["summary"], "[local-path]")
             self.assertEqual(stream["metrics"], {"candidate_count": 4})
             self.assertNotIn("private", stream)
             self.assertNotIn("source_id", stream)
