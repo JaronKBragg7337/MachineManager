@@ -27,6 +27,8 @@ class DashboardContractTests(unittest.TestCase):
             "function gpuEvidenceActive(gpu)",
             "function cpuActivityText(system, gpu)",
             "function cpuActivityCard(system, gpu)",
+            "function taskKindLabel(value)",
+            'revenue: "Revenue discovery"',
             "UNATTENDED SCHEDULE",
             "UNATTENDED WORK CADENCE",
             "manager-owned cadence",
