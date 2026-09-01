@@ -135,15 +135,19 @@ def merge_public_events(
 ) -> list[Mapping[str, Any]]:
     """Keep a bounded chronological public event window without duplicates."""
     merged: list[Mapping[str, Any]] = []
-    seen_ids: set[str] = set()
+    positions: dict[str, int] = {}
     for candidate in [*existing, *current]:
         if not isinstance(candidate, Mapping):
             continue
         event_id = str(candidate.get("event_id", "")).strip()
-        if event_id and event_id in seen_ids:
-            continue
         if event_id:
-            seen_ids.add(event_id)
+            if event_id in positions:
+                # Prefer the fresh local record over an older already-public
+                # projection so newly allowlisted identity fields can repair
+                # historical events without duplicating them.
+                merged[positions[event_id]] = candidate
+                continue
+            positions[event_id] = len(merged)
         merged.append(candidate)
     return merged[-max(1, int(limit)) :]
 

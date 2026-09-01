@@ -1246,12 +1246,16 @@ class TelemetryTests(unittest.TestCase):
     def test_runner_bounds_and_deduplicates_public_events(self) -> None:
         existing = [{"event_id": "old-1"}, {"event_id": "old-2"}]
         current = [
-            {"event_id": "old-2"},
+            {"event_id": "old-2", "task_id": "task-research-1"},
             {"event_id": "new-1"},
             {"event_id": "new-2"},
         ]
         merged = merge_public_events(existing, current, limit=2)
         self.assertEqual([event["event_id"] for event in merged], ["new-1", "new-2"])
+
+        replaced = merge_public_events(existing, current, limit=3)
+        self.assertEqual(replaced[0]["event_id"], "old-2")
+        self.assertEqual(replaced[0]["task_id"], "task-research-1")
 
     def test_publisher_allowlists_public_fields(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
