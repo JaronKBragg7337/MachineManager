@@ -1457,7 +1457,7 @@ class TelemetryTests(unittest.TestCase):
                             publisher.publish()
                     request.assert_not_called()
 
-    def test_public_upload_bypasses_cadence_for_a_meaningful_state_change(self) -> None:
+    def test_public_upload_coalesces_state_change_requests_during_cadence(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             publisher = GitHubPagesPublisher(
                 Path(raw) / "dashboard",
@@ -1470,7 +1470,8 @@ class TelemetryTests(unittest.TestCase):
                 with patch.object(publisher, "publish", return_value=True) as publish:
                     self.assertFalse(publisher.maybe_publish(now=101.0))
                     publish.assert_not_called()
-                    self.assertTrue(publisher.maybe_publish(now=101.0, immediate=True))
+                    self.assertFalse(publisher.maybe_publish(now=101.0, immediate=True))
+                    self.assertTrue(publisher.maybe_publish(now=221.0, immediate=True))
                     publish.assert_called_once_with()
 
     def test_public_state_marker_ignores_progress_but_records_lifecycle_changes(self) -> None:

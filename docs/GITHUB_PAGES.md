@@ -32,9 +32,10 @@ public_upload in the local config and provide a dedicated fine-grained
 MACHINE_MANAGER_GITHUB_TOKEN through an ignored env_file. The uploader batches
 the sanitized latest, events, and scenarios files into one normal commit every
 two minutes by default. A public manager, worker, job, or work-lane state
-change publishes immediately, so recovery and lifecycle changes do not wait for
-the regular cadence. It never uploads raw logs, command lines, private paths,
-or credentials.
+change requests a publication, but the same cooldown still coalesces rapid
+changes into the next due snapshot; this prevents overlapping GitHub Pages
+deployments while keeping recovery and lifecycle evidence fresh. It never
+uploads raw logs, command lines, private paths, or credentials.
 
 After a successful upload, the manager fast-forwards the local `main` reference
 to the same remote commit when the checkout contains only the three generated

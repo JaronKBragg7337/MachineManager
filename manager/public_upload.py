@@ -324,13 +324,21 @@ class GitHubPagesPublisher:
         return True
 
     def maybe_publish(self, *, now: float | None = None, immediate: bool = False) -> bool:
-        """Publish on the regular cadence, or immediately for a public state change."""
+        """Publish when due, coalescing state-change requests during cooldown.
+
+        ``immediate`` is retained as a compatibility hint for callers that
+        detect a meaningful public state change. It must not bypass the
+        cadence: GitHub Pages deployments are asynchronous, so repeated
+        bypasses can create overlapping deployments and leave the public site
+        behind. The next due publication still includes the newest snapshot.
+        """
         if not self.configured:
             return False
         now = time.monotonic() if now is None else float(now)
-        if (
-            not immediate and self.last_publish_monotonic is not None
+        cooldown_active = (
+            self.last_publish_monotonic is not None
             and now - self.last_publish_monotonic < self.interval_s
-        ):
+        )
+        if cooldown_active:
             return False
         return self.publish()
