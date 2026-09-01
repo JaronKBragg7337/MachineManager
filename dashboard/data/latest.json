@@ -12,16 +12,16 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T07:59:45.821Z",
+        "observed_at": "2026-09-01T08:00:07.296Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 656.8,
+        "uptime_s": 678.2,
         "keys_per_second": 748780000,
         "coverage_pct": 0,
         "hashrate_mkey_s": 748.78,
         "matches_found": 0,
-        "sample_count": 39,
+        "sample_count": 40,
         "keys_tested": 10039251173376,
         "batch_number": 3271
       }
@@ -35,16 +35,16 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T07:59:45.821Z",
+        "observed_at": "2026-09-01T08:00:07.296Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 656.8,
+        "uptime_s": 678.2,
         "keys_per_second": 748780000,
         "coverage_pct": 0,
         "hashrate_mkey_s": 748.78,
         "matches_found": 0,
-        "sample_count": 39,
+        "sample_count": 40,
         "keys_tested": 10039251173376,
         "batch_number": 3271
       }
@@ -338,8 +338,7 @@
     "mode": "EXECUTE_AND_REPORT"
   },
   "queue": {
-    "COMPLETE": 23,
-    "RUNNING": 1
+    "COMPLETE": 24
   },
   "queue_kinds": {
     "agent_review": 22,
@@ -350,9 +349,9 @@
       "task_id": "recurring-machine-manager-capability-research-000001",
       "kind": "research",
       "objective_id": "machine-manager-research",
-      "status": "RUNNING",
+      "status": "COMPLETE",
       "attempts": 3,
-      "updated": "2026-09-01T07:59:46.761Z"
+      "updated": "2026-09-01T08:00:08.195Z"
     },
     {
       "task_id": "agent-task-local-manager-brain-b2cf1bf3a0b8",
@@ -508,32 +507,32 @@
     }
   ],
   "gpu": {
-    "util_pct": 76.0,
+    "util_pct": 85.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 65.0,
-    "power_w": 82.07,
+    "temp_c": 61.0,
+    "power_w": 68.97,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 6.4
+    "cpu_pct": 38.4
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T07:59:45.821Z",
+    "observed_at": "2026-09-01T08:00:07.296Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 656.8,
+    "uptime_s": 678.2,
     "keys_per_second": 748780000,
     "coverage_pct": 0,
     "hashrate_mkey_s": 748.78,
     "matches_found": 0,
-    "sample_count": 39,
+    "sample_count": 40,
     "keys_tested": 10039251173376,
     "batch_number": 3271
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T07:59:46.757Z"
+  "updated": "2026-09-01T08:00:08.192Z"
 }
