@@ -14,12 +14,13 @@ from typing import Any, Mapping
 from .agents import AgentCoordinator
 from .autonomy import OperatingCharter
 from .capabilities import CapabilityRegistry
-from .dispatcher import WorkDispatcher
+from .dispatcher import BackgroundWorkDispatcher, WorkDispatcher
 from .evidence import EvidenceCoordinator
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
 from .probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe, nvidia_smi_probe
 from .public_upload import GitHubPagesPublisher, PublicUploadError
+from .recurring import RecurringTaskSeeder
 from .research_worker import OllamaResearchHandler, PublicResearchHandler
 from .scheduler import WorkScheduler
 from .state_store import StateStore
@@ -471,6 +472,7 @@ def main() -> int:
     scheduler: WorkScheduler | None = None
     queue_dispatcher: WorkDispatcher | None = None
     queue_dispatch_limit = 4
+    recurring_seeder: RecurringTaskSeeder | None = None
     workstreams: WorkstreamRegistry | None = None
     local_publisher: TelemetryPublisher | None = None
     remote_publisher: GitHubPagesPublisher | None = None
@@ -626,12 +628,33 @@ def main() -> int:
                 else:
                     raise ValueError("research_worker.mode must be ollama or evidence_only")
             if dispatch_enabled:
-                queue_dispatcher = WorkDispatcher(
+                recurring_seeder = RecurringTaskSeeder.from_config(
+                    scheduler,
+                    config.get("recurring_tasks", []),
+                    actor=str(config.get("actor", "local-manager")),
+                )
+                dispatcher_type = (
+                    BackgroundWorkDispatcher
+                    if bool(raw_dispatch.get("background", False))
+                    else WorkDispatcher
+                )
+                dispatcher_kwargs: dict[str, Any] = {}
+                if dispatcher_type is BackgroundWorkDispatcher:
+                    max_workers = max(1, min(int(raw_dispatch.get("max_workers", 1)), 4))
+                    dispatcher_kwargs = {
+                        "max_workers": max_workers,
+                        "max_in_flight": max(
+                            1,
+                            min(int(raw_dispatch.get("max_in_flight", max_workers)), max_workers),
+                        ),
+                    }
+                queue_dispatcher = dispatcher_type(
                     scheduler,
                     research_handlers,
                     defer_delay_s=defer_delay_s,
                     max_attempts=max_attempts,
                     actor=str(config.get("actor", "local-manager")),
+                    **dispatcher_kwargs,
                 )
         except (TypeError, ValueError) as exc:
             store.append_event(
@@ -778,6 +801,16 @@ def main() -> int:
                     store.append_event(event)
             else:
                 snapshot["workstreams"] = []
+            if recurring_seeder is not None:
+                try:
+                    for event in recurring_seeder.tick():
+                        store.append_event(event)
+                except Exception as error:
+                    _record_noncritical_output_failure(
+                        manager_log_path,
+                        output="Recurring task scheduling",
+                        error=error,
+                    )
             if queue_dispatcher is not None:
                 try:
                     queue_dispatcher.dispatch(limit=queue_dispatch_limit)
@@ -856,6 +889,15 @@ def main() -> int:
         if manager is not None and agents is not None and capabilities is not None and scheduler is not None:
             if requested_stop:
                 manager.cancel_all()
+            if queue_dispatcher is not None:
+                try:
+                    queue_dispatcher.close()
+                except Exception as error:
+                    _record_noncritical_output_failure(
+                        manager_log_path,
+                        output="Queue dispatcher shutdown",
+                        error=error,
+                    )
             _persist_runtime(manager, agents, store, seen_event_ids)
             if local_publisher and requested_stop:
                 stopped = manager.snapshot(objective=objective)

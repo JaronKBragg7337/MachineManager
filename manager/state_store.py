@@ -517,6 +517,15 @@ class StateStore:
             for row in rows
         ]
 
+    def task_status(self, task_id: str) -> str | None:
+        """Return one task status without loading its private payload."""
+        with self._lock:
+            row = self._connection.execute(
+                "SELECT status FROM tasks WHERE task_id = ?",
+                (str(task_id),),
+            ).fetchone()
+        return None if row is None else str(row["status"])
+
     def start_task(self, task_id: str, *, now: float | None = None) -> bool:
         """Move one queued task to RUNNING and increment its attempt count."""
         now = time.time() if now is None else float(now)

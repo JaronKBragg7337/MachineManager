@@ -10,9 +10,12 @@
   "public_event_limit": 500,
   "queue_dispatch": {
     "enabled": false,
+    "background": true,
     "limit": 4,
     "defer_delay_s": 300,
-    "max_attempts": 3
+    "max_attempts": 3,
+    "max_workers": 1,
+    "max_in_flight": 1
   },
   "research_worker": {
     "enabled": false,
@@ -25,6 +28,32 @@
     "max_source_bytes": 120000,
     "max_sources": 3
   },
+  "recurring_tasks": [
+    {
+      "id": "machine-manager-capability-research",
+      "kind": "research",
+      "objective_id": "machine-manager-research",
+      "interval_s": 21600,
+      "enabled": false,
+      "payload": {
+        "question": "Identify one evidence-backed next integration milestone for Machine Manager from the current public platform documentation.",
+        "sources": [
+          {
+            "title": "GitHub REST API documentation",
+            "url": "https://docs.github.com/en/rest"
+          },
+          {
+            "title": "OpenAI platform documentation",
+            "url": "https://platform.openai.com/docs/overview"
+          },
+          {
+            "title": "Anthropic documentation",
+            "url": "https://docs.anthropic.com/en/docs/overview"
+          }
+        ]
+      }
+    }
+  ],
   "autonomy": {
     "mode": "EXECUTE_AND_REPORT",
     "allow_account_enrollment": true,

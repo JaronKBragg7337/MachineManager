@@ -132,6 +132,17 @@ source excerpts and runs with GPU layers disabled. With `mode: "evidence_only"`,
 the handler records source evidence without a model summary. The runner does
 not enable this lane by default; enabling it requires both
 `queue_dispatch.enabled` and `research_worker.enabled` in the local config.
+Set `queue_dispatch.background` to true for network or model-backed handlers
+so they execute outside the protected worker's health-sampling loop.
+
+## Recurring objectives
+
+`recurring_tasks` contains durable task templates. Each enabled template gets a
+deterministic task id per interval, records its cursor in SQLite, and avoids
+overlapping a prior `QUEUED` or `RUNNING` task. A restart resumes the same
+queued task instead of creating a duplicate; missed intervals produce one
+bounded catch-up task rather than a burst. Recurring scheduling is active only
+when queue dispatch is enabled.
 
 ## Visible work lanes
 

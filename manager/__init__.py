@@ -1,7 +1,8 @@
 """Reusable local Machine Manager runtime."""
 
 from .machine_manager import MachineManager
-from .dispatcher import DispatchOutcome, DispatchResult, WorkDispatcher
+from .dispatcher import BackgroundWorkDispatcher, DispatchOutcome, DispatchResult, WorkDispatcher
+from .recurring import RecurringTaskSeeder, RecurringTaskSpec
 from .research_worker import (
     BoundedSourceFetcher,
     LocalOllamaResearchSummarizer,
@@ -19,6 +20,7 @@ __all__ = [
     "HealthSignals",
     "JobState",
     "MachineManager",
+    "BackgroundWorkDispatcher",
     "DispatchOutcome",
     "DispatchResult",
     "BoundedSourceFetcher",
@@ -27,6 +29,8 @@ __all__ = [
     "PublicResearchHandler",
     "ResearchRetryableError",
     "ResearchTaskError",
+    "RecurringTaskSeeder",
+    "RecurringTaskSpec",
     "StateStore",
     "WorkItem",
     "WorkDispatcher",
