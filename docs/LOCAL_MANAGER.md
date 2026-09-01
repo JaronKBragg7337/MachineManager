@@ -95,6 +95,11 @@ The runner stores local operational state in SQLite:
 - job attempt and restart counters survive a manager restart;
 - event history is retained locally with a bounded retention limit;
 - queued work items are available for future research and specialist jobs;
+- `WorkDispatcher` provides an explicit handler registry for future work. A
+  registered handler can complete, retry, fail, or escalate a claimed task;
+  unknown task kinds are returned to `QUEUED` with a later schedule rather than
+  being lost. The protected KeyHunt assignment is intentionally outside this
+  dispatch path.
 - a singleton lock prevents two managers from supervising the same config;
 - a worker PID lease allows a healthy worker to be adopted after a manager
   restart instead of spawning a duplicate.
@@ -109,6 +114,10 @@ bounded action, short reason, and model runtime (separate from manager poll
 latency); it does not publish private prompts or hidden reasoning. Agent output
 is advisory; the supervisor still owns process control, retry limits,
 escalation, and secrets.
+
+The public snapshot also includes a bounded recent task ledger. It contains
+only task id, allowlisted kind, objective id, state, attempt count, and a
+sanitized timestamp; task payloads remain local in SQLite.
 
 ## Visible work lanes
 

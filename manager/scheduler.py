@@ -44,7 +44,7 @@ class WorkScheduler:
         )
         return task_id
 
-    def claim(self, *, limit: int = 10) -> list[WorkItem]:
+    def claim(self, *, limit: int = 10, now: float | None = None) -> list[WorkItem]:
         return [
             WorkItem(
                 task_id=item["task_id"],
@@ -53,7 +53,7 @@ class WorkScheduler:
                 attempts=item["attempts"],
                 payload=item["payload"],
             )
-            for item in self.store.claim_due_tasks(limit=limit)
+            for item in self.store.claim_due_tasks(limit=limit, now=now)
         ]
 
     def start(self, task_id: str) -> bool:
@@ -73,9 +73,21 @@ class WorkScheduler:
             return
         self.store.finish_task(task_id, status="FAILED")
 
+    def defer(self, task_id: str, *, retry_at: float) -> None:
+        """Return a claimed task to QUEUED for a later bounded dispatch pass."""
+        self.store.finish_task(task_id, status="QUEUED", scheduled_at=retry_at)
+
+    def escalate(self, task_id: str) -> None:
+        """Stop dispatch retries while preserving the task's audit record."""
+        self.store.finish_task(task_id, status="ESCALATED")
+
     def snapshot(self) -> dict[str, int]:
         return self.store.task_counts()
 
     def kind_snapshot(self) -> dict[str, int]:
         """Return durable task totals grouped by their work kind."""
         return self.store.task_kind_counts()
+
+    def activity_snapshot(self, *, limit: int = 20) -> list[dict[str, Any]]:
+        """Return recent task metadata, excluding private payloads."""
+        return self.store.task_activity(limit=limit)

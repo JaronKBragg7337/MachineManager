@@ -492,6 +492,31 @@ class StateStore:
                 claimed.append(item)
         return claimed
 
+    def task_activity(self, *, limit: int = 20) -> list[dict[str, Any]]:
+        """Return recent task metadata without loading private task payloads."""
+        limit = max(1, min(int(limit), 100))
+        with self._lock:
+            rows = self._connection.execute(
+                """
+                SELECT task_id, kind, objective_id, status, attempts, updated
+                FROM tasks
+                ORDER BY updated DESC, task_id
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+        return [
+            {
+                "task_id": str(row["task_id"]),
+                "kind": str(row["kind"]),
+                "objective_id": str(row["objective_id"]),
+                "status": str(row["status"]),
+                "attempts": int(row["attempts"]),
+                "updated_at": float(row["updated"]),
+            }
+            for row in rows
+        ]
+
     def start_task(self, task_id: str, *, now: float | None = None) -> bool:
         """Move one queued task to RUNNING and increment its attempt count."""
         now = time.time() if now is None else float(now)

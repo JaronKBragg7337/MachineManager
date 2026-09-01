@@ -52,6 +52,7 @@ The repository-level Python runtime in [`manager/`](manager/) currently provides
 - Resilient public telemetry: transient dashboard-file locks retry locally, and a persistent telemetry failure defers that snapshot instead of terminating protected work.
 - Objective-change requests are queued as durable handoffs while the active job keeps its original objective and worker assignment until an explicit transition.
 - Durable agent work ledger: each bounded specialist review is recorded as a real queued, running, or completed task, with interrupted reviews returned to the queue after a manager restart.
+- Explicit durable dispatch is available for future research, build, verification, outreach, and handoff workers: registered handlers can complete, retry, fail, or escalate a task, while unregistered kinds are deferred instead of silently discarded. The protected KeyHunt assignment is not dispatched through this path.
 - Synthetic workers and reliability tests for healthy work, live-but-stalled work, crashes, malformed local-agent output, resource pressure, escalation, objective changes, manager restart recovery, event contracts, and public-telemetry boundaries. The recorded stalled-worker evaluation proves that a live process with stale evidence is detected and recovered; the malformed-response evaluation proves that bad model output is contained and logged while supervision continues; the repeated-failure evaluation proves that exhausted retries escalate instead of looping forever; the resource-pressure evaluation proves that capacity is part of health without forcing an unnecessary restart; the manager-restart evaluation proves that the watchdog can restore supervision while adopting the protected worker that survived; the objective-change evaluation proves that a new request is queued without mutating active work.
 - Bounded local specialist slots that can give safe, compact operational advice while the manager retains control of worker lifecycle and retry policy.
 - Public agent views show whether a specialist is currently working, its bounded run timing, completed task count, and next run without publishing prompts or unrestricted reasoning.
@@ -78,7 +79,7 @@ Local manager observation
 
 The local publisher writes a sanitized snapshot on each observation. When public upload is configured, ordinary telemetry is batched on a short cadence, while meaningful manager, worker, job, or work-lane state changes are published immediately after local validation. The page refreshes its published data once per minute and visibly marks stale snapshots, so it does not pretend to be a direct live connection to the laptop.
 
-The operations view separates queued work, agent reviews currently running, and completed task records, so a quiet worker interval is distinguishable from work that has never been scheduled.
+The operations view separates queued work, agent reviews currently running, completed task records, and a recent sanitized task ledger, so a quiet worker interval is distinguishable from work that has never been scheduled.
 
 The public projection contains only allowlisted operational summaries and aggregate progress. It does not mirror raw logs, command lines, private machine details, credentials, or protected workload material. Details of the publishing boundary are in [the dashboard guide](docs/GITHUB_PAGES.md).
 

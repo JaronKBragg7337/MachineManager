@@ -28,7 +28,7 @@ from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
 from manager.probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe
 from manager.state_store import StateStore
-from manager import MachineManager, WorkScheduler
+from manager import DispatchOutcome, MachineManager, WorkDispatcher, WorkScheduler
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -809,6 +809,71 @@ class TelemetryTests(unittest.TestCase):
                 scheduler.complete(task_id)
                 self.assertEqual(scheduler.snapshot(), {"COMPLETE": 1})
 
+    def test_scheduler_activity_excludes_private_task_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                scheduler.enqueue(
+                    kind="research",
+                    objective_id="research-objective",
+                    payload={"private_note": "not for publication"},
+                    task_id="task-research-1",
+                )
+                activity = scheduler.activity_snapshot(limit=5)
+                self.assertEqual(activity[0]["task_id"], "task-research-1")
+                self.assertEqual(activity[0]["status"], "QUEUED")
+                self.assertNotIn("payload", activity[0])
+                self.assertIsInstance(activity[0]["updated_at"], float)
+
+    def test_work_dispatcher_completes_defers_and_escalates(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                scheduler.enqueue(
+                    kind="research",
+                    objective_id="research-objective",
+                    task_id="task-research-1",
+                    scheduled_at=100,
+                )
+                scheduler.enqueue(
+                    kind="objective_change",
+                    objective_id="next-objective",
+                    task_id="task-handoff-1",
+                    scheduled_at=100,
+                )
+
+                def failing_handler(_item):
+                    raise RuntimeError("handler failed")
+
+                dispatcher = WorkDispatcher(
+                    scheduler,
+                    {"research": lambda _item: DispatchOutcome()},
+                    defer_delay_s=10,
+                    max_attempts=2,
+                )
+                first = dispatcher.dispatch(now=100)
+                self.assertEqual(
+                    [(result.task_id, result.status) for result in first],
+                    [("task-handoff-1", "DEFERRED"), ("task-research-1", "COMPLETE")],
+                )
+                self.assertEqual(scheduler.snapshot(), {"COMPLETE": 1, "QUEUED": 1})
+
+                scheduler.enqueue(
+                    kind="build",
+                    objective_id="build-objective",
+                    task_id="task-build-1",
+                    scheduled_at=200,
+                )
+                dispatcher.handlers["build"] = failing_handler
+                dispatcher.handlers["objective_change"] = lambda _item: DispatchOutcome()
+                retry = dispatcher.dispatch(now=200)
+                build_retry = next(result for result in retry if result.task_id == "task-build-1")
+                self.assertEqual(build_retry.status, "RETRY")
+                escalated = dispatcher.dispatch(now=211)
+                build_escalated = next(result for result in escalated if result.task_id == "task-build-1")
+                self.assertEqual(build_escalated.status, "ESCALATED")
+                self.assertEqual(scheduler.snapshot()["ESCALATED"], 1)
+
     def test_agent_response_falls_back_safely(self) -> None:
         self.assertTrue(parse_agent_response("").fallback)
         self.assertTrue(parse_agent_response("not json").fallback)
@@ -1182,6 +1247,25 @@ class TelemetryTests(unittest.TestCase):
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
                     "queue": {"QUEUED": 3, "COMPLETE": 2, "pid": 9999},
                     "queue_kinds": {"agent_review": 2, "objective_change": 1, "private_kind": 99},
+                    "queue_activity": [
+                        {
+                            "task_id": "task-research-1",
+                            "kind": "research",
+                            "objective_id": "obj-1",
+                            "status": "COMPLETE",
+                            "attempts": 1,
+                            "updated_at": 1724875200.0,
+                            "payload": {"private_key": "do not publish"},
+                        },
+                        {
+                            "task_id": "task-private",
+                            "kind": "private_kind",
+                            "objective_id": "private-objective",
+                            "status": "COMPLETE",
+                            "attempts": 1,
+                            "updated_at": 1724875200.0,
+                        },
+                    ],
                     "gpu": {"util_pct": 80, "power_w": 70, "resource_active": True, "private_key": "do not publish"},
                     "system": {"cpu_pct": 8.5, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
@@ -1210,6 +1294,10 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
             self.assertEqual(latest["queue"], {"QUEUED": 3, "COMPLETE": 2})
             self.assertEqual(latest["queue_kinds"], {"agent_review": 2, "objective_change": 1})
+            self.assertEqual(len(latest["queue_activity"]), 1)
+            self.assertEqual(latest["queue_activity"][0]["kind"], "research")
+            self.assertEqual(latest["queue_activity"][0]["status"], "COMPLETE")
+            self.assertNotIn("payload", json.dumps(latest["queue_activity"]))
             self.assertTrue(latest["autonomy"]["developer_tools"])
             self.assertEqual(latest["system"]["cpu_pct"], 8.5)
             self.assertTrue(latest["gpu"]["resource_active"])

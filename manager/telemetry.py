@@ -259,6 +259,44 @@ def _safe_queue_kinds(queue_kinds: Mapping[str, Any] | None) -> dict[str, int]:
     return safe
 
 
+def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[dict[str, Any]]:
+    """Publish recent task metadata without task payloads or local internals."""
+    safe: list[dict[str, Any]] = []
+    for item in activity or ():
+        if not isinstance(item, Mapping):
+            continue
+        kind = _text(item.get("kind"), max_len=40).lower()
+        status = _text(item.get("status"), max_len=20).upper()
+        task_id = _text(item.get("task_id"), max_len=80)
+        if kind not in PUBLIC_QUEUE_KIND_KEYS or status not in PUBLIC_QUEUE_KEYS or not task_id:
+            continue
+        attempts = _number(item.get("attempts"))
+        if attempts is None:
+            continue
+        updated_at = _number(item.get("updated_at"))
+        if updated_at is None:
+            continue
+        try:
+            updated = dt.datetime.fromtimestamp(updated_at, dt.timezone.utc).isoformat(
+                timespec="milliseconds"
+            ).replace("+00:00", "Z")
+        except (OverflowError, OSError, ValueError):
+            continue
+        safe.append(
+            {
+                "task_id": task_id,
+                "kind": kind,
+                "objective_id": _text(item.get("objective_id"), max_len=80),
+                "status": status,
+                "attempts": max(0, int(attempts)),
+                "updated": updated,
+            }
+        )
+        if len(safe) >= 20:
+            break
+    return safe
+
+
 def _safe_autonomy(value: Mapping[str, Any] | None) -> dict[str, str | bool]:
     if not isinstance(value, Mapping):
         return {}
@@ -548,6 +586,7 @@ class TelemetryPublisher:
             "autonomy": _safe_autonomy(snapshot.get("autonomy")),
             "queue": _safe_queue(snapshot.get("queue")),
             "queue_kinds": _safe_queue_kinds(snapshot.get("queue_kinds")),
+            "queue_activity": _safe_queue_activity(snapshot.get("queue_activity")),
             "gpu": gpu,
             "system": system,
             "progress": safe_workers[0].get("progress", {}) if safe_workers else {},
