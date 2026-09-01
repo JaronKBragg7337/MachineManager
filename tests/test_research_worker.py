@@ -101,7 +101,7 @@ class _TextResponse:
         return (
             b"<html><title>Public terms</title><body>"
             b"Eligibility is public. Password: demo-secret. "
-            b"See https://example.org/public for the public rules. "
+            b"See https://example.org/home/public for the public rules. "
             b"Do not publish C:\\Users\\lilli\\private.txt."
             b"</body></html>"
         )
@@ -245,7 +245,7 @@ class ResearchWorkerTests(unittest.TestCase):
         with patch("manager.research_worker.urllib.request.build_opener", return_value=_TextOpener()):
             source = fetcher.fetch({"url": "https://example.org/terms", "title": "Public terms"})
         self.assertIn("Eligibility is public.", source["excerpt"])
-        self.assertIn("https://example.org/public", source["excerpt"])
+        self.assertIn("https://example.org/home/public", source["excerpt"])
         self.assertIn("[redacted]", source["excerpt"])
         self.assertNotIn("demo-secret", source["excerpt"])
         self.assertNotIn("C:\\Users\\lilli", source["excerpt"])
