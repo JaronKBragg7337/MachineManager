@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T14:01:08.262Z",
+        "observed_at": "2026-09-01T14:02:02.869Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "hashrate_mkey_s": 756.03,
+        "hashrate_mkey_s": 757.63,
         "coverage_pct": 0,
         "matches_found": 0,
-        "batch_number": 8552,
-        "sample_count": 38,
-        "uptime_s": 631.4,
-        "keys_tested": 26232955600896,
-        "keys_per_second": 756030000
+        "batch_number": 8568,
+        "sample_count": 41,
+        "uptime_s": 686.0,
+        "keys_tested": 26284243550208,
+        "keys_per_second": 757630000
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T14:01:08.262Z",
+        "observed_at": "2026-09-01T14:02:02.869Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "hashrate_mkey_s": 756.03,
+        "hashrate_mkey_s": 757.63,
         "coverage_pct": 0,
         "matches_found": 0,
-        "batch_number": 8552,
-        "sample_count": 38,
-        "uptime_s": 631.4,
-        "keys_tested": 26232955600896,
-        "keys_per_second": 756030000
+        "batch_number": 8568,
+        "sample_count": 41,
+        "uptime_s": 686.0,
+        "keys_tested": 26284243550208,
+        "keys_per_second": 757630000
       }
     }
   ],
@@ -229,38 +229,15 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NEEDS_EVIDENCE_REVIEW",
-      "scanned_at": "2026-09-01T13:01:35.747Z",
-      "files_scanned": 2989,
-      "files_skipped": 11,
-      "candidate_count": 16,
+      "state": "NO_CANDIDATES",
+      "scanned_at": "2026-09-01T14:02:02.888Z",
+      "files_scanned": 2994,
+      "files_skipped": 6,
+      "candidate_count": 0,
       "truncated": false,
       "more_pending": true,
-      "categories": {
-        "approval_gate": 5,
-        "autonomy_limit": 7,
-        "scope_boundary": 4
-      },
-      "review_plan": [
-        {
-          "category": "approval_gate",
-          "candidate_count": 5,
-          "test_id": "approval-gate-check",
-          "recommended_test": "Test a harmless delegated action and record whether the platform already owns the approval step."
-        },
-        {
-          "category": "autonomy_limit",
-          "candidate_count": 7,
-          "test_id": "delegated-capability-check",
-          "recommended_test": "Run one bounded capability test and record what the configured worker actually permits."
-        },
-        {
-          "category": "scope_boundary",
-          "candidate_count": 4,
-          "test_id": "scope-boundary-check",
-          "recommended_test": "Verify the intended service, target, and technique boundary before the representative test."
-        }
-      ]
+      "categories": {},
+      "review_plan": []
     },
     {
       "id": "machine-manager-source",
@@ -330,16 +307,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "REVIEW",
+      "state": "WAITING",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 16,
-        "files_scanned": 2989,
+        "candidate_count": 0,
+        "files_scanned": 2994,
         "more_pending": true
       },
-      "updated": "2026-09-01T13:01:44.640Z"
+      "updated": "2026-09-01T14:02:03.725Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -423,7 +400,8 @@
       "status": "COMPLETE",
       "attempts": 1,
       "updated": "2026-09-01T14:01:09.155Z",
-      "outcome": "task_running"
+      "message": "System is healthy with no errors or resource constraints detected.",
+      "outcome": "recommendation"
     },
     {
       "task_id": "recurring-machine-manager-capability-research-000002",
@@ -739,7 +717,7 @@
       "interval_s": 21600.0,
       "sequence": 2,
       "next_run_at": "2026-09-01T19:48:51.437Z",
-      "next_in_s": 20862.273775577545,
+      "next_in_s": 20807.69416832924,
       "last_task_id": "recurring-machine-manager-capability-research-000002",
       "last_status": "COMPLETE"
     },
@@ -751,7 +729,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 66228.77809619904,
+      "next_in_s": 66174.19848895073,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -763,46 +741,46 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 23399.239612340927,
+      "next_in_s": 23344.66000509262,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
-    "util_pct": 96.0,
+    "util_pct": 80.0,
     "util_pct_recent_max": 96.0,
-    "util_pct_recent_avg": 81.0,
+    "util_pct_recent_avg": 82.2,
     "util_pct_sample_count": 5,
     "util_pct_zero_samples": 0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 64.0,
-    "power_w": 82.71,
+    "temp_c": 63.0,
+    "power_w": 65.97,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 17.3,
+    "cpu_pct": 10.4,
     "cpu_pct_recent_max": 17.3,
-    "cpu_pct_recent_avg": 8.0,
+    "cpu_pct_recent_avg": 9.0,
     "cpu_pct_sample_count": 5,
     "cpu_pct_zero_samples": 0.0
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T14:01:08.262Z",
+    "observed_at": "2026-09-01T14:02:02.869Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "hashrate_mkey_s": 756.03,
+    "hashrate_mkey_s": 757.63,
     "coverage_pct": 0,
     "matches_found": 0,
-    "batch_number": 8552,
-    "sample_count": 38,
-    "uptime_s": 631.4,
-    "keys_tested": 26232955600896,
-    "keys_per_second": 756030000
+    "batch_number": 8568,
+    "sample_count": 41,
+    "uptime_s": 686.0,
+    "keys_tested": 26284243550208,
+    "keys_per_second": 757630000
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T14:01:09.155Z"
+  "updated": "2026-09-01T14:02:03.716Z"
 }
