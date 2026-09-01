@@ -960,7 +960,7 @@
     function gpuActivityCard(gpu) {
       const util = numberValue(gpu.util_pct);
       if (gpuEvidenceActive(gpu) && util !== null && util < 15) {
-        return resourceCard("GPU activity", "ACTIVE", "", "Dedicated memory + power confirm work; raw driver sample " + Math.round(util) + "%", 100, "green");
+        return resourceCard("GPU activity", "ACTIVE", "", "Memory + power confirm work; diagnostic driver sample " + Math.round(util) + "%", 100, "green");
       }
       if (util === 0) {
         return resourceCard("GPU activity", "IDLE", "", "Raw driver sample 0%; no independent activity evidence", 0, "");
@@ -1147,7 +1147,7 @@
         const value = numberValue(metrics[definition[0]]);
         if (value === null || (definition[0] === "coverage_pct" && value <= 0)) return "";
         if (definition[0] === "util_pct" && gpuEvidenceActive(metrics) && value < 15) {
-          return '<span class="event-metric">GPU ACTIVE (raw ' + escapeHtml(compactNumber(value) + "%") + ')</span>';
+          return '<span class="event-metric">GPU ACTIVE (diagnostic raw sample ' + escapeHtml(compactNumber(value) + "%") + "; memory/power confirm work)</span>";
         }
         return '<span class="event-metric">' + escapeHtml(definition[2] + " " + compactNumber(value) + definition[1]) + '</span>';
       }).filter(Boolean);

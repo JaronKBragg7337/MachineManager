@@ -47,7 +47,7 @@ class DashboardContractTests(unittest.TestCase):
             self.assertIn(marker, self.dashboard)
 
     def test_low_gpu_event_samples_keep_the_raw_value_visible(self) -> None:
-        self.assertIn("GPU ACTIVE (raw ", self.dashboard)
+        self.assertIn("GPU ACTIVE (diagnostic raw sample ", self.dashboard)
 
     def test_low_cpu_samples_explain_active_gpu_work(self) -> None:
         self.assertIn("Raw CPU sample ", self.dashboard)

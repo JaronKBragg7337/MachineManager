@@ -58,7 +58,7 @@ vm.runInContext(
 
 const output = executionContext.output;
 assert.strictEqual(output.gpuText, "ACTIVE");
-assert.match(output.gpuCard, /Dedicated memory \+ power confirm work; raw driver sample 0%/);
+assert.match(output.gpuCard, /Memory \+ power confirm work; diagnostic driver sample 0%/);
 assert.strictEqual(output.cpuText, "LOW");
 assert.match(output.cpuCard, /Raw CPU sample 0\.2%/);
 assert.ok(!output.gpuCard.includes('<span class="muted">0%</span>'));
