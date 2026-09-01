@@ -565,18 +565,35 @@ class StateStore:
         return count
 
     def task_activity(self, *, limit: int = 20) -> list[dict[str, Any]]:
-        """Return recent task metadata without loading private task payloads."""
+        """Return recent task metadata without loading private task payloads.
+
+        The latest task for each kind is retained before the remaining rows are
+        filled by recency. This keeps a busy specialist from hiding every
+        other work lane in a compact public activity snapshot.
+        """
         limit = max(1, min(int(limit), 100))
         with self._lock:
             rows = self._connection.execute(
                 """
+                WITH ranked AS (
+                    SELECT task_id, kind, objective_id, status, attempts, updated,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY kind
+                               ORDER BY updated DESC, task_id
+                           ) AS kind_rank
+                    FROM tasks
+                )
                 SELECT task_id, kind, objective_id, status, attempts, updated
-                FROM tasks
-                ORDER BY updated DESC, task_id
+                FROM ranked
+                ORDER BY CASE WHEN kind_rank = 1 THEN 0 ELSE 1 END,
+                         updated DESC, task_id
                 LIMIT ?
                 """,
                 (limit,),
             ).fetchall()
+        # The query reserves one row per kind, then fills the remaining slots.
+        # Restore the normal newest-first presentation order for the dashboard.
+        rows = sorted(rows, key=lambda row: (-float(row["updated"]), str(row["task_id"])))
         return [
             {
                 "task_id": str(row["task_id"]),

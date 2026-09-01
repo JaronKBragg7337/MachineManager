@@ -26,7 +26,12 @@ from .revenue_worker import SuperteamOpportunityHandler
 from .scheduler import WorkScheduler
 from .state_store import StateStore
 from .supervisor import WorkerSpec
-from .telemetry import TelemetryPublisher, atomic_json_write, utc_now
+from .telemetry import (
+    PUBLIC_QUEUE_ACTIVITY_LIMIT,
+    TelemetryPublisher,
+    atomic_json_write,
+    utc_now,
+)
 from .verification_worker import RepositoryVerificationHandler
 from .workstreams import WorkstreamRegistry
 
@@ -878,7 +883,7 @@ def main() -> int:
                     )
             snapshot["queue"] = scheduler.snapshot()
             snapshot["queue_kinds"] = scheduler.kind_snapshot()
-            snapshot["queue_activity"] = scheduler.activity_snapshot(limit=20)
+            snapshot["queue_activity"] = scheduler.activity_snapshot(limit=PUBLIC_QUEUE_ACTIVITY_LIMIT)
             snapshot["recurring"] = recurring_seeder.snapshot() if recurring_seeder is not None else []
             _persist_runtime(manager, agents, store, seen_event_ids)
             public_events = merge_public_events(
@@ -967,7 +972,7 @@ def main() -> int:
                 stopped["constraint_audits"] = evidence.public_audits() if evidence else []
                 stopped["queue"] = scheduler.snapshot()
                 stopped["queue_kinds"] = scheduler.kind_snapshot()
-                stopped["queue_activity"] = scheduler.activity_snapshot(limit=20)
+                stopped["queue_activity"] = scheduler.activity_snapshot(limit=PUBLIC_QUEUE_ACTIVITY_LIMIT)
                 public_events = merge_public_events(
                     public_events,
                     store.recent_events(limit=public_event_limit),

@@ -158,6 +158,7 @@ PUBLIC_QUEUE_KIND_KEYS = {
     "procurement",
     "revenue",
 }
+PUBLIC_QUEUE_ACTIVITY_LIMIT = 32
 PUBLIC_RECURRING_STATES = {
     "DISABLED",
     "NOT_STARTED",
@@ -283,7 +284,7 @@ def _safe_queue_kinds(queue_kinds: Mapping[str, Any] | None) -> dict[str, int]:
 
 
 def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[dict[str, Any]]:
-    """Publish recent task metadata without task payloads or local internals."""
+    """Publish a kind-balanced task ledger without private task payloads."""
     safe: list[dict[str, Any]] = []
     for item in activity or ():
         if not isinstance(item, Mapping):
@@ -315,9 +316,24 @@ def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[d
                 "updated": updated,
             }
         )
-        if len(safe) >= 20:
+    if len(safe) <= PUBLIC_QUEUE_ACTIVITY_LIMIT:
+        return safe
+
+    # Preserve the first (normally newest) record for every visible kind, then
+    # fill the remaining slots in source order. This protects less frequent
+    # lanes even if a caller supplies an unbalanced activity list.
+    required_indices: set[int] = set()
+    seen_kinds: set[str] = set()
+    for index, item in enumerate(safe):
+        if item["kind"] not in seen_kinds:
+            seen_kinds.add(item["kind"])
+            required_indices.add(index)
+    selected_indices = set(required_indices)
+    for index in range(len(safe)):
+        if len(selected_indices) >= PUBLIC_QUEUE_ACTIVITY_LIMIT:
             break
-    return safe
+        selected_indices.add(index)
+    return [safe[index] for index in range(len(safe)) if index in selected_indices]
 
 
 def _safe_recurring(recurring: Iterable[Mapping[str, Any]] | None) -> list[dict[str, Any]]:

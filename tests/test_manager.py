@@ -841,6 +841,72 @@ class TelemetryTests(unittest.TestCase):
                 self.assertNotIn("payload", activity[0])
                 self.assertIsInstance(activity[0]["updated_at"], float)
 
+    def test_scheduler_activity_keeps_each_kind_visible_under_task_flood(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                scheduler.enqueue(
+                    kind="research",
+                    objective_id="research-objective",
+                    task_id="task-research-1",
+                )
+                scheduler.enqueue(
+                    kind="verification",
+                    objective_id="verification-objective",
+                    task_id="task-verification-1",
+                )
+                for index in range(24):
+                    scheduler.enqueue(
+                        kind="agent_review",
+                        objective_id="agent-objective",
+                        task_id=f"task-agent-{index}",
+                    )
+
+                activity = scheduler.activity_snapshot(limit=10)
+
+                self.assertEqual(len(activity), 10)
+                self.assertIn("research", {item["kind"] for item in activity})
+                self.assertIn("verification", {item["kind"] for item in activity})
+
+    def test_public_queue_activity_preserves_kind_diversity(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            activity = [
+                {
+                    "task_id": "task-research-1",
+                    "kind": "research",
+                    "objective_id": "research-objective",
+                    "status": "COMPLETE",
+                    "attempts": 1,
+                    "updated_at": 1724875200.0,
+                },
+                {
+                    "task_id": "task-verification-1",
+                    "kind": "verification",
+                    "objective_id": "verification-objective",
+                    "status": "COMPLETE",
+                    "attempts": 1,
+                    "updated_at": 1724875201.0,
+                },
+            ] + [
+                {
+                    "task_id": f"task-agent-{index}",
+                    "kind": "agent_review",
+                    "objective_id": "agent-objective",
+                    "status": "COMPLETE",
+                    "attempts": 1,
+                    "updated_at": 1724875202.0 + index,
+                }
+                for index in range(40)
+            ]
+
+            dashboard = Path(raw) / "dashboard"
+            TelemetryPublisher(dashboard).publish({"queue_activity": activity})
+            latest = json.loads((dashboard / "data" / "latest.json").read_text(encoding="utf-8"))
+
+            self.assertEqual(len(latest["queue_activity"]), 32)
+            self.assertIn("research", {item["kind"] for item in latest["queue_activity"]})
+            self.assertIn("verification", {item["kind"] for item in latest["queue_activity"]})
+
     def test_dispatcher_leaves_coordinator_owned_agent_reviews_untouched(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             with StateStore(Path(raw) / "state.sqlite3") as store:
