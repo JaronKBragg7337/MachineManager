@@ -146,6 +146,10 @@ shows the current or last task ID, and the AI run timeline includes the assigned
 focus on start events so a visible run can be traced to its recorded outcome
 without exposing the prompt or model reasoning.
 
+After a run completes, the card also labels the last result as a bounded response
+or a deterministic fallback. This makes model availability visible without
+publishing the model's unrestricted output.
+
 Agent review tasks are coordinator-owned. The generic queue dispatcher reserves
 that task kind so it cannot mistake an in-flight review for unhandled future
 work. If a manager restart leaves a review queued, the coordinator adopts that

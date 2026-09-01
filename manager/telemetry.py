@@ -225,6 +225,7 @@ PUBLIC_GPU_ACTIVITY_BASES = {
 }
 PUBLIC_HOST_LOAD_STATES = {"ACTIVE", "LOW", "IDLE", "UNKNOWN"}
 PUBLIC_HOST_LOAD_BASES = {"host_counter", "gpu_worker_offload", "not_confirmed", "unknown"}
+PUBLIC_AGENT_OUTCOMES = {"recommendation", "fallback"}
 
 
 def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | bool]:
@@ -437,6 +438,11 @@ def _safe_autonomy(value: Mapping[str, Any] | None) -> dict[str, str | bool]:
     return safe
 
 
+def _agent_outcome(value: Any) -> str:
+    outcome = _text(value, max_len=20).lower()
+    return outcome if outcome in PUBLIC_AGENT_OUTCOMES else ""
+
+
 class TelemetryPublisher:
     """Write only the dashboard's compact, public-safe JSON contract."""
 
@@ -500,6 +506,7 @@ class TelemetryPublisher:
                 "enabled": bool(agent.get("enabled", False)),
                 "last_action": _text(agent.get("last_action"), max_len=40),
                 "last_reason": _text(agent.get("last_reason"), max_len=160),
+                "last_outcome": _agent_outcome(agent.get("last_outcome")),
                 "last_duration_s": _number(agent.get("last_duration_s")),
                 "started_at": _text(agent.get("started_at"), max_len=40),
                 "elapsed_s": _number(agent.get("elapsed_s")),

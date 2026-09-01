@@ -273,6 +273,7 @@ class AgentCoordinator:
                 "enabled": spec.enabled,
                 "last_action": "",
                 "last_reason": "",
+                "last_outcome": "",
                 "last_duration_s": None,
                 "started_at": None,
                 "elapsed_s": None,
@@ -423,6 +424,7 @@ class AgentCoordinator:
         status["state"] = "READY" if error_name is None else "DEGRADED"
         status["last_action"] = decision.action
         status["last_reason"] = decision.reason
+        status["last_outcome"] = "fallback" if decision.fallback else "recommendation"
         status["last_duration_s"] = duration_s
         status["started_at"] = None
         status["elapsed_s"] = None
