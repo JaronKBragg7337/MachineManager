@@ -58,6 +58,36 @@ class ScenarioArtifactTests(unittest.TestCase):
         self.assertNotIn("pid", json.dumps(trace).lower())
         self.assertNotIn("pid", json.dumps(evaluation).lower())
 
+    def test_repeated_failure_artifacts_record_a_sanitized_escalation(self) -> None:
+        trace = json.loads(
+            (
+                REPO_ROOT
+                / "scenarios"
+                / "repeated-failure-escalation"
+                / "trace-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        evaluation = json.loads(
+            (
+                REPO_ROOT
+                / "evaluations"
+                / "repeated-failure-escalation-manager-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(trace["result"], "PASS")
+        self.assertEqual(trace["induced_failure"]["failure_observations"], 2)
+        self.assertTrue(trace["observations"]["retry_budget_exhausted"])
+        self.assertEqual(trace["recovery"]["final_state"], "ESCALATED")
+        self.assertTrue(trace["recovery"]["worker_stopped_after_escalation"])
+        self.assertEqual(evaluation["result"], "PASS")
+        self.assertEqual(evaluation["ceo_intervention_count"], 0)
+        self.assertEqual(
+            evaluation["manager_observation"]["escalation_outcome"],
+            "retry_limit_reached",
+        )
+        self.assertNotIn("pid", json.dumps(trace).lower())
+        self.assertNotIn("pid", json.dumps(evaluation).lower())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,33 @@
+{
+  "evaluation_id": "repeated-failure-escalation-manager-001",
+  "reference_id": "repeated-failure-escalation-001",
+  "version": "1.0",
+  "started_at": "2026-09-01T05:52:06.094Z",
+  "initial_state": {
+    "supervisor_state": "VERIFYING",
+    "max_restarts": 1
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Run a deterministic worker that exits twice",
+    "failure_observations": 2
+  },
+  "manager_observation": {
+    "first_failure_state": "FAILED",
+    "second_failure_state": "FAILED",
+    "restart_count": 1,
+    "escalation_action": "escalate",
+    "escalation_outcome": "retry_limit_reached"
+  },
+  "recovery": {
+    "restart_count": 1,
+    "confirmed_state": "ESCALATED",
+    "worker_stopped_after_escalation": true,
+    "recovery_time_s": 0.016,
+    "outside_intervention_count": 0
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The manager performed one bounded retry, then escalated on the repeated failure instead of restarting indefinitely."
+}

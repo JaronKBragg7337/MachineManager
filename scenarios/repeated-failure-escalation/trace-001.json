@@ -1,0 +1,35 @@
+{
+  "scenario_id": "repeated-failure-escalation-001",
+  "version": "1.0",
+  "description": "Repeated synthetic worker failure reaches a bounded escalation state",
+  "timestamp": "2026-09-01T05:52:06.094Z",
+  "result": "PASS",
+  "score": 1,
+  "action": "ESCALATE",
+  "initial_state": {
+    "supervisor_state": "VERIFYING",
+    "max_restarts": 1
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Allow the deterministic worker to exit twice",
+    "failure_observations": 2
+  },
+  "observations": {
+    "first_failure_state": "FAILED",
+    "first_retry_started": true,
+    "second_failure_state": "FAILED",
+    "retry_budget_exhausted": true,
+    "restart_count": 1
+  },
+  "recovery": {
+    "final_state": "ESCALATED",
+    "worker_stopped_after_escalation": true,
+    "escalation_action": "escalate",
+    "escalation_outcome": "retry_limit_reached",
+    "outside_intervention_count": 0
+  },
+  "verification": "The manager retries once, preserves the repeated-failure history, and escalates without an endless restart loop",
+  "resulting_state": "ESCALATED",
+  "intervention_count": 0
+}

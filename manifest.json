@@ -2,7 +2,7 @@
     "suite_version":  "0.1",
     "created":  "2026-08-18T19:27:55.2490419-04:00",
     "description":  "Reference Scenario Suite for Machine Manager evaluation. Grok reference performance is the initial benchmark.",
-    "notes":  "Stalled-worker and malformed/empty local-agent-response scenarios are now covered. Scenarios 5-8 remain pending. Do not change search targets or credentials during reliability tests.",
+    "notes":  "Stalled-worker, malformed/empty local-agent-response, and repeated-failure-escalation scenarios are now covered. Resource-pressure, objective-change, and restart-recovery scenarios remain pending. Do not change search targets or credentials during reliability tests.",
     "scenarios":  [
                       {
                           "path":  "scenarios/healthy-operation",
@@ -30,6 +30,13 @@
                           "pass":  true,
                           "version":  "1.0",
                           "id":  "malformed-agent-response-001",
+                          "score":  1
+                      },
+                      {
+                          "path":  "scenarios/repeated-failure-escalation",
+                          "pass":  true,
+                          "version":  "1.0",
+                          "id":  "repeated-failure-escalation-001",
                           "score":  1
                       }
                   ],
@@ -65,6 +72,14 @@
                            "ceo_intervention_count":  0,
                            "recovery_time_s":  0.0,
                            "path":  "evaluations/malformed-agent-response-manager-001.json"
+                       },
+                       {
+                           "id":  "repeated-failure-escalation-manager-001",
+                           "reference_id":  "repeated-failure-escalation-001",
+                           "result":  "PASS",
+                           "ceo_intervention_count":  0,
+                           "recovery_time_s":  0.016,
+                           "path":  "evaluations/repeated-failure-escalation-manager-001.json"
                        }
                    ]
 }
