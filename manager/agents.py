@@ -370,8 +370,7 @@ class AgentCoordinator:
                 "message": (
                     "start_agent_review · focus: "
                     + _safe_text(
-                        spec.focus,
-                        default="review the current machine evidence",
+                        spec.focus or "review the current machine evidence",
                         max_len=180,
                     )
                 ),
