@@ -27,7 +27,7 @@ from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, Outreac
 from manager.capabilities import CapabilityRegistry
 from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
-from manager.probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe
+from manager.probes import CpuUsageProbe, NvidiaSmiProbe, gpu_resource_ok, keyhunt_progress_probe
 from manager.state_store import StateStore
 from manager import DispatchOutcome, MachineManager, WorkDispatcher, WorkScheduler
 
@@ -82,7 +82,60 @@ class SupervisorTests(unittest.TestCase):
             self.assertEqual(probe(), {})
         probe._previous = (100, 1000)
         with patch.object(probe, "_read_times", return_value=(120, 1200)):
-            self.assertEqual(probe(), {"cpu_pct": 90.0})
+            sample = probe()
+        self.assertEqual(sample["cpu_pct"], 90.0)
+        self.assertEqual(sample["cpu_pct_recent_max"], 90.0)
+        self.assertEqual(sample["cpu_pct_recent_avg"], 90.0)
+        self.assertEqual(sample["cpu_pct_sample_count"], 1)
+        self.assertEqual(sample["cpu_pct_zero_samples"], 0)
+
+    def test_cpu_usage_probe_keeps_bounded_history(self) -> None:
+        probe = CpuUsageProbe(history_size=3)
+        probe._previous = (0, 1000)
+        with patch.object(
+            probe,
+            "_read_times",
+            side_effect=[(100, 1100), (100, 1200), (150, 1300), (150, 1400)],
+        ):
+            samples = [probe() for _ in range(4)]
+
+        self.assertEqual([sample["cpu_pct"] for sample in samples], [0.0, 100.0, 50.0, 100.0])
+        self.assertEqual(samples[-1]["cpu_pct_recent_max"], 100.0)
+        self.assertEqual(samples[-1]["cpu_pct_recent_avg"], 83.3)
+        self.assertEqual(samples[-1]["cpu_pct_sample_count"], 3)
+        self.assertEqual(samples[-1]["cpu_pct_zero_samples"], 0)
+
+    def test_nvidia_probe_keeps_history_and_does_not_turn_errors_into_zeros(self) -> None:
+        def sample(util: float) -> dict[str, float]:
+            return {
+                "util_pct": util,
+                "mem_used_mib": 2367,
+                "mem_total_mib": 8188,
+                "temp_c": 62,
+                "power_w": 80,
+            }
+
+        probe = NvidiaSmiProbe(history_size=3)
+        with patch(
+            "manager.probes.nvidia_smi_probe",
+            side_effect=[sample(80), sample(20), sample(0), sample(70)],
+        ):
+            results = [probe() for _ in range(4)]
+
+        self.assertEqual(results[-1]["util_pct"], 70)
+        self.assertEqual(results[-1]["util_pct_recent_max"], 70.0)
+        self.assertEqual(results[-1]["util_pct_recent_avg"], 30.0)
+        self.assertEqual(results[-1]["util_pct_sample_count"], 3)
+        self.assertEqual(results[-1]["util_pct_zero_samples"], 1)
+
+        error_probe = NvidiaSmiProbe()
+        with patch(
+            "manager.probes.nvidia_smi_probe",
+            side_effect=[{"probe_error": "TimeoutExpired"}, sample(70)],
+        ):
+            self.assertEqual(error_probe(), {"probe_error": "TimeoutExpired"})
+            recovered = error_probe()
+        self.assertEqual(recovered["util_pct_sample_count"], 1)
 
     def test_gpu_resource_probe_tolerates_transient_zero_utilization(self) -> None:
         self.assertTrue(
@@ -1565,8 +1618,24 @@ class TelemetryTests(unittest.TestCase):
                             "payload": {"private_key": "do not publish"},
                         }
                     ],
-                    "gpu": {"util_pct": 80, "power_w": 70, "resource_active": True, "private_key": "do not publish"},
-                    "system": {"cpu_pct": 8.5, "private_key": "do not publish"},
+                    "gpu": {
+                        "util_pct": 80,
+                        "util_pct_recent_max": 90,
+                        "util_pct_recent_avg": 72.5,
+                        "util_pct_sample_count": 5,
+                        "util_pct_zero_samples": 1,
+                        "power_w": 70,
+                        "resource_active": True,
+                        "private_key": "do not publish",
+                    },
+                    "system": {
+                        "cpu_pct": 8.5,
+                        "cpu_pct_recent_max": 12.0,
+                        "cpu_pct_recent_avg": 7.1,
+                        "cpu_pct_sample_count": 5,
+                        "cpu_pct_zero_samples": 1,
+                        "private_key": "do not publish",
+                    },
                     "updated": "2026-08-28T20:00:00Z",
                 },
                 events=[
@@ -1606,7 +1675,11 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("payload", json.dumps(latest["recurring"]))
             self.assertTrue(latest["autonomy"]["developer_tools"])
             self.assertEqual(latest["system"]["cpu_pct"], 8.5)
+            self.assertEqual(latest["system"]["cpu_pct_recent_max"], 12.0)
+            self.assertEqual(latest["system"]["cpu_pct_sample_count"], 5)
             self.assertTrue(latest["gpu"]["resource_active"])
+            self.assertEqual(latest["gpu"]["util_pct_recent_max"], 90)
+            self.assertEqual(latest["gpu"]["util_pct_zero_samples"], 1)
             self.assertNotIn("private_note", json.dumps(latest))
             self.assertNotIn("private_path", json.dumps(latest))
             self.assertNotIn("findings", json.dumps(latest))

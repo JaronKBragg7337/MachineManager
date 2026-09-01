@@ -18,7 +18,7 @@ from .dispatcher import BackgroundWorkDispatcher, WorkDispatcher
 from .evidence import EvidenceCoordinator
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
-from .probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe, nvidia_smi_probe
+from .probes import CpuUsageProbe, NvidiaSmiProbe, gpu_resource_ok, keyhunt_progress_probe
 from .public_upload import GitHubPagesPublisher, PublicUploadError
 from .recurring import RecurringTaskSeeder
 from .research_worker import OllamaResearchHandler, PublicResearchHandler
@@ -212,7 +212,7 @@ def _worker_spec(worker: Mapping[str, Any], *, config_path: Path) -> WorkerSpec:
     resource_probe = None
     resource_ok = None
     if worker.get("resource") == "nvidia-gpu":
-        resource_probe = nvidia_smi_probe
+        resource_probe = NvidiaSmiProbe()
         resource_ok = gpu_resource_ok
 
     stdout_file = resolve_path(worker.get("stdout_file"), base=base)

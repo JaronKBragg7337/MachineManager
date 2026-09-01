@@ -2,12 +2,20 @@
   "gpu": {
     "resource_active": true,
     "util_pct": 0,
+    "util_pct_recent_max": 86,
+    "util_pct_recent_avg": 48.4,
+    "util_pct_sample_count": 5,
+    "util_pct_zero_samples": 1,
     "mem_used_mib": 2367,
     "mem_total_mib": 8188,
     "power_w": 80,
     "temp_c": 62
   },
   "system": {
-    "cpu_pct": 0.2
+    "cpu_pct": 0.2,
+    "cpu_pct_recent_max": 1.2,
+    "cpu_pct_recent_avg": 0.4,
+    "cpu_pct_sample_count": 5,
+    "cpu_pct_zero_samples": 2
   }
 }

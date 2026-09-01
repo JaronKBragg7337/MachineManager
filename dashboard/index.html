@@ -953,10 +953,28 @@
       const util = numberValue(gpu.util_pct);
       if (util === null) return "Not reported";
       if (gpuEvidenceActive(gpu) && util < 15) {
-        return "Diagnostic " + Math.round(util) + "%; memory/power active";
+        return "Diagnostic " + Math.round(util) + "%; memory/power active" + gpuRecentHistoryText(gpu);
       }
       if (util === 0) return "0%; no independent activity evidence";
       return String(Math.round(util)) + "%";
+    }
+
+    function gpuRecentHistoryText(gpu) {
+      const recentMax = numberValue(gpu.util_pct_recent_max);
+      const sampleCount = numberValue(gpu.util_pct_sample_count);
+      if (recentMax !== null && sampleCount !== null && sampleCount > 1 && recentMax >= 15) {
+        return "; recent peak " + Math.round(recentMax) + "% over " + Math.round(sampleCount) + " samples";
+      }
+      return "";
+    }
+
+    function cpuRecentHistoryText(system) {
+      const recentMax = numberValue((system || {}).cpu_pct_recent_max);
+      const sampleCount = numberValue((system || {}).cpu_pct_sample_count);
+      if (recentMax !== null && sampleCount !== null && sampleCount > 1 && recentMax >= 1) {
+        return "; recent host peak " + recentMax.toFixed(1) + "% over " + Math.round(sampleCount) + " samples";
+      }
+      return "";
     }
 
     function gpuEvidenceActive(gpu) {
@@ -970,7 +988,7 @@
     function gpuActivityCard(gpu) {
       const util = numberValue(gpu.util_pct);
       if (gpuEvidenceActive(gpu) && util !== null && util < 15) {
-        return resourceCard("GPU activity", "ACTIVE", "", "Memory + power confirm work; diagnostic driver sample " + Math.round(util) + "%", 100, "green");
+        return resourceCard("GPU activity", "ACTIVE", "", "Memory + power confirm work; diagnostic driver sample " + Math.round(util) + "%" + gpuRecentHistoryText(gpu), 100, "green");
       }
       if (util === 0) {
         return resourceCard("GPU activity", "IDLE", "", "Raw driver sample 0%; no independent activity evidence", 0, "");
@@ -991,7 +1009,7 @@
       const cpu = numberValue((system || {}).cpu_pct);
       if (cpu === null) return resourceCard("CPU utilization", "--", "", "No verified live reading", null, "");
       if (gpuEvidenceActive(gpu) && cpu < 0.5) {
-        return resourceCard("CPU utilization", "LOW", "", "Diagnostic CPU sample " + cpu.toFixed(1) + "%; GPU worker is active", 0, "");
+        return resourceCard("CPU utilization", "LOW", "", "Diagnostic CPU sample " + cpu.toFixed(1) + "%" + cpuRecentHistoryText(system) + "; GPU worker is active", 0, "");
       }
       if (cpu === 0) {
         return resourceCard("CPU utilization", "IDLE", "", "Raw CPU sample 0%; no active GPU evidence", 0, "");

@@ -38,6 +38,10 @@ when both are available, and tolerates a short zero-utilization sample when
 dedicated GPU memory and active power still identify a working CUDA process.
 An idle device with no worker memory remains unhealthy even if a driver power
 sample is noisy.
+The in-memory resource probe also retains a bounded five-observation summary:
+the current driver sample remains visible, while recent maximum, average,
+sample count, and zero-sample count make transient readings auditable without
+turning a probe error into a fabricated zero.
 
 ## Synthetic worker
 

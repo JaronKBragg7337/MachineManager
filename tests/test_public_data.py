@@ -59,20 +59,40 @@ class PublicDataContractTests(unittest.TestCase):
         self.assertIsInstance(latest.get("system"), dict)
 
         gpu = latest["gpu"]
-        for key in ("util_pct", "mem_used_mib", "mem_total_mib", "temp_c", "power_w"):
+        for key in (
+            "util_pct",
+            "util_pct_recent_max",
+            "util_pct_recent_avg",
+            "util_pct_sample_count",
+            "util_pct_zero_samples",
+            "mem_used_mib",
+            "mem_total_mib",
+            "temp_c",
+            "power_w",
+        ):
             if key in gpu:
                 self.assertIsInstance(gpu[key], (int, float))
                 self.assertGreaterEqual(gpu[key], 0, key)
-        if "util_pct" in gpu:
-            self.assertLessEqual(gpu["util_pct"], 100, "gpu.util_pct")
+        for key in ("util_pct", "util_pct_recent_max", "util_pct_recent_avg"):
+            if key in gpu:
+                self.assertLessEqual(gpu[key], 100, f"gpu.{key}")
         if "resource_active" in gpu:
             self.assertIsInstance(gpu["resource_active"], bool)
 
         system = latest["system"]
-        if "cpu_pct" in system:
-            self.assertIsInstance(system["cpu_pct"], (int, float))
-            self.assertGreaterEqual(system["cpu_pct"], 0, "system.cpu_pct")
-            self.assertLessEqual(system["cpu_pct"], 100, "system.cpu_pct")
+        for key in (
+            "cpu_pct",
+            "cpu_pct_recent_max",
+            "cpu_pct_recent_avg",
+            "cpu_pct_sample_count",
+            "cpu_pct_zero_samples",
+        ):
+            if key in system:
+                self.assertIsInstance(system[key], (int, float))
+                self.assertGreaterEqual(system[key], 0, f"system.{key}")
+        for key in ("cpu_pct", "cpu_pct_recent_max", "cpu_pct_recent_avg"):
+            if key in system:
+                self.assertLessEqual(system[key], 100, f"system.{key}")
 
         self.assertIsInstance(events, list)
         self.assertIsInstance(scenarios_document, dict)

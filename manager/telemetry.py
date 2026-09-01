@@ -95,7 +95,15 @@ PUBLIC_METRIC_KEYS = {
     "restart_count",
     "max_restarts",
     "util_pct",
+    "util_pct_recent_max",
+    "util_pct_recent_avg",
+    "util_pct_sample_count",
+    "util_pct_zero_samples",
     "cpu_pct",
+    "cpu_pct_recent_max",
+    "cpu_pct_recent_avg",
+    "cpu_pct_sample_count",
+    "cpu_pct_zero_samples",
     "mem_used_mib",
     "mem_total_mib",
     "temp_c",
@@ -670,6 +678,10 @@ class TelemetryPublisher:
         gpu: dict[str, int | float | bool] = {}
         for source, target in (
             ("util_pct", "util_pct"),
+            ("util_pct_recent_max", "util_pct_recent_max"),
+            ("util_pct_recent_avg", "util_pct_recent_avg"),
+            ("util_pct_sample_count", "util_pct_sample_count"),
+            ("util_pct_zero_samples", "util_pct_zero_samples"),
             ("mem_used_mib", "mem_used_mib"),
             ("mem_total_mib", "mem_total_mib"),
             ("temp_c", "temp_c"),
@@ -683,9 +695,16 @@ class TelemetryPublisher:
 
         system_input = snapshot.get("system") if isinstance(snapshot.get("system"), Mapping) else {}
         system: dict[str, int | float] = {}
-        cpu_pct = _number(system_input.get("cpu_pct"))
-        if cpu_pct is not None:
-            system["cpu_pct"] = max(0.0, min(100.0, cpu_pct))
+        for source, target in (
+            ("cpu_pct", "cpu_pct"),
+            ("cpu_pct_recent_max", "cpu_pct_recent_max"),
+            ("cpu_pct_recent_avg", "cpu_pct_recent_avg"),
+            ("cpu_pct_sample_count", "cpu_pct_sample_count"),
+            ("cpu_pct_zero_samples", "cpu_pct_zero_samples"),
+        ):
+            number = _number(system_input.get(source))
+            if number is not None:
+                system[target] = max(0.0, min(100.0, number))
 
         safe_workers = self._workers(snapshot.get("workers", []))
         safe_jobs = self._jobs(snapshot.get("jobs", []))

@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import ctypes
+from collections import deque
+import math
 import os
 import re
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 
 def nvidia_smi_probe() -> dict[str, Any]:
@@ -41,11 +43,58 @@ def nvidia_smi_probe() -> dict[str, Any]:
         return {"probe_error": type(exc).__name__}
 
 
+def _history_size(value: int) -> int:
+    try:
+        return max(1, int(value))
+    except (TypeError, ValueError):
+        return 5
+
+
+def _history_metrics(values: Iterable[float], *, prefix: str) -> dict[str, int | float]:
+    samples = list(values)
+    if not samples:
+        return {}
+    return {
+        f"{prefix}_recent_max": round(max(samples), 1),
+        f"{prefix}_recent_avg": round(sum(samples) / len(samples), 1),
+        f"{prefix}_sample_count": len(samples),
+        f"{prefix}_zero_samples": sum(value == 0 for value in samples),
+    }
+
+
+class NvidiaSmiProbe:
+    """Add a small bounded utilization history to each GPU observation.
+
+    ``util_pct`` remains the current raw driver sample. The additional fields
+    make a transient zero visible as a measurement characteristic instead of
+    forcing the dashboard or health decision to infer history from timestamps.
+    Probe failures are returned unchanged and never become synthetic zeros.
+    """
+
+    def __init__(self, *, history_size: int = 5) -> None:
+        self._util_history: deque[float] = deque(maxlen=_history_size(history_size))
+
+    def __call__(self) -> dict[str, Any]:
+        metrics = nvidia_smi_probe()
+        try:
+            util = float(metrics["util_pct"])
+        except (KeyError, TypeError, ValueError):
+            return metrics
+        if not math.isfinite(util):
+            return metrics
+
+        self._util_history.append(max(0.0, min(100.0, util)))
+        result = dict(metrics)
+        result.update(_history_metrics(self._util_history, prefix="util_pct"))
+        return result
+
+
 class CpuUsageProbe:
     """Measure host CPU use from cumulative operating-system counters."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, history_size: int = 5) -> None:
         self._previous = self._read_times()
+        self._usage_history: deque[float] = deque(maxlen=_history_size(history_size))
 
     def __call__(self) -> dict[str, float]:
         current = self._read_times()
@@ -60,7 +109,11 @@ class CpuUsageProbe:
         if delta_total <= 0 or delta_idle < 0:
             return {}
         used_pct = (1.0 - min(1.0, delta_idle / delta_total)) * 100.0
-        return {"cpu_pct": round(max(0.0, min(100.0, used_pct)), 1)}
+        sample = round(max(0.0, min(100.0, used_pct)), 1)
+        self._usage_history.append(sample)
+        result: dict[str, int | float] = {"cpu_pct": sample}
+        result.update(_history_metrics(self._usage_history, prefix="cpu_pct"))
+        return result
 
     @staticmethod
     def _read_times() -> tuple[int, int] | None:
