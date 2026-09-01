@@ -88,6 +88,37 @@ class ScenarioArtifactTests(unittest.TestCase):
         self.assertNotIn("pid", json.dumps(trace).lower())
         self.assertNotIn("pid", json.dumps(evaluation).lower())
 
+    def test_resource_pressure_artifacts_record_a_sanitized_pass(self) -> None:
+        trace = json.loads(
+            (
+                REPO_ROOT
+                / "scenarios"
+                / "resource-pressure"
+                / "trace-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        evaluation = json.loads(
+            (
+                REPO_ROOT
+                / "evaluations"
+                / "resource-pressure-manager-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(trace["result"], "PASS")
+        self.assertTrue(trace["observations"]["worker_alive_during_pressure"])
+        self.assertTrue(trace["observations"]["heartbeat_fresh_during_pressure"])
+        self.assertEqual(trace["observations"]["supervisor_state_during_pressure"], "STALLED")
+        self.assertEqual(trace["recovery"]["final_state"], "RUNNING")
+        self.assertEqual(trace["recovery"]["restart_count"], 0)
+        self.assertEqual(evaluation["result"], "PASS")
+        self.assertEqual(evaluation["ceo_intervention_count"], 0)
+        self.assertEqual(
+            evaluation["manager_observation"]["supervisor_state_during_pressure"],
+            "STALLED",
+        )
+        self.assertNotIn("pid", json.dumps(trace).lower())
+        self.assertNotIn("pid", json.dumps(evaluation).lower())
+
 
 if __name__ == "__main__":
     unittest.main()

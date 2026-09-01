@@ -1,0 +1,34 @@
+{
+  "evaluation_id": "resource-pressure-manager-001",
+  "reference_id": "resource-pressure-001",
+  "version": "1.0",
+  "started_at": "2026-09-01T05:58:19.675Z",
+  "initial_state": {
+    "supervisor_state": "RUNNING",
+    "worker_process_alive": true,
+    "heartbeat_fresh": true,
+    "resource_active": true
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Switch the synthetic resource probe to temporary pressure",
+    "resource_active_after": false
+  },
+  "manager_observation": {
+    "worker_alive_during_pressure": true,
+    "heartbeat_fresh_during_pressure": true,
+    "supervisor_state_during_pressure": "STALLED",
+    "resource_signal_required": true
+  },
+  "recovery": {
+    "capacity_restored": true,
+    "restart_count": 0,
+    "confirmed_state": "RUNNING",
+    "recovery_time_s": 0.0,
+    "outside_intervention_count": 0
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The manager detected resource pressure without mistaking a live process and fresh heartbeat for useful work, then resumed when capacity returned without restarting the worker."
+}

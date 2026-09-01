@@ -1,0 +1,36 @@
+{
+  "scenario_id": "resource-pressure-001",
+  "version": "1.0",
+  "description": "Resource pressure is detected even while the worker process and heartbeat remain healthy",
+  "timestamp": "2026-09-01T05:58:19.675Z",
+  "result": "PASS",
+  "score": 1,
+  "action": "CONTINUE",
+  "initial_state": {
+    "supervisor_state": "RUNNING",
+    "worker_process_alive": true,
+    "heartbeat_fresh": true,
+    "resource_active": true
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Report temporary resource pressure while the synthetic worker continues",
+    "resource_active": false
+  },
+  "observations": {
+    "worker_alive_during_pressure": true,
+    "heartbeat_fresh_during_pressure": true,
+    "resource_active_during_pressure": false,
+    "supervisor_state_during_pressure": "STALLED",
+    "pressure_detection_s": 0.0
+  },
+  "recovery": {
+    "capacity_restored": true,
+    "final_state": "RUNNING",
+    "restart_count": 0,
+    "outside_intervention_count": 0
+  },
+  "verification": "The supervisor requires an active resource signal for health and resumes without restart when temporary pressure clears",
+  "resulting_state": "RUNNING",
+  "intervention_count": 0
+}
