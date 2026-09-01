@@ -167,6 +167,7 @@
     {
       "id": "local-manager-brain",
       "role": "health-review-specialist",
+      "focus": "Review worker health, resource evidence, and bounded recovery signals.",
       "provider": "ollama",
       "model": "qwen3.5:4b",
       "base_url": "http://127.0.0.1:11434",

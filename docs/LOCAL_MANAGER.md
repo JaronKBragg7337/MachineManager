@@ -135,6 +135,12 @@ latency); it does not publish private prompts or hidden reasoning. Agent output
 is advisory; the supervisor still owns process control, retry limits,
 escalation, and secrets.
 
+Each agent may also declare a short `focus` in local configuration. The focus is
+included in that agent's sanitized prompt and public registry entry so multiple
+specialists can review the same machine without pretending they have the same
+assignment. It is descriptive context, not extra authority; every agent still
+returns only the bounded action set above.
+
 Agent review tasks are coordinator-owned. The generic queue dispatcher reserves
 that task kind so it cannot mistake an in-flight review for unhandled future
 work. If a manager restart leaves a review queued, the coordinator adopts that

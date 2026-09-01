@@ -58,6 +58,7 @@ class AgentDecision:
 class AgentSpec:
     agent_id: str
     role: str
+    focus: str = ""
     provider: str = "disabled"
     model: str = ""
     base_url: str = "http://127.0.0.1:11434"
@@ -78,6 +79,7 @@ class AgentSpec:
         return cls(
             agent_id=agent_id,
             role=_safe_text(value.get("role"), default="specialist", max_len=80),
+            focus=_safe_text(value.get("focus"), max_len=180),
             provider=_safe_text(value.get("provider"), default="disabled", max_len=40).lower(),
             model=_safe_text(value.get("model"), max_len=80),
             base_url=_safe_loopback_url(value.get("base_url")),
@@ -185,7 +187,9 @@ class LocalOllamaAgent:
             ],
         }
         return (
-            "You are a bounded Machine Manager specialist. Review the sanitized "
+            "You are a bounded Machine Manager specialist. Your assigned role is "
+            f"{_safe_text(self.spec.role, default='specialist', max_len=80)} and your assigned focus is "
+            f"{_safe_text(self.spec.focus, default='review the current machine evidence', max_len=180)}. Review the sanitized "
             "machine snapshot below. Respond with JSON only, exactly in the form "
             '{"action":"continue|restart|escalate|queue_follow_up|pause","reason":"short reason"}. '
             "Use the evidence review plans to choose a bounded follow-up when useful, but do not "
@@ -262,6 +266,7 @@ class AgentCoordinator:
             spec.agent_id: {
                 "id": spec.agent_id,
                 "role": spec.role,
+                "focus": spec.focus,
                 "provider": spec.provider,
                 "model": spec.model,
                 "state": "DISABLED" if not spec.enabled else "READY",

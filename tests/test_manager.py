@@ -1180,6 +1180,7 @@ class TelemetryTests(unittest.TestCase):
             {
                 "id": "test-agent",
                 "role": "test",
+                "focus": "Review evidence only.",
                 "provider": "ollama",
                 "model": "test-model",
                 "base_url": "http://127.0.0.1:11434",
@@ -1220,6 +1221,7 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(body["options"]["num_predict"], 80)
         self.assertIn("approval-gate-check", body["prompt"])
         self.assertIn("Run a harmless delegated action.", body["prompt"])
+        self.assertIn("Review evidence only.", body["prompt"])
         self.assertNotIn(r"C:\private\do-not-send", body["prompt"])
 
     def test_ollama_agent_preserves_allowed_loopback_url(self) -> None:
@@ -1650,7 +1652,7 @@ class TelemetryTests(unittest.TestCase):
                     "objective": "synthetic reliability test",
                     "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234, "progress": {"kind": "reported_progress", "sample_count": 4, "keys_tested": 99, "private_key": "do not publish"}}],
                     "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "command": "do not publish"}],
-                    "agents": [{"id": "agent-1", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_duration_s": 0.4}],
+                    "agents": [{"id": "agent-1", "role": "evidence-review-specialist", "focus": "Review evidence only.", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_duration_s": 0.4}],
                     "worker_profiles": [{"id": "profile-1", "provider": "test", "model": "safe", "model_version": "v1", "state": "READY", "retest_required": False, "private_path": "C:\\Users\\lilli\\private", "capabilities": [{"id": "safe-capability", "status": "TESTED_PASS", "summary": "token=not-for-publication", "private_note": "do not publish"}]}],
                     "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "more_pending": True, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
@@ -1739,6 +1741,7 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["workers"][0]["progress"]["keys_tested"], 99)
             self.assertNotIn("private_key", json.dumps(latest))
             self.assertEqual(latest["agents"][0]["last_reason"], "healthy")
+            self.assertEqual(latest["agents"][0]["focus"], "Review evidence only.")
             self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
             self.assertEqual(latest["queue"], {"QUEUED": 3, "COMPLETE": 2})
             self.assertEqual(latest["queue_kinds"], {"agent_review": 2, "objective_change": 1})

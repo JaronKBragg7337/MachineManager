@@ -490,6 +490,7 @@ class TelemetryPublisher:
             {
                 "id": _text(agent.get("id", "")),
                 "role": _text(agent.get("role"), default="specialist", max_len=80),
+                "focus": _text(agent.get("focus"), max_len=180),
                 "provider": _text(agent.get("provider"), default="unknown", max_len=40),
                 "model": _text(agent.get("model"), max_len=80),
                 "state": _text(agent.get("state"), default="UNKNOWN", max_len=30).upper(),

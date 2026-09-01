@@ -23,6 +23,7 @@ class DashboardContractTests(unittest.TestCase):
             "const agentRows = agents.length ? agents.map",
             "AI reviewer is working",
             "Processing the current sanitized snapshot",
+            "Assigned focus:",
             "function renderRecurringSchedules(items)",
             "function gpuEvidenceActive(gpu)",
             "function gpuActivityBasisText(gpu)",
