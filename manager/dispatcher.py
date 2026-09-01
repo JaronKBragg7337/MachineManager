@@ -84,6 +84,8 @@ class WorkDispatcher:
                 "job_id": "task-queue",
                 "worker_id": "",
                 "actor": self.actor,
+                "kind": item.kind,
+                "task_id": item.task_id,
                 "event_type": event_type,
                 "previous_state": "QUEUED" if event_type == "queue_task_claimed" else "RUNNING",
                 "new_state": new_state,

@@ -1297,6 +1297,9 @@ class TelemetryTests(unittest.TestCase):
                         "timestamp": "2026-08-28T20:00:00Z",
                         "event_id": "evt-1",
                         "event_type": "state_change",
+                        "kind": "research",
+                        "objective_id": "research-objective",
+                        "task_id": "task-research-1",
                         "new_state": "RUNNING",
                         "action": "start",
                         "error": "C:\\Users\\lilli\\secret-token.txt",
@@ -1334,6 +1337,9 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("pid", json.dumps(events))
             self.assertEqual(events[0]["metrics"]["keys_tested"], 99)
             self.assertFalse(events[0]["error"] is False)
+            self.assertEqual(events[0]["kind"], "research")
+            self.assertEqual(events[0]["objective_id"], "research-objective")
+            self.assertEqual(events[0]["task_id"], "task-research-1")
             self.assertEqual(latest["workers"][0]["state"], "RUNNING")
 
     def test_publisher_retries_a_transient_dashboard_file_lock(self) -> None:

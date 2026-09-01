@@ -187,6 +187,8 @@ class RecurringTaskSeeder:
                     "job_id": "task-queue",
                     "worker_id": "",
                     "actor": self.actor,
+                    "kind": spec.kind,
+                    "task_id": task_id,
                     "event_type": "recurring_task_scheduled",
                     "previous_state": "IDLE",
                     "new_state": "QUEUED",

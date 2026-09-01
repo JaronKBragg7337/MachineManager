@@ -1522,7 +1522,15 @@
       const researchEvents = recentEvents(200).filter(function (event) {
         const type = String(event.type || "").toLowerCase();
         const actor = String(event.actor || "").toLowerCase();
-        return type.indexOf("queue_task_") === 0 && actor.indexOf("research") !== -1;
+        const kind = String(event.kind || "").toLowerCase();
+        const objectiveId = String(event.objective_id || "").toLowerCase();
+        const taskId = String(event.task_id || "").toLowerCase();
+        return type.indexOf("queue_task_") === 0 && (
+          kind === "research" ||
+          objectiveId.indexOf("research") !== -1 ||
+          taskId.indexOf("research") !== -1 ||
+          actor.indexOf("research") !== -1
+        );
       });
       const currentTask = researchTasks[0] || {};
       const registryState = researchTasks.length ? upper(currentTask.status || "UNKNOWN").replace(/_/g, " ") : "READY FOR OBJECTIVE";
