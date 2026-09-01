@@ -88,6 +88,29 @@ class _LargeOpener:
         return _LargeResponse()
 
 
+class _TextResponse:
+    headers = {"Content-Type": "text/html; charset=utf-8"}
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def read(self, _limit):
+        return (
+            b"<html><title>Public terms</title><body>"
+            b"Eligibility is public. Password: demo-secret. "
+            b"Do not publish C:\\Users\\lilli\\private.txt."
+            b"</body></html>"
+        )
+
+
+class _TextOpener:
+    def open(self, _request, timeout):
+        return _TextResponse()
+
+
 class ResearchWorkerTests(unittest.TestCase):
     def test_public_research_handler_writes_evidence_artifact(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -215,6 +238,16 @@ class ResearchWorkerTests(unittest.TestCase):
         self.assertTrue(source["truncated"])
         self.assertEqual(source["status"], "FETCHED")
         self.assertLessEqual(len(source["excerpt"]), 4000)
+
+    def test_source_scrubs_sensitive_spans_without_erasing_public_context(self) -> None:
+        fetcher = BoundedSourceFetcher()
+        with patch("manager.research_worker.urllib.request.build_opener", return_value=_TextOpener()):
+            source = fetcher.fetch({"url": "https://example.org/terms", "title": "Public terms"})
+        self.assertIn("Eligibility is public.", source["excerpt"])
+        self.assertIn("[redacted]", source["excerpt"])
+        self.assertNotIn("demo-secret", source["excerpt"])
+        self.assertNotIn("C:\\Users\\lilli", source["excerpt"])
+        self.assertNotEqual(source["excerpt"], "[redacted]")
 
 
 if __name__ == "__main__":
