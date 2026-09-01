@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-01T05:45:57.889Z",
+  "updated": "2026-09-01T05:48:20.883Z",
   "scenarios": [
     {
       "id": "healthy-operation-001",
@@ -35,6 +35,13 @@
       "result": "PASS",
       "score": 1,
       "recovery_s": 0.109
+    },
+    {
+      "id": "malformed-agent-response-manager-001",
+      "actor": "local-manager-synthetic",
+      "result": "PASS",
+      "score": 1,
+      "recovery_s": 0.0
     }
   ]
 }

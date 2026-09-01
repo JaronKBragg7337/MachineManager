@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T05:45:57.042Z",
+        "observed_at": "2026-09-01T05:48:19.999Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "keys_per_second": 755700000,
-        "keys_tested": 4034333245440,
+        "sample_count": 1,
+        "uptime_s": 0.9,
         "coverage_pct": 0,
-        "uptime_s": 313.5,
-        "matches_found": 0,
-        "batch_number": 1308,
-        "sample_count": 20,
-        "hashrate_mkey_s": 755.7
+        "keys_per_second": 745610000,
+        "batch_number": 1342,
+        "hashrate_mkey_s": 745.61,
+        "keys_tested": 4138368761856,
+        "matches_found": 0
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T05:45:57.042Z",
+        "observed_at": "2026-09-01T05:48:19.999Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "keys_per_second": 755700000,
-        "keys_tested": 4034333245440,
+        "sample_count": 1,
+        "uptime_s": 0.9,
         "coverage_pct": 0,
-        "uptime_s": 313.5,
-        "matches_found": 0,
-        "batch_number": 1308,
-        "sample_count": 20,
-        "hashrate_mkey_s": 755.7
+        "keys_per_second": 745610000,
+        "batch_number": 1342,
+        "hashrate_mkey_s": 745.61,
+        "keys_tested": 4138368761856,
+        "matches_found": 0
       }
     }
   ],
@@ -58,14 +58,14 @@
       "model": "qwen3.5:4b",
       "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System is healthy with stable GPU utilization and no errors detected.",
-      "last_duration_s": 6.078,
-      "started_at": "2026-09-01T05:45:57.889Z",
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "started_at": "2026-09-01T05:48:20.884Z",
       "elapsed_s": 0.0,
-      "tasks_completed": 1,
-      "last_run": "2026-09-01T05:41:06.681Z",
-      "next_run": "2026-09-01T05:46:06.681Z"
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -329,46 +329,46 @@
     }
   ],
   "autonomy": {
+    "transparent_outreach": true,
+    "paid_work": true,
+    "procurement_when_funded": true,
+    "outreach_opt_out": true,
     "public_submissions": true,
+    "gpu_idle_use": true,
     "account_enrollment": true,
     "developer_tools": true,
-    "outreach_opt_out": true,
-    "transparent_outreach": true,
-    "procurement_when_funded": true,
     "terms_aware_execution": true,
-    "paid_work": true,
-    "gpu_idle_use": true,
-    "handoff_style": "service-required",
-    "mode": "EXECUTE_AND_REPORT"
+    "mode": "EXECUTE_AND_REPORT",
+    "handoff_style": "service-required"
   },
   "queue": {},
   "gpu": {
-    "util_pct": 89.0,
+    "util_pct": 80.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 56.0,
-    "power_w": 82.78,
+    "temp_c": 55.0,
+    "power_w": 79.96,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 5.6
+    "cpu_pct": 6.9
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T05:45:57.042Z",
+    "observed_at": "2026-09-01T05:48:19.999Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "keys_per_second": 755700000,
-    "keys_tested": 4034333245440,
+    "sample_count": 1,
+    "uptime_s": 0.9,
     "coverage_pct": 0,
-    "uptime_s": 313.5,
-    "matches_found": 0,
-    "batch_number": 1308,
-    "sample_count": 20,
-    "hashrate_mkey_s": 755.7
+    "keys_per_second": 745610000,
+    "batch_number": 1342,
+    "hashrate_mkey_s": 745.61,
+    "keys_tested": 4138368761856,
+    "matches_found": 0
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T05:45:57.889Z"
+  "updated": "2026-09-01T05:48:20.883Z"
 }
