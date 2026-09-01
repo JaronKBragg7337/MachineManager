@@ -16,7 +16,9 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping
+import uuid
 
+from .scheduler import WorkScheduler
 from .supervisor import utc_now
 
 
@@ -180,8 +182,14 @@ class LocalOllamaAgent:
 class AgentCoordinator:
     """Run configured agents without letting a slow model block supervision."""
 
-    def __init__(self, raw_specs: Iterable[Mapping[str, Any]] = ()) -> None:
+    def __init__(
+        self,
+        raw_specs: Iterable[Mapping[str, Any]] = (),
+        *,
+        scheduler: WorkScheduler | None = None,
+    ) -> None:
         self.specs = [AgentSpec.from_mapping(item) for item in raw_specs if isinstance(item, Mapping)]
+        self.scheduler = scheduler
         self._last_run: dict[str, float] = {}
         self._statuses: dict[str, dict[str, Any]] = {
             spec.agent_id: {
@@ -204,6 +212,7 @@ class AgentCoordinator:
         }
         self.events: list[dict[str, Any]] = []
         self._pending: dict[str, concurrent.futures.Future[tuple[AgentDecision, str | None, float]]] = {}
+        self._pending_task_ids: dict[str, str] = {}
         self._pending_snapshots: dict[str, dict[str, Any]] = {}
         self._pending_started: dict[str, float] = {}
         self._executor = concurrent.futures.ThreadPoolExecutor(
@@ -230,6 +239,56 @@ class AgentCoordinator:
                 return AgentDecision("continue", "agent model is not configured", True)
             return LocalOllamaAgent(spec).ask(snapshot, events)
         return AgentDecision("continue", "agent provider is unavailable", True)
+
+    def _start_task(self, spec: AgentSpec, snapshot: Mapping[str, Any]) -> str | None:
+        """Create a durable task record without making queue failure fatal."""
+        if self.scheduler is None:
+            return None
+        task_id = f"agent-task-{spec.agent_id}-{uuid.uuid4().hex[:12]}"
+        objective_id = _safe_text(
+            snapshot.get("objective_id"),
+            default="agent-coordination",
+            max_len=80,
+        )
+        try:
+            self.scheduler.enqueue(
+                kind="agent_review",
+                objective_id=objective_id,
+                payload={"agent_id": spec.agent_id},
+                task_id=task_id,
+            )
+            if not self.scheduler.start(task_id):
+                self.scheduler.fail(task_id)
+                return None
+        except Exception:
+            try:
+                self.scheduler.fail(task_id)
+            except Exception:
+                pass
+            return None
+
+        timestamp = utc_now()
+        self.events.append(
+            {
+                "timestamp": timestamp,
+                "event_id": f"agent-task-start-{uuid.uuid4().hex[:12]}",
+                "objective_id": objective_id,
+                "job_id": "agent-coordinator",
+                "worker_id": spec.agent_id,
+                "actor": spec.agent_id,
+                "event_type": "agent_task_started",
+                "previous_state": "WAITING",
+                "new_state": "WORKING",
+                "metrics": {"attempt": 1},
+                "action": "start_agent_review",
+                "outcome": "task_running",
+                "artifact_refs": [f"task:{task_id}"],
+                "error": None,
+                "duration": None,
+            }
+        )
+        self.events = self.events[-500:]
+        return task_id
 
     def _run_async(
         self,
@@ -259,7 +318,15 @@ class AgentCoordinator:
         decision: AgentDecision,
         error_name: str | None,
         duration_s: float | None = None,
+        task_id: str | None = None,
     ) -> AgentDecision:
+        if task_id and self.scheduler is not None:
+            try:
+                self.scheduler.complete(task_id)
+            except Exception:
+                # The agent result remains useful if a transient local database
+                # issue prevents the optional ledger update.
+                pass
         status = self._statuses[spec.agent_id]
         status["state"] = "READY" if error_name is None else "DEGRADED"
         status["last_action"] = decision.action
@@ -289,7 +356,7 @@ class AgentCoordinator:
                 "action": decision.action,
                 "outcome": "fallback" if decision.fallback else "recommendation",
                 "message": decision.reason,
-                "artifact_refs": [],
+                "artifact_refs": [f"task:{task_id}"] if task_id else [],
                 "error": error_name,
                 "duration": None,
             }
@@ -315,7 +382,17 @@ class AgentCoordinator:
                 started = self._pending_started.get(agent_id)
                 duration_s = None if started is None else round(max(0.0, time.monotonic() - started), 3)
             self._pending_started.pop(agent_id, None)
-            decisions.append(self._record(spec, snapshot, decision, error_name, duration_s))
+            task_id = self._pending_task_ids.pop(agent_id, None)
+            decisions.append(
+                self._record(
+                    spec,
+                    snapshot,
+                    decision,
+                    error_name,
+                    duration_s,
+                    task_id,
+                )
+            )
             del self._pending[agent_id]
             self._pending_snapshots.pop(agent_id, None)
 
@@ -351,9 +428,12 @@ class AgentCoordinator:
             self._last_run[spec.agent_id] = now
             status["started_at"] = utc_now()
             status["elapsed_s"] = 0.0
+            task_id = self._start_task(spec, snapshot)
             if spec.provider == "ollama":
                 future = self._executor.submit(self._run_async, spec, dict(snapshot), event_list)
                 self._pending[spec.agent_id] = future
+                if task_id:
+                    self._pending_task_ids[spec.agent_id] = task_id
                 self._pending_snapshots[spec.agent_id] = dict(snapshot)
                 self._pending_started[spec.agent_id] = time.monotonic()
                 continue
@@ -369,10 +449,26 @@ class AgentCoordinator:
                 )
                 error_name = type(exc).__name__
             duration_s = round(max(0.0, time.monotonic() - started), 3)
-            decisions.append(self._record(spec, snapshot, decision, error_name, duration_s))
+            decisions.append(
+                self._record(
+                    spec,
+                    snapshot,
+                    decision,
+                    error_name,
+                    duration_s,
+                    task_id,
+                )
+            )
         return decisions
 
     def close(self) -> None:
+        if self.scheduler is not None:
+            for task_id in self._pending_task_ids.values():
+                try:
+                    self.scheduler.fail(task_id, retry_at=time.time())
+                except Exception:
+                    pass
+        self._pending_task_ids.clear()
         for future in self._pending.values():
             future.cancel()
         self._pending.clear()

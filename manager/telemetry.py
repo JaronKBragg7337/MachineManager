@@ -108,6 +108,7 @@ PUBLIC_METRIC_KEYS = {
     "detection_time_s",
     "recovery_time_s",
     "tasks_completed",
+    "tasks_requeued",
     "fallback",
     "duration_s",
     "heartbeat_age_s",

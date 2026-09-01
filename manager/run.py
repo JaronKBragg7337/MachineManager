@@ -533,8 +533,29 @@ def main() -> int:
         agents_raw = config.get("agents", [])
         if not isinstance(agents_raw, list):
             raise ValueError("config.agents must be an array")
-        agents = AgentCoordinator(agents_raw)
         scheduler = WorkScheduler(store)
+        recovered_task_count = scheduler.recover_interrupted()
+        if recovered_task_count:
+            store.append_event(
+                {
+                    "timestamp": utc_now(),
+                    "event_id": f"evt-queue-recovery-{time.time_ns()}",
+                    "objective_id": primary_objective_id,
+                    "job_id": "task-queue",
+                    "worker_id": "",
+                    "actor": str(config.get("actor", "local-manager")),
+                    "event_type": "queue_tasks_recovered",
+                    "previous_state": "RUNNING",
+                    "new_state": "QUEUED",
+                    "metrics": {"tasks_requeued": recovered_task_count},
+                    "action": "recover_interrupted_tasks",
+                    "outcome": "requeued_for_retry",
+                    "artifact_refs": [],
+                    "error": None,
+                    "duration": None,
+                }
+            )
+        agents = AgentCoordinator(agents_raw, scheduler=scheduler)
         try:
             workstreams = WorkstreamRegistry(store, config.get("workstreams", []))
         except (TypeError, ValueError) as exc:

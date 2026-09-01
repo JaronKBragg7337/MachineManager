@@ -56,6 +56,14 @@ class WorkScheduler:
             for item in self.store.claim_due_tasks(limit=limit)
         ]
 
+    def start(self, task_id: str) -> bool:
+        """Start one task that this runtime just enqueued."""
+        return self.store.start_task(task_id)
+
+    def recover_interrupted(self) -> int:
+        """Return tasks left RUNNING by a prior manager process to the queue."""
+        return self.store.requeue_running_tasks()
+
     def complete(self, task_id: str) -> None:
         self.store.finish_task(task_id, status="COMPLETE")
 

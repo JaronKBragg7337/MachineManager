@@ -492,6 +492,34 @@ class StateStore:
                 claimed.append(item)
         return claimed
 
+    def start_task(self, task_id: str, *, now: float | None = None) -> bool:
+        """Move one queued task to RUNNING and increment its attempt count."""
+        now = time.time() if now is None else float(now)
+        with self._lock, self._connection:
+            cursor = self._connection.execute(
+                """
+                UPDATE tasks
+                SET status='RUNNING', attempts=attempts+1, updated=?
+                WHERE task_id=? AND status='QUEUED'
+                """,
+                (now, str(task_id)),
+            )
+        return cursor.rowcount == 1
+
+    def requeue_running_tasks(self, *, now: float | None = None) -> int:
+        """Requeue tasks left RUNNING by an interrupted manager process."""
+        now = time.time() if now is None else float(now)
+        with self._lock, self._connection:
+            cursor = self._connection.execute(
+                """
+                UPDATE tasks
+                SET status='QUEUED', scheduled_at=?, updated=?
+                WHERE status='RUNNING'
+                """,
+                (now, now),
+            )
+        return cursor.rowcount
+
     def finish_task(
         self,
         task_id: str,

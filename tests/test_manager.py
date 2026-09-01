@@ -785,6 +785,29 @@ class TelemetryTests(unittest.TestCase):
                 self.assertEqual(reopened.get_job("job-1")["restart_count"], 1)
                 self.assertEqual(reopened.task_counts()["COMPLETE"], 1)
 
+    def test_scheduler_tracks_and_recovers_interrupted_task(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                task_id = scheduler.enqueue(
+                    kind="agent_review",
+                    objective_id="obj-1",
+                    payload={"agent_id": "agent-1"},
+                    task_id="task-agent-1",
+                )
+                self.assertEqual(task_id, "task-agent-1")
+                self.assertEqual(scheduler.snapshot(), {"QUEUED": 1})
+                self.assertTrue(scheduler.start(task_id))
+                self.assertFalse(scheduler.start(task_id))
+                self.assertEqual(scheduler.snapshot(), {"RUNNING": 1})
+                self.assertEqual(scheduler.recover_interrupted(), 1)
+                self.assertEqual(scheduler.snapshot(), {"QUEUED": 1})
+                claimed = scheduler.claim(limit=1)
+                self.assertEqual(claimed[0].task_id, task_id)
+                self.assertEqual(claimed[0].attempts, 2)
+                scheduler.complete(task_id)
+                self.assertEqual(scheduler.snapshot(), {"COMPLETE": 1})
+
     def test_agent_response_falls_back_safely(self) -> None:
         self.assertTrue(parse_agent_response("").fallback)
         self.assertTrue(parse_agent_response("not json").fallback)
@@ -899,6 +922,43 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(coordinator.events[0]["message"], "deterministic agent heartbeat")
         self.assertEqual(coordinator.events[0]["metrics"]["duration_s"], 0.0)
         self.assertEqual(coordinator.events[0]["event_type"], "agent_decision")
+
+    def test_agent_run_uses_durable_task_ledger(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                coordinator = AgentCoordinator(
+                    [
+                        {
+                            "id": "ledger-agent",
+                            "role": "test",
+                            "provider": "test",
+                            "enabled": True,
+                            "interval_s": 60,
+                        }
+                    ],
+                    scheduler=scheduler,
+                )
+                try:
+                    with patch("manager.agents.time.monotonic", return_value=1.0):
+                        decisions = coordinator.tick(
+                            {
+                                "status": "HEALTHY",
+                                "objective": "synthetic",
+                                "objective_id": "synthetic-objective",
+                                "workers": [],
+                                "jobs": [],
+                            }
+                        )
+                    self.assertEqual(decisions[0].action, "continue")
+                    self.assertEqual(scheduler.snapshot(), {"COMPLETE": 1})
+                    self.assertEqual(
+                        [event["event_type"] for event in coordinator.events],
+                        ["agent_task_started", "agent_decision"],
+                    )
+                    self.assertTrue(coordinator.events[1]["artifact_refs"][0].startswith("task:"))
+                finally:
+                    coordinator.close()
 
     def test_public_upload_rejects_pid_before_network_access(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
