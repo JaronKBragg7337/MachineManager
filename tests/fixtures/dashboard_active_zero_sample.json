@@ -1,0 +1,13 @@
+{
+  "gpu": {
+    "resource_active": true,
+    "util_pct": 0,
+    "mem_used_mib": 2367,
+    "mem_total_mib": 8188,
+    "power_w": 80,
+    "temp_c": 62
+  },
+  "system": {
+    "cpu_pct": 0.2
+  }
+}
