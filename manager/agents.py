@@ -277,6 +277,11 @@ class AgentCoordinator:
                 "started_at": None,
                 "elapsed_s": None,
                 "tasks_completed": prior_count(spec, prior_agents.get(spec.agent_id, {})),
+                "current_task_id": None,
+                "last_task_id": _safe_text(
+                    prior_agents.get(spec.agent_id, {}).get("last_task_id"),
+                    max_len=100,
+                ),
                 "last_run": prior_agents.get(spec.agent_id, {}).get("last_run"),
                 "next_run": prior_agents.get(spec.agent_id, {}).get("next_run"),
             }
@@ -346,6 +351,7 @@ class AgentCoordinator:
                 pass
             return None
 
+        self._statuses[spec.agent_id]["current_task_id"] = task_id
         timestamp = utc_now()
         self.events.append(
             {
@@ -361,6 +367,14 @@ class AgentCoordinator:
                 "metrics": {"attempt": 1},
                 "action": "start_agent_review",
                 "outcome": "task_running",
+                "message": (
+                    "start_agent_review · focus: "
+                    + _safe_text(
+                        spec.focus,
+                        default="review the current machine evidence",
+                        max_len=180,
+                    )
+                ),
                 "artifact_refs": [f"task:{task_id}"],
                 "error": None,
                 "duration": None,
@@ -413,6 +427,9 @@ class AgentCoordinator:
         status["last_duration_s"] = duration_s
         status["started_at"] = None
         status["elapsed_s"] = None
+        status["current_task_id"] = None
+        if task_id:
+            status["last_task_id"] = task_id
         status["tasks_completed"] = int(status["tasks_completed"]) + 1
         status["last_run"] = utc_now()
         status["next_run"] = self._next_run(spec.interval_s)

@@ -504,6 +504,8 @@ class TelemetryPublisher:
                 "started_at": _text(agent.get("started_at"), max_len=40),
                 "elapsed_s": _number(agent.get("elapsed_s")),
                 "tasks_completed": _number(agent.get("tasks_completed")) or 0,
+                "current_task_id": _text(agent.get("current_task_id"), max_len=100),
+                "last_task_id": _text(agent.get("last_task_id"), max_len=100),
                 "last_run": _text(agent.get("last_run"), max_len=40),
                 "next_run": _text(agent.get("next_run"), max_len=40),
             }

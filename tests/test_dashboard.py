@@ -24,6 +24,8 @@ class DashboardContractTests(unittest.TestCase):
             "AI reviewer is working",
             "Processing the current sanitized snapshot",
             "Assigned focus:",
+            "function agentRunRecord(agent)",
+            "Run record",
             "function renderRecurringSchedules(items)",
             "function gpuEvidenceActive(gpu)",
             "function gpuActivityBasisText(gpu)",

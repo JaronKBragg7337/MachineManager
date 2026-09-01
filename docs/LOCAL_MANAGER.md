@@ -141,6 +141,11 @@ specialists can review the same machine without pretending they have the same
 assignment. It is descriptive context, not extra authority; every agent still
 returns only the bounded action set above.
 
+Each scheduled review also receives a durable task record. The public agent card
+shows the current or last task ID, and the AI run timeline includes the assigned
+focus on start events so a visible run can be traced to its recorded outcome
+without exposing the prompt or model reasoning.
+
 Agent review tasks are coordinator-owned. The generic queue dispatcher reserves
 that task kind so it cannot mistake an in-flight review for unhandled future
 work. If a manager restart leaves a review queued, the coordinator adopts that
