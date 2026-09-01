@@ -42,6 +42,13 @@
       "result": "PASS",
       "score": 1,
       "recovery_s": 0.0
+    },
+    {
+      "id": "repeated-failure-escalation-manager-001",
+      "actor": "local-manager-synthetic",
+      "result": "PASS",
+      "score": 1,
+      "recovery_s": 0.016
     }
   ]
 }
