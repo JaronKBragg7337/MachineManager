@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T07:39:39.352Z",
+        "observed_at": "2026-09-01T07:39:59.790Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 604.0,
+        "uptime_s": 624.6,
         "coverage_pct": 0,
-        "hashrate_mkey_s": 751.43,
-        "batch_number": 2964,
-        "keys_per_second": 751430000,
-        "sample_count": 37,
+        "hashrate_mkey_s": 756.14,
+        "batch_number": 2981,
+        "keys_per_second": 756140000,
+        "sample_count": 38,
         "matches_found": 0,
-        "keys_tested": 9100565938176
+        "keys_tested": 9152860520448
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T07:39:39.352Z",
+        "observed_at": "2026-09-01T07:39:59.790Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 604.0,
+        "uptime_s": 624.6,
         "coverage_pct": 0,
-        "hashrate_mkey_s": 751.43,
-        "batch_number": 2964,
-        "keys_per_second": 751430000,
-        "sample_count": 37,
+        "hashrate_mkey_s": 756.14,
+        "batch_number": 2981,
+        "keys_per_second": 756140000,
+        "sample_count": 38,
         "matches_found": 0,
-        "keys_tested": 9100565938176
+        "keys_tested": 9152860520448
       }
     }
   ],
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System healthy, objective running, resources within limits",
-      "last_duration_s": 3.187,
-      "started_at": "2026-09-01T07:39:40.225Z",
-      "elapsed_s": 0.0,
-      "tasks_completed": 2,
-      "last_run": "2026-09-01T07:35:00.351Z",
-      "next_run": "2026-09-01T07:40:00.351Z"
+      "last_reason": "System is healthy with stable GPU utilization and no errors detected.",
+      "last_duration_s": 4.297,
+      "started_at": "",
+      "elapsed_s": null,
+      "tasks_completed": 3,
+      "last_run": "2026-09-01T07:40:00.897Z",
+      "next_run": "2026-09-01T07:45:00.897Z"
     }
   ],
   "capabilities": [
@@ -343,8 +343,7 @@
     "mode": "EXECUTE_AND_REPORT"
   },
   "queue": {
-    "COMPLETE": 17,
-    "RUNNING": 1
+    "COMPLETE": 18
   },
   "queue_kinds": {
     "agent_review": 17,
@@ -355,9 +354,9 @@
       "task_id": "agent-task-local-manager-brain-b791ecc5d5d0",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "RUNNING",
+      "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T07:39:40.225Z"
+      "updated": "2026-09-01T07:40:00.897Z"
     },
     {
       "task_id": "agent-task-local-manager-brain-e3ebfa29aa81",
@@ -497,32 +496,32 @@
     }
   ],
   "gpu": {
-    "util_pct": 68.0,
+    "util_pct": 89.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 57.0,
-    "power_w": 81.11,
+    "temp_c": 63.0,
+    "power_w": 82.73,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 5.4
+    "cpu_pct": 17.0
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T07:39:39.352Z",
+    "observed_at": "2026-09-01T07:39:59.790Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 604.0,
+    "uptime_s": 624.6,
     "coverage_pct": 0,
-    "hashrate_mkey_s": 751.43,
-    "batch_number": 2964,
-    "keys_per_second": 751430000,
-    "sample_count": 37,
+    "hashrate_mkey_s": 756.14,
+    "batch_number": 2981,
+    "keys_per_second": 756140000,
+    "sample_count": 38,
     "matches_found": 0,
-    "keys_tested": 9100565938176
+    "keys_tested": 9152860520448
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T07:39:40.224Z"
+  "updated": "2026-09-01T07:40:00.895Z"
 }
