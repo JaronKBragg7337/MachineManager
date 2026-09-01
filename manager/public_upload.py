@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import time
 import urllib.error
 import urllib.parse
@@ -71,6 +72,7 @@ class GitHubPagesPublisher:
         token_env: str = "MACHINE_MANAGER_GITHUB_TOKEN",
         interval_s: float = 300.0,
         path_prefix: str = "dashboard/data",
+        local_repo_dir: Path | None = None,
     ) -> None:
         if not owner or not repository or not branch:
             raise ValueError("GitHub owner, repository, and branch are required")
@@ -83,10 +85,12 @@ class GitHubPagesPublisher:
         self.token_env = token_env
         self.interval_s = float(interval_s)
         self.path_prefix = path_prefix.strip("/")
+        self.local_repo_dir = Path(local_repo_dir) if local_repo_dir else self.dashboard_dir.parent
         self.last_publish_monotonic: float | None = None
         self.last_digest: str | None = None
         self.last_published_at: str | None = None
         self.last_error: str | None = None
+        self.last_mirror_status: str = "not_attempted"
 
     @classmethod
     def from_mapping(cls, dashboard_dir: Path, value: Mapping[str, Any]) -> "GitHubPagesPublisher":
@@ -98,6 +102,11 @@ class GitHubPagesPublisher:
             token_env=str(value.get("token_env", "MACHINE_MANAGER_GITHUB_TOKEN")),
             interval_s=float(value.get("interval_s", 300)),
             path_prefix=str(value.get("path_prefix", "dashboard/data")),
+            local_repo_dir=(
+                Path(str(value["local_repo_dir"]))
+                if value.get("local_repo_dir")
+                else dashboard_dir.parent
+            ),
         )
 
     @property
@@ -109,6 +118,7 @@ class GitHubPagesPublisher:
             "configured": self.configured,
             "last_published_at": self.last_published_at,
             "last_error": self.last_error,
+            "local_mirror": self.last_mirror_status,
         }
 
     def _api_url(self, suffix: str) -> str:
@@ -164,6 +174,61 @@ class GitHubPagesPublisher:
             digest.update(name.encode("utf-8"))
             digest.update(files[name])
         return digest.hexdigest()
+
+    def _mirror_local_ref(self, remote_sha: str) -> str:
+        """Fast-forward the local branch without touching the working files.
+
+        The manager writes the three public files in its working tree while the
+        API publisher commits the same sanitized bytes remotely. Once that
+        commit exists, advancing the local ref keeps the checkout's history in
+        step without replacing live files. Any staged, unrelated, untracked, or
+        divergent local work defers the mirror rather than overwriting it.
+        """
+
+        if not re.fullmatch(r"[0-9a-fA-F]{40}", remote_sha):
+            return "deferred"
+        repository = self.local_repo_dir
+        if not repository or not (repository / ".git").exists():
+            return "unavailable"
+        allowed_paths = {f"{self.path_prefix}/{name}" for name in PUBLIC_FILES}
+
+        def git(*arguments: str) -> subprocess.CompletedProcess[str]:
+            return subprocess.run(
+                ["git", "-C", str(repository), *arguments],
+                capture_output=True,
+                text=True,
+                timeout=20,
+                check=False,
+            )
+
+        try:
+            branch = git("symbolic-ref", "--short", "HEAD")
+            if branch.returncode != 0 or branch.stdout.strip() != self.branch:
+                return "deferred"
+            head = git("rev-parse", "HEAD")
+            local_sha = head.stdout.strip()
+            if head.returncode != 0 or not re.fullmatch(r"[0-9a-fA-F]{40}", local_sha):
+                return "deferred"
+            status = git("status", "--porcelain")
+            if status.returncode != 0:
+                return "deferred"
+            for line in status.stdout.splitlines():
+                path = line[3:] if len(line) >= 3 else ""
+                if len(line) < 3 or line[0] != " " or line[1] != "M" or path not in allowed_paths:
+                    return "deferred"
+            ancestor = git("merge-base", "--is-ancestor", local_sha, remote_sha)
+            if ancestor.returncode != 0:
+                return "deferred"
+            if local_sha != remote_sha:
+                updated = git("update-ref", f"refs/heads/{self.branch}", remote_sha, local_sha)
+                if updated.returncode != 0:
+                    return "deferred"
+            tracking = git("show-ref", "--verify", "--quiet", f"refs/remotes/origin/{self.branch}")
+            if tracking.returncode == 0:
+                git("update-ref", f"refs/remotes/origin/{self.branch}", remote_sha)
+            return "synced"
+        except (OSError, subprocess.TimeoutExpired):
+            return "deferred"
 
     def publish(self, *, force: bool = False) -> bool:
         files = self._read_files()
@@ -241,6 +306,7 @@ class GitHubPagesPublisher:
                 f"git/refs/heads/{urllib.parse.quote(self.branch, safe='')}",
                 {"sha": new_sha, "force": False},
             )
+            self.last_mirror_status = self._mirror_local_ref(new_sha)
         except PublicUploadError as exc:
             self.last_error = type(exc).__name__
             raise

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from types import SimpleNamespace
 import sys
 import tempfile
 import time
@@ -951,6 +952,74 @@ class TelemetryTests(unittest.TestCase):
                     calls = request.call_args_list
             commit_payload = calls[-2].args[2]
             self.assertIn("Co-Authored-By: Codex <noreply@openai.com>", commit_payload["message"])
+
+    def test_public_upload_mirrors_a_fast_forward_when_only_generated_files_are_dirty(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repository = Path(raw) / "repo"
+            (repository / ".git").mkdir(parents=True)
+            publisher = GitHubPagesPublisher(
+                repository / "dashboard",
+                owner="owner",
+                repository="repo",
+                local_repo_dir=repository,
+            )
+            remote_sha = "a" * 40
+            local_sha = "b" * 40
+            updates: list[list[str]] = []
+
+            def fake_git(command: list[str], **kwargs: object) -> SimpleNamespace:
+                action = command[3:]
+                if action[:1] == ["symbolic-ref"]:
+                    return SimpleNamespace(returncode=0, stdout="main\n", stderr="")
+                if action[:1] == ["rev-parse"]:
+                    return SimpleNamespace(returncode=0, stdout=local_sha + "\n", stderr="")
+                if action[:1] == ["status"]:
+                    return SimpleNamespace(
+                        returncode=0,
+                        stdout=(
+                            " M dashboard/data/latest.json\n"
+                            " M dashboard/data/events.json\n"
+                            " M dashboard/data/scenarios.json\n"
+                        ),
+                        stderr="",
+                    )
+                if action[:1] == ["merge-base"]:
+                    return SimpleNamespace(returncode=0, stdout="", stderr="")
+                if action[:1] == ["show-ref"]:
+                    return SimpleNamespace(returncode=1, stdout="", stderr="")
+                if action[:1] == ["update-ref"]:
+                    updates.append(action)
+                    return SimpleNamespace(returncode=0, stdout="", stderr="")
+                raise AssertionError(action)
+
+            with patch("manager.public_upload.subprocess.run", side_effect=fake_git):
+                self.assertEqual(publisher._mirror_local_ref(remote_sha), "synced")
+            self.assertEqual(updates, [["update-ref", "refs/heads/main", remote_sha, local_sha]])
+
+    def test_public_upload_defers_local_mirror_for_unrelated_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            repository = Path(raw) / "repo"
+            (repository / ".git").mkdir(parents=True)
+            publisher = GitHubPagesPublisher(
+                repository / "dashboard",
+                owner="owner",
+                repository="repo",
+                local_repo_dir=repository,
+            )
+            remote_sha = "a" * 40
+
+            def fake_git(command: list[str], **kwargs: object) -> SimpleNamespace:
+                action = command[3:]
+                if action[:1] == ["symbolic-ref"]:
+                    return SimpleNamespace(returncode=0, stdout="main\n", stderr="")
+                if action[:1] == ["rev-parse"]:
+                    return SimpleNamespace(returncode=0, stdout=("b" * 40) + "\n", stderr="")
+                if action[:1] == ["status"]:
+                    return SimpleNamespace(returncode=0, stdout=" M README.md\n", stderr="")
+                raise AssertionError(action)
+
+            with patch("manager.public_upload.subprocess.run", side_effect=fake_git):
+                self.assertEqual(publisher._mirror_local_ref(remote_sha), "deferred")
 
     def test_runner_reads_array_and_object_public_records(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

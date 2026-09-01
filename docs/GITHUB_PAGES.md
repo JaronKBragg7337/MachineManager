@@ -36,6 +36,12 @@ change publishes immediately, so recovery and lifecycle changes do not wait for
 the regular cadence. It never uploads raw logs, command lines, private paths,
 or credentials.
 
+After a successful upload, the manager fast-forwards the local `main` reference
+to the same remote commit when the checkout contains only the three generated
+dashboard files as unstaged changes. Staged, unrelated, untracked, or diverged
+local work causes the mirror step to defer; the remote upload still succeeds and
+no local work is overwritten.
+
 This makes the dashboard public and remotely viewable whenever the machine is
 online. It is not a substitute for an always-on host: a sleeping or powered-off
 laptop cannot supervise a GPU worker or publish fresh telemetry.
