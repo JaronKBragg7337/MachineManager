@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T15:27:31.765Z",
+        "observed_at": "2026-09-01T15:29:47.999Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 952.0,
-        "hashrate_mkey_s": 761.51,
+        "uptime_s": 1088.2,
+        "hashrate_mkey_s": 750.38,
         "matches_found": 0,
-        "keys_per_second": 761510000,
-        "batch_number": 9820,
-        "sample_count": 57,
+        "keys_per_second": 750380000,
+        "batch_number": 9854,
+        "sample_count": 65,
         "coverage_pct": 0,
-        "keys_tested": 30126108573696
+        "keys_tested": 30230597074944
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T15:27:31.765Z",
+        "observed_at": "2026-09-01T15:29:47.999Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 952.0,
-        "hashrate_mkey_s": 761.51,
+        "uptime_s": 1088.2,
+        "hashrate_mkey_s": 750.38,
         "matches_found": 0,
-        "keys_per_second": 761510000,
-        "batch_number": 9820,
-        "sample_count": 57,
+        "keys_per_second": 750380000,
+        "batch_number": 9854,
+        "sample_count": 65,
         "coverage_pct": 0,
-        "keys_tested": 30126108573696
+        "keys_tested": 30230597074944
       }
     }
   ],
@@ -747,7 +747,7 @@
       "interval_s": 21600.0,
       "sequence": 2,
       "next_run_at": "2026-09-01T19:48:51.437Z",
-      "next_in_s": 15678.710186004639,
+      "next_in_s": 15542.488793611526,
       "last_task_id": "recurring-machine-manager-capability-research-000002",
       "last_status": "COMPLETE"
     },
@@ -759,7 +759,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 61045.21450662613,
+      "next_in_s": 60908.99311423302,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -771,29 +771,29 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 18215.67602276802,
+      "next_in_s": 18079.45463037491,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
-    "util_pct": 50.0,
-    "util_pct_recent_max": 96.0,
-    "util_pct_recent_avg": 60.6,
+    "util_pct": 90.0,
+    "util_pct_recent_max": 90.0,
+    "util_pct_recent_avg": 84.4,
     "util_pct_sample_count": 5,
-    "util_pct_zero_samples": 1,
+    "util_pct_zero_samples": 0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 55.0,
-    "power_w": 79.71,
+    "temp_c": 60.0,
+    "power_w": 68.6,
     "resource_active": true,
     "activity_state": "ACTIVE",
     "activity_basis": "driver_utilization"
   },
   "system": {
-    "cpu_pct": 6.5,
-    "cpu_pct_recent_max": 23.3,
-    "cpu_pct_recent_avg": 9.6,
+    "cpu_pct": 7.7,
+    "cpu_pct_recent_max": 7.7,
+    "cpu_pct_recent_avg": 6.4,
     "cpu_pct_sample_count": 5,
     "cpu_pct_zero_samples": 0.0,
     "load_state": "ACTIVE",
@@ -802,19 +802,19 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T15:27:31.765Z",
+    "observed_at": "2026-09-01T15:29:47.999Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 952.0,
-    "hashrate_mkey_s": 761.51,
+    "uptime_s": 1088.2,
+    "hashrate_mkey_s": 750.38,
     "matches_found": 0,
-    "keys_per_second": 761510000,
-    "batch_number": 9820,
-    "sample_count": 57,
+    "keys_per_second": 750380000,
+    "batch_number": 9854,
+    "sample_count": 65,
     "coverage_pct": 0,
-    "keys_tested": 30126108573696
+    "keys_tested": 30230597074944
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T15:27:32.718Z"
+  "updated": "2026-09-01T15:29:48.936Z"
 }
