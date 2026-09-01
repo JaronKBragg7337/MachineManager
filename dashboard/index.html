@@ -1191,7 +1191,7 @@
         const value = numberValue(metrics[definition[0]]);
         if (value === null || (definition[0] === "coverage_pct" && value <= 0)) return "";
         if (definition[0] === "util_pct" && gpuEvidenceActive(metrics) && value < 15) {
-          return '<span class="event-metric">GPU ACTIVE (diagnostic raw sample ' + escapeHtml(compactNumber(value) + "%") + "; memory/power confirm work)</span>";
+          return '<span class="event-metric">' + escapeHtml("GPU ACTIVE (diagnostic raw sample " + compactNumber(value) + "%" + gpuRecentHistoryText(metrics) + "; memory/power confirm work)") + "</span>";
         }
         return '<span class="event-metric">' + escapeHtml(definition[2] + " " + compactNumber(value) + definition[1]) + '</span>';
       }).filter(Boolean);

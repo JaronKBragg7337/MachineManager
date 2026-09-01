@@ -60,6 +60,7 @@ vm.runInContext(
     "unavailableCpuCard: cpuActivityCard({}, {})," +
     "numericLabel: resourceMeterLabel(\"86\", 86)," +
     "zeroGpuMetric: eventMetricChips({metrics: {util_pct: 0, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
+    "zeroGpuMetricWithHistory: eventMetricChips({metrics: {util_pct: 0, util_pct_recent_max: 77, util_pct_sample_count: 3, util_pct_zero_samples: 1, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
     "queueEvidence: taskEvidenceLabel({message: \"Result summary\", outcome: \"handler_completed\"})," +
     "queueEvidenceFallback: taskEvidenceLabel({outcome: \"handler_completed\"})," +
     "reviewPlan: auditReviewPlan([{category: \"approval_gate\", candidate_count: 2, recommended_test: \"Run a harmless delegated action.\"}])," +
@@ -97,6 +98,7 @@ assert.match(output.unavailableCpuCard, /<div class="resource-value">--<small><\
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
 assert.match(output.zeroGpuMetric, /GPU ACTIVE \(diagnostic raw sample 0%; memory\/power confirm work\)/);
 assert.ok(!output.zeroGpuMetric.includes('GPU ACTIVE (raw 0%)'));
+assert.match(output.zeroGpuMetricWithHistory, /GPU ACTIVE \(diagnostic raw sample 0%; recent peak 77% over 3 samples; 1 transient zero sample; memory\/power confirm work\)/);
 assert.strictEqual(output.queueEvidence, "Result summary");
 assert.strictEqual(output.queueEvidenceFallback, "handler completed");
 assert.match(output.reviewPlan, /approval gate · 2 candidates/);
