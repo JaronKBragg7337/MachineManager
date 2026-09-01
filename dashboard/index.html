@@ -1183,6 +1183,12 @@
     function taskEvidenceLabel(item) {
       const message = String(item && item.message || "").trim();
       if (message) return message;
+      const kind = String(item && item.kind || "").toLowerCase().trim();
+      const metrics = item && item.metrics && typeof item.metrics === "object" ? item.metrics : {};
+      const testsRun = numberValue(metrics.tests_run);
+      if (kind === "verification" && testsRun !== null && typeof metrics.passed === "boolean") {
+        return "Repository verification " + (metrics.passed ? "passed " : "failed ") + compactNumber(testsRun) + " test(s)";
+      }
       const outcome = String(item && item.outcome || "").trim();
       return outcome ? outcome.replace(/_/g, " ") : "No public result yet";
     }

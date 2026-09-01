@@ -49,6 +49,7 @@ class DashboardContractTests(unittest.TestCase):
             "latest 32 public task records",
             "kind-balanced window interleaves recent records",
             "function taskEvidenceLabel(item)",
+            "Repository verification ",
             "function taskEvidenceMetricChips(item)",
             "Latest evidence",
             "function auditReviewPlan(plan)",
