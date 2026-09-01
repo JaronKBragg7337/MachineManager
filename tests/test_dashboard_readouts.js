@@ -43,10 +43,12 @@ vm.runInContext(
     dashboard.slice(auditStart, auditEnd) +
     "\noutput = {" +
     "gpuText: gpuActivityText(fixture.gpu)," +
+    "gpuObservation: gpuObservationText(fixture.gpu)," +
     "gpuCard: gpuActivityCard(fixture.gpu)," +
     "cpuText: cpuActivityText(fixture.system, fixture.gpu)," +
     "cpuCard: cpuActivityCard(fixture.system, fixture.gpu)," +
     "idleGpuText: gpuActivityText(idleFixture.gpu)," +
+    "idleGpuObservation: gpuObservationText(idleFixture.gpu)," +
     "idleGpuCard: gpuActivityCard(idleFixture.gpu)," +
     "idleCpuText: cpuActivityText(idleFixture.system, idleFixture.gpu)," +
     "idleCpuCard: cpuActivityCard(idleFixture.system, idleFixture.gpu)," +
@@ -66,12 +68,14 @@ vm.runInContext(
 
 const output = executionContext.output;
 assert.strictEqual(output.gpuText, "ACTIVE");
+assert.strictEqual(output.gpuObservation, "Diagnostic 0%; memory/power active");
 assert.match(output.gpuCard, /Memory \+ power confirm work; diagnostic driver sample 0%/);
 assert.strictEqual(output.cpuText, "LOW");
-assert.match(output.cpuCard, /Raw CPU sample 0\.2%/);
+assert.match(output.cpuCard, /Diagnostic CPU sample 0\.2%/);
 assert.ok(!output.gpuCard.includes('<span class="muted">0%</span>'));
 assert.ok(!output.cpuCard.includes('<span class="muted">0%</span>'));
 assert.strictEqual(output.idleGpuText, "IDLE");
+assert.strictEqual(output.idleGpuObservation, "0%; no independent activity evidence");
 assert.match(output.idleGpuCard, /Raw driver sample 0%; no independent activity evidence/);
 assert.strictEqual(output.idleCpuText, "IDLE");
 assert.match(output.idleCpuCard, /Raw CPU sample 0%; no active GPU evidence/);
