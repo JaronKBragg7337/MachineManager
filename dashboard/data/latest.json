@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T08:11:20.711Z",
+        "observed_at": "2026-09-01T08:16:01.166Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "hashrate_mkey_s": 761.95,
-        "uptime_s": 22.0,
-        "batch_number": 3440,
+        "hashrate_mkey_s": 743.55,
+        "uptime_s": 302.6,
+        "batch_number": 3508,
         "matches_found": 0,
-        "keys_tested": 10556660514816,
+        "keys_tested": 10763825577984,
         "coverage_pct": 0,
-        "sample_count": 2,
-        "keys_per_second": 761950000
+        "sample_count": 19,
+        "keys_per_second": 743550000
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T08:11:20.711Z",
+        "observed_at": "2026-09-01T08:16:01.166Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "hashrate_mkey_s": 761.95,
-        "uptime_s": 22.0,
-        "batch_number": 3440,
+        "hashrate_mkey_s": 743.55,
+        "uptime_s": 302.6,
+        "batch_number": 3508,
         "matches_found": 0,
-        "keys_tested": 10556660514816,
+        "keys_tested": 10763825577984,
         "coverage_pct": 0,
-        "sample_count": 2,
-        "keys_per_second": 761950000
+        "sample_count": 19,
+        "keys_per_second": 743550000
       }
     }
   ],
@@ -56,13 +56,13 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
       "last_action": "continue",
       "last_reason": "System is healthy with stable GPU utilization and no errors detected.",
       "last_duration_s": 3.281,
-      "started_at": "",
-      "elapsed_s": null,
+      "started_at": "2026-09-01T08:16:02.119Z",
+      "elapsed_s": 0.0,
       "tasks_completed": 1,
       "last_run": "2026-09-01T08:11:21.423Z",
       "next_run": "2026-09-01T08:16:21.423Z"
@@ -338,13 +338,22 @@
     "handoff_style": "service-required"
   },
   "queue": {
-    "COMPLETE": 28
+    "COMPLETE": 28,
+    "RUNNING": 1
   },
   "queue_kinds": {
-    "agent_review": 26,
+    "agent_review": 27,
     "research": 2
   },
   "queue_activity": [
+    {
+      "task_id": "agent-task-local-manager-brain-0cbb0b1645bc",
+      "kind": "agent_review",
+      "objective_id": "p71",
+      "status": "RUNNING",
+      "attempts": 1,
+      "updated": "2026-09-01T08:16:02.119Z"
+    },
     {
       "task_id": "agent-task-local-manager-brain-cff9f091329d",
       "kind": "agent_review",
@@ -496,43 +505,35 @@
       "status": "COMPLETE",
       "attempts": 1,
       "updated": "2026-09-01T07:10:38.321Z"
-    },
-    {
-      "task_id": "agent-task-local-manager-brain-57a8314924d4",
-      "kind": "agent_review",
-      "objective_id": "p71",
-      "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T07:05:26.638Z"
     }
   ],
   "gpu": {
-    "util_pct": 88.0,
+    "util_pct": 77.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
     "temp_c": 63.0,
-    "power_w": 82.25,
+    "power_w": 81.68,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 13.3
+    "cpu_pct": 6.2
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T08:11:20.711Z",
+    "observed_at": "2026-09-01T08:16:01.166Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "hashrate_mkey_s": 761.95,
-    "uptime_s": 22.0,
-    "batch_number": 3440,
+    "hashrate_mkey_s": 743.55,
+    "uptime_s": 302.6,
+    "batch_number": 3508,
     "matches_found": 0,
-    "keys_tested": 10556660514816,
+    "keys_tested": 10763825577984,
     "coverage_pct": 0,
-    "sample_count": 2,
-    "keys_per_second": 761950000
+    "sample_count": 19,
+    "keys_per_second": 743550000
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T08:11:21.422Z"
+  "updated": "2026-09-01T08:16:02.118Z"
 }
