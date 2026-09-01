@@ -181,6 +181,7 @@ class SuperteamOpportunityHandler:
             return DispatchOutcome(
                 status="ESCALATED",
                 metrics={"authority_required": True, "listings_found": 0, "eligible_listings": 0},
+                public_message="Authenticated discovery is waiting for the agent credential handoff.",
             )
         request = urllib.request.Request(
             self._endpoint(payload),
@@ -205,6 +206,7 @@ class SuperteamOpportunityHandler:
                 return DispatchOutcome(
                     status="ESCALATED",
                     metrics={"authority_required": True, "listings_found": 0, "eligible_listings": 0},
+                    public_message="The service rejected the agent credential; refresh the credential handoff.",
                 )
             if error.code == 429 or error.code >= 500:
                 raise RevenueRetryableError("Superteam discovery temporarily unavailable") from error
@@ -230,4 +232,8 @@ class SuperteamOpportunityHandler:
                 "agent_allowed_listings": sum(item["agent_access"] == "AGENT_ALLOWED" for item in eligible),
                 "authority_required": False,
             },
+            public_message=(
+                f"Authenticated discovery found {len(listings)} listing(s); "
+                f"{len(eligible)} agent-eligible."
+            ),
         )

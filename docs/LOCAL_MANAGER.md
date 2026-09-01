@@ -128,6 +128,11 @@ The public snapshot also includes a bounded recent task ledger. It contains
 only task id, allowlisted kind, objective id, state, attempt count, and a
 sanitized timestamp; task payloads remain local in SQLite.
 
+Registered task handlers may also return a short `public_message`. The dispatcher
+redacts and length-limits that note before it is written to the lifecycle event,
+so the public Research and Activity views can show a useful result summary while
+keeping prompts, credentials, local paths, and unrestricted model output local.
+
 ## Research worker
 
 The optional `research_worker` configuration connects the durable `research`

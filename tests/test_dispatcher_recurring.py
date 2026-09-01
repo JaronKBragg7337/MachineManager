@@ -6,13 +6,46 @@ import tempfile
 import time
 import unittest
 
-from manager.dispatcher import BackgroundWorkDispatcher, DispatchOutcome
+from manager.dispatcher import BackgroundWorkDispatcher, DispatchOutcome, WorkDispatcher
 from manager.recurring import RecurringTaskSeeder
 from manager.scheduler import WorkScheduler
 from manager.state_store import StateStore
 
 
 class BackgroundDispatcherTests(unittest.TestCase):
+    def test_handler_public_message_is_redacted_in_lifecycle_event(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                scheduler.enqueue(
+                    kind="research",
+                    objective_id="research-objective",
+                    task_id="task-public-message-1",
+                    scheduled_at=100,
+                )
+                dispatcher = WorkDispatcher(
+                    scheduler,
+                    {
+                        "research": lambda _item: DispatchOutcome(
+                            public_message=(
+                                "Found a useful result. token=private-value. "
+                                r"C:\Users\lilli\private.txt"
+                            )
+                        )
+                    },
+                )
+
+                dispatcher.dispatch(limit=1, now=100)
+                event = next(
+                    event
+                    for event in store.recent_events(limit=10)
+                    if event["event_type"] == "queue_task_completed"
+                )
+                self.assertIn("Found a useful result.", event["message"])
+                self.assertIn("token: [redacted]", event["message"])
+                self.assertNotIn("private-value", event["message"])
+                self.assertNotIn(r"C:\Users\lilli", event["message"])
+
     def test_background_dispatch_does_not_wait_for_handler(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             with StateStore(Path(raw) / "state.sqlite3") as store:

@@ -59,6 +59,7 @@ class RevenueWorkerTests(unittest.TestCase):
             self.assertEqual(outcome.status, "COMPLETE")
             self.assertEqual(outcome.metrics["listings_found"], 1)
             self.assertEqual(outcome.metrics["eligible_listings"], 1)
+            self.assertIn("Authenticated discovery found 1 listing(s); 1 agent-eligible.", outcome.public_message)
             request = opener.call_args.args[0]
             self.assertEqual(request.get_header("Authorization"), "Bearer test-key")
             artifact = json.loads((Path(raw) / "revenue-task-1.json").read_text(encoding="utf-8"))
@@ -75,6 +76,7 @@ class RevenueWorkerTests(unittest.TestCase):
 
             self.assertEqual(outcome.status, "ESCALATED")
             self.assertTrue(outcome.metrics["authority_required"])
+            self.assertIn("waiting for the agent credential handoff", outcome.public_message)
             opener.assert_not_called()
             artifact = json.loads((Path(raw) / "revenue-missing-key.json").read_text(encoding="utf-8"))
             self.assertEqual(artifact["status"], "AUTHORITY_REQUIRED")
@@ -98,6 +100,7 @@ class RevenueWorkerTests(unittest.TestCase):
 
             self.assertEqual(outcome.status, "ESCALATED")
             self.assertTrue(outcome.metrics["authority_required"])
+            self.assertIn("rejected the agent credential", outcome.public_message)
             artifact = json.loads((Path(raw) / "revenue-rejected.json").read_text(encoding="utf-8"))
             self.assertEqual(artifact["error_category"], "service_rejected_credential")
             self.assertNotIn("do-not-store", json.dumps(artifact))

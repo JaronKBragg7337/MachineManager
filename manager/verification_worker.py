@@ -117,4 +117,11 @@ class RepositoryVerificationHandler:
             )
         except OSError as error:
             raise VerificationRetryableError("verification evidence could not be saved") from error
-        return DispatchOutcome(status="COMPLETE" if passed else "FAILED", metrics=metrics)
+        return DispatchOutcome(
+            status="COMPLETE" if passed else "FAILED",
+            metrics=metrics,
+            public_message=(
+                f"Repository verification {'passed' if passed else 'failed'} "
+                f"{tests_run} test(s) in {duration_s:.1f}s."
+            ),
+        )

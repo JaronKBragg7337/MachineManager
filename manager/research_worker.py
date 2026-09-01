@@ -337,7 +337,24 @@ class PublicResearchHandler:
             "word_count": sum(int(source.get("word_count", 0)) for source in fetched),
             "summary_available": bool(summary),
         }
-        return DispatchOutcome(status="COMPLETE", metrics=metrics)
+        summary_text = ""
+        next_action = ""
+        if isinstance(summary, Mapping):
+            summary_text = _local_text(summary.get("summary"), max_len=150)
+            next_action = _local_text(summary.get("next_action"), max_len=100)
+        if summary_text and next_action:
+            public_message = f"Summary: {summary_text} Next: {next_action}"
+        elif summary_text:
+            public_message = f"Summary: {summary_text}"
+        elif next_action:
+            public_message = f"Next: {next_action}"
+        else:
+            public_message = f"Fetched {len(fetched)} public source(s); evidence artifact retained locally."
+        return DispatchOutcome(
+            status="COMPLETE",
+            metrics=metrics,
+            public_message=public_message,
+        )
 
 
 class OllamaResearchHandler(PublicResearchHandler):

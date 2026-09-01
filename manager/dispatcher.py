@@ -13,6 +13,7 @@ import time
 from typing import Callable, Iterable, Mapping
 import uuid
 
+from .redaction import redact_text
 from .scheduler import WorkItem, WorkScheduler
 from .supervisor import utc_now
 
@@ -24,6 +25,7 @@ class DispatchOutcome:
     status: str = "COMPLETE"
     retry_after_s: float = 300.0
     metrics: Mapping[str, int | float | bool] = field(default_factory=dict)
+    public_message: str = ""
 
 
 @dataclass(frozen=True)
@@ -76,31 +78,34 @@ class WorkDispatcher:
         outcome: str,
         error: str | None = None,
         metrics: Mapping[str, int | float | bool] | None = None,
+        public_message: str = "",
     ) -> None:
         """Persist a public-safe lifecycle event for one task attempt."""
         event_metrics: dict[str, int | float | bool] = {"attempt": item.attempts}
         event_metrics.update(dict(metrics or {}))
-        self.scheduler.store.append_event(
-            {
-                "timestamp": utc_now(),
-                "event_id": f"evt-queue-task-{uuid.uuid4().hex[:12]}",
-                "objective_id": item.objective_id,
-                "job_id": "task-queue",
-                "worker_id": "",
-                "actor": self.actor,
-                "kind": item.kind,
-                "task_id": item.task_id,
-                "event_type": event_type,
-                "previous_state": "QUEUED" if event_type == "queue_task_claimed" else "RUNNING",
-                "new_state": new_state,
-                "metrics": event_metrics,
-                "action": action,
-                "outcome": outcome,
-                "artifact_refs": [f"task:{item.task_id}"],
-                "error": error,
-                "duration": None,
-            }
-        )
+        event: dict[str, object] = {
+            "timestamp": utc_now(),
+            "event_id": f"evt-queue-task-{uuid.uuid4().hex[:12]}",
+            "objective_id": item.objective_id,
+            "job_id": "task-queue",
+            "worker_id": "",
+            "actor": self.actor,
+            "kind": item.kind,
+            "task_id": item.task_id,
+            "event_type": event_type,
+            "previous_state": "QUEUED" if event_type == "queue_task_claimed" else "RUNNING",
+            "new_state": new_state,
+            "metrics": event_metrics,
+            "action": action,
+            "outcome": outcome,
+            "artifact_refs": [f"task:{item.task_id}"],
+            "error": error,
+            "duration": None,
+        }
+        clean_message = redact_text(public_message, max_len=220).strip()
+        if clean_message:
+            event["message"] = clean_message
+        self.scheduler.store.append_event(event)
 
     def _apply_outcome(
         self,
@@ -112,6 +117,7 @@ class WorkDispatcher:
         """Apply one handler result and record its public-safe lifecycle event."""
         status = str(outcome.status).upper()
         result_metrics: Mapping[str, int | float | bool] = dict(outcome.metrics)
+        public_message = str(outcome.public_message or "")
         if status not in self._TERMINAL and status != "RETRY":
             raise ValueError(f"unsupported dispatch outcome: {status}")
         if status == "COMPLETE":
@@ -123,6 +129,7 @@ class WorkDispatcher:
                 action="complete_queue_task",
                 outcome="handler_completed",
                 metrics=result_metrics,
+                public_message=public_message,
             )
         elif status == "RETRY":
             retry_after = max(0.1, float(outcome.retry_after_s))
@@ -136,6 +143,7 @@ class WorkDispatcher:
                     action="escalate_queue_task",
                     outcome="retry_budget_exhausted",
                     metrics=result_metrics,
+                    public_message=public_message,
                 )
             else:
                 self.scheduler.defer(item.task_id, retry_at=current + retry_after)
@@ -146,6 +154,7 @@ class WorkDispatcher:
                     action="retry_queue_task",
                     outcome="handler_requested_retry",
                     metrics={**result_metrics, "retry_after_s": retry_after},
+                    public_message=public_message,
                 )
         elif status == "FAILED":
             self.scheduler.fail(item.task_id)
@@ -156,6 +165,7 @@ class WorkDispatcher:
                 action="fail_queue_task",
                 outcome="handler_reported_failure",
                 metrics=result_metrics,
+                public_message=public_message,
             )
         else:
             self.scheduler.escalate(item.task_id)
@@ -166,6 +176,7 @@ class WorkDispatcher:
                 action="escalate_queue_task",
                 outcome="handler_requested_escalation",
                 metrics=result_metrics,
+                public_message=public_message,
             )
         return status, result_metrics
 

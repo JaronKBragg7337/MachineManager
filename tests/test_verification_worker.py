@@ -30,6 +30,7 @@ class VerificationWorkerTests(unittest.TestCase):
             self.assertEqual(outcome.status, "COMPLETE")
             self.assertEqual(outcome.metrics["tests_run"], 69)
             self.assertTrue(outcome.metrics["passed"])
+            self.assertIn("Repository verification passed 69 test(s)", outcome.public_message)
             evidence = json.loads((artifact_dir / "verification-task-1.json").read_text(encoding="utf-8"))
             self.assertEqual(evidence["return_code"], 0)
             self.assertEqual(evidence["tests_run"], 69)
@@ -52,6 +53,7 @@ class VerificationWorkerTests(unittest.TestCase):
             )
             self.assertEqual(outcome.status, "FAILED")
             self.assertFalse(outcome.metrics["passed"])
+            self.assertIn("Repository verification failed 69 test(s)", outcome.public_message)
 
     def test_timeout_is_retryable(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

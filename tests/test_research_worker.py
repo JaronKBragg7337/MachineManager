@@ -151,6 +151,8 @@ class ResearchWorkerTests(unittest.TestCase):
             self.assertEqual(outcome.status, "COMPLETE")
             self.assertEqual(outcome.metrics["source_count"], 2)
             self.assertTrue(outcome.metrics["summary_available"])
+            self.assertIn("Summary: Observed change.", outcome.public_message)
+            self.assertIn("Next: Verify the finding.", outcome.public_message)
             self.assertEqual(artifact["question"], "What changed?")
             self.assertEqual(len(artifact["sources"]), 2)
             self.assertNotIn("private_note", json.dumps(artifact))
