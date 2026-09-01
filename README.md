@@ -51,6 +51,7 @@ The repository-level Python runtime in [`manager/`](manager/) currently provides
 - GPU evidence tolerance: the NVIDIA probe accepts a brief zero-utilization sample when dedicated worker memory and active power still prove CUDA activity, while idle/no-memory readings remain unhealthy.
 - A recorded one-time operator-resume mechanism for a specific escalated job, rather than silently erasing a failed history. See [the recovery guide](docs/LOCAL_MANAGER.md#one-time-operator-resume-after-escalation).
 - Resilient public telemetry: transient dashboard-file locks retry locally, and a persistent telemetry failure defers that snapshot instead of terminating protected work.
+- Public-data contract coverage: CI validates the three published JSON shapes, timestamp and resource ranges, and the final redaction boundary before a snapshot can be deployed.
 - Objective-change requests are queued as durable handoffs while the active job keeps its original objective and worker assignment until an explicit transition.
 - Durable agent work ledger: each bounded specialist review is recorded as a real queued, running, or completed task; coordinator-owned reviews resume without duplication after a manager restart, and completed counts are restored from SQLite.
 - Explicit durable dispatch is available for future research, build, verification, outreach, and handoff workers: registered handlers can complete, retry, fail, or escalate a task, while unregistered kinds are deferred instead of silently discarded. The protected KeyHunt assignment is not dispatched through this path.
