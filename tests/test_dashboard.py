@@ -19,6 +19,8 @@ class DashboardContractTests(unittest.TestCase):
             "Run evidence",
             "Started ",
             "Run at snapshot",
+            "AI support team",
+            "const agentRows = agents.length ? agents.map",
             "AI reviewer is working",
             "Processing the current sanitized snapshot",
         ):
