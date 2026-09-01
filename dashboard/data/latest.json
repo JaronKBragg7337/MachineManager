@@ -12,17 +12,17 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:42:20.795Z",
+        "observed_at": "2026-09-01T06:47:33.747Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "keys_per_second": 741900000,
-        "batch_number": 2127,
+        "keys_per_second": 755680000,
+        "batch_number": 2213,
         "coverage_pct": 0,
-        "uptime_s": 313.5,
-        "sample_count": 20,
-        "keys_tested": 6539641356288,
-        "hashrate_mkey_s": 741.9,
+        "uptime_s": 626.5,
+        "sample_count": 39,
+        "keys_tested": 6801265262592,
+        "hashrate_mkey_s": 755.68,
         "matches_found": 0
       }
     }
@@ -35,17 +35,17 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:42:20.795Z",
+        "observed_at": "2026-09-01T06:47:33.747Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "keys_per_second": 741900000,
-        "batch_number": 2127,
+        "keys_per_second": 755680000,
+        "batch_number": 2213,
         "coverage_pct": 0,
-        "uptime_s": 313.5,
-        "sample_count": 20,
-        "keys_tested": 6539641356288,
-        "hashrate_mkey_s": 741.9,
+        "uptime_s": 626.5,
+        "sample_count": 39,
+        "keys_tested": 6801265262592,
+        "hashrate_mkey_s": 755.68,
         "matches_found": 0
       }
     }
@@ -59,13 +59,13 @@
       "state": "WORKING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is healthy with stable GPU utilization and no errors detected.",
-      "last_duration_s": 3.609,
-      "started_at": "2026-09-01T06:42:21.725Z",
+      "last_reason": "System healthy, objective running, resources stable",
+      "last_duration_s": 6.782,
+      "started_at": "2026-09-01T06:47:34.712Z",
       "elapsed_s": 0.0,
-      "tasks_completed": 1,
-      "last_run": "2026-09-01T06:37:29.877Z",
-      "next_run": "2026-09-01T06:42:29.877Z"
+      "tasks_completed": 2,
+      "last_run": "2026-09-01T06:42:43.163Z",
+      "next_run": "2026-09-01T06:47:43.163Z"
     }
   ],
   "capabilities": [
@@ -338,39 +338,39 @@
     "handoff_style": "service-required"
   },
   "queue": {
-    "COMPLETE": 3,
+    "COMPLETE": 4,
     "RUNNING": 1
   },
   "queue_kinds": {
-    "agent_review": 4
+    "agent_review": 5
   },
   "gpu": {
     "util_pct": 87.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 63.0,
-    "power_w": 69.38,
+    "temp_c": 59.0,
+    "power_w": 81.96,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 5.6
+    "cpu_pct": 7.0
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T06:42:20.795Z",
+    "observed_at": "2026-09-01T06:47:33.747Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "keys_per_second": 741900000,
-    "batch_number": 2127,
+    "keys_per_second": 755680000,
+    "batch_number": 2213,
     "coverage_pct": 0,
-    "uptime_s": 313.5,
-    "sample_count": 20,
-    "keys_tested": 6539641356288,
-    "hashrate_mkey_s": 741.9,
+    "uptime_s": 626.5,
+    "sample_count": 39,
+    "keys_tested": 6801265262592,
+    "hashrate_mkey_s": 755.68,
     "matches_found": 0
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T06:42:21.725Z"
+  "updated": "2026-09-01T06:47:34.712Z"
 }
