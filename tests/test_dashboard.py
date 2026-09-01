@@ -25,6 +25,7 @@ class DashboardContractTests(unittest.TestCase):
             "Processing the current sanitized snapshot",
             "function renderRecurringSchedules(items)",
             "UNATTENDED SCHEDULE",
+            "UNATTENDED WORK CADENCE",
             "manager-owned cadence",
         ):
             self.assertIn(marker, self.dashboard)
