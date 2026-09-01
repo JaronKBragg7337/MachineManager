@@ -938,7 +938,10 @@
     function gpuActivityText(gpu) {
       const util = numberValue(gpu.util_pct);
       const activeEvidence = gpuEvidenceActive(gpu);
-      return activeEvidence && util !== null && util < 15 ? "ACTIVE" : util === null ? "--" : String(Math.round(util)) + "%";
+      if (activeEvidence && util !== null && util < 15) return "ACTIVE";
+      if (util === 0) return "IDLE";
+      if (util === null) return "--";
+      return String(Math.round(util)) + "%";
     }
 
     function gpuEvidenceActive(gpu) {
@@ -954,6 +957,9 @@
       if (gpuEvidenceActive(gpu) && util !== null && util < 15) {
         return resourceCard("GPU activity", "ACTIVE", "", "Dedicated memory + power confirm work; raw driver sample " + Math.round(util) + "%", 100, "green");
       }
+      if (util === 0) {
+        return resourceCard("GPU activity", "IDLE", "", "Raw driver sample 0%; no independent activity evidence", 0, "");
+      }
       return resourceCard("GPU utilization", util === null ? "--" : String(Math.round(util)), "%", util === null ? "No verified live reading" : "Current accelerator activity", util, "green");
     }
 
@@ -961,6 +967,7 @@
       const cpu = numberValue((system || {}).cpu_pct);
       if (cpu === null) return "--";
       if (gpuEvidenceActive(gpu) && cpu < 0.5) return "LOW";
+      if (cpu === 0) return "IDLE";
       if (cpu > 0 && cpu < 1) return "<1%";
       return String(Math.round(cpu)) + "%";
     }
@@ -970,6 +977,9 @@
       if (cpu === null) return resourceCard("CPU utilization", "--", "", "No verified live reading", null, "");
       if (gpuEvidenceActive(gpu) && cpu < 0.5) {
         return resourceCard("CPU utilization", "LOW", "", "Raw CPU sample " + cpu.toFixed(1) + "%; GPU worker is active", 0, "");
+      }
+      if (cpu === 0) {
+        return resourceCard("CPU utilization", "IDLE", "", "Raw CPU sample 0%; no active GPU evidence", 0, "");
       }
       if (cpu > 0 && cpu < 1) return resourceCard("CPU utilization", "<1", "%", "Low measured host activity", cpu, "");
       return resourceCard("CPU utilization", String(Math.round(cpu)), "%", "Current host activity", cpu, "");
@@ -1036,7 +1046,7 @@
 
     function resourceMeterLabel(value, percent) {
       const semantic = upper(value);
-      if (percent === null || ["ACTIVE", "LOW", "--"].includes(semantic)) return "";
+      if (percent === null || ["ACTIVE", "LOW", "IDLE", "--"].includes(semantic)) return "";
       return '<span class="muted">' + escapeHtml(String(Math.round(percent))) + '%</span>';
     }
 

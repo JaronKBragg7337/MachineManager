@@ -8,6 +8,7 @@ const vm = require("vm");
 const root = path.resolve(__dirname, "..");
 const dashboard = fs.readFileSync(path.join(root, "dashboard", "index.html"), "utf8");
 const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "dashboard_active_zero_sample.json"), "utf8"));
+const idleFixture = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "dashboard_idle_zero_sample.json"), "utf8"));
 const start = dashboard.indexOf("function escapeHtml(value)");
 const end = dashboard.indexOf("function workProgress()", start);
 const resourceStart = dashboard.indexOf("function resourceMeterLabel(value, percent)", end);
@@ -20,7 +21,7 @@ assert.ok(resourceEnd > resourceStart, "dashboard resource helper section must h
 
 // Execute only the dashboard helper section in an isolated context; no DOM or
 // browser globals are needed for these pure readout functions.
-const executionContext = { fixture, output: null };
+const executionContext = { fixture, idleFixture, output: null };
 vm.createContext(executionContext);
 vm.runInContext(
   dashboard.slice(start, end) +
@@ -30,6 +31,10 @@ vm.runInContext(
     "gpuCard: gpuActivityCard(fixture.gpu)," +
     "cpuText: cpuActivityText(fixture.system, fixture.gpu)," +
     "cpuCard: cpuActivityCard(fixture.system, fixture.gpu)," +
+    "idleGpuText: gpuActivityText(idleFixture.gpu)," +
+    "idleGpuCard: gpuActivityCard(idleFixture.gpu)," +
+    "idleCpuText: cpuActivityText(idleFixture.system, idleFixture.gpu)," +
+    "idleCpuCard: cpuActivityCard(idleFixture.system, idleFixture.gpu)," +
     "numericLabel: resourceMeterLabel(\"86\", 86)" +
     "};",
   executionContext,
@@ -43,6 +48,12 @@ assert.strictEqual(output.cpuText, "LOW");
 assert.match(output.cpuCard, /Raw CPU sample 0\.2%/);
 assert.ok(!output.gpuCard.includes('<span class="muted">0%</span>'));
 assert.ok(!output.cpuCard.includes('<span class="muted">0%</span>'));
+assert.strictEqual(output.idleGpuText, "IDLE");
+assert.match(output.idleGpuCard, /Raw driver sample 0%; no independent activity evidence/);
+assert.strictEqual(output.idleCpuText, "IDLE");
+assert.match(output.idleCpuCard, /Raw CPU sample 0%; no active GPU evidence/);
+assert.ok(!output.idleGpuCard.includes('<span class="muted">0%</span>'));
+assert.ok(!output.idleCpuCard.includes('<span class="muted">0%</span>'));
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
 
 console.log("dashboard readout fixture: OK");
