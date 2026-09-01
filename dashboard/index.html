@@ -374,6 +374,10 @@
     .agent-meta .mini-card { padding: 10px; }
     .agent-meta .value { margin-top: 5px; color: var(--text); font-size: 13px; font-weight: 800; overflow-wrap: anywhere; }
     .agent-boundary { margin-top: 16px; padding: 12px 13px; border: 1px solid rgba(164, 138, 255, .25); border-radius: 11px; color: #c8bcff; background: rgba(164, 138, 255, .06); font-size: 11px; line-height: 1.5; }
+    .review-plan { display: grid; gap: 9px; margin-top: 10px; }
+    .review-plan-item { display: grid; gap: 3px; padding: 9px 10px; border: 1px solid rgba(55, 222, 235, .18); border-radius: 9px; background: rgba(4, 22, 42, .34); }
+    .review-plan-item strong { color: var(--text); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+    .review-plan-item span { color: var(--muted); }
 
     .evaluation-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
     .evaluation-metric { padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: rgba(5, 20, 39, .58); }
@@ -1652,9 +1656,20 @@
       return items.length ? items.join(" · ") : "No candidate categories";
     }
 
+    function auditReviewPlan(plan) {
+      const items = asArray(plan);
+      if (!items.length) return '<span class="muted">No category-specific evidence test is available.</span>';
+      return items.map(function (item) {
+        const category = String(item.category || "review lead").replace(/_/g, " ");
+        const count = numberValue(item.candidate_count);
+        const countLabel = count === null ? "" : " · " + String(Math.round(count)) + " candidates";
+        return '<div class="review-plan-item"><strong>' + escapeHtml(category + countLabel) + '</strong><span>' + escapeHtml(item.recommended_test || "Run a bounded evidence test and record the result.") + '</span></div>';
+      }).join("");
+    }
+
     function auditCard(audit) {
       const stateLabel = upper(audit.state || "UNKNOWN").replace(/_/g, " ");
-      return '<article class="agent-card"><div class="agent-top"><div><p class="eyebrow">Constraint review target</p><h2>' + escapeHtml(audit.label || audit.id || "Unnamed audit") + '</h2><div class="agent-model">Published summary only — local paths and excerpts stay on the MSI.</div></div>' + badge(audit.state, stateLabel) + '</div><div class="agent-meta"><div class="mini-card"><span class="label">Files scanned</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.files_scanned) || 0)) + '</div></div><div class="mini-card"><span class="label">Candidates</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.candidate_count) || 0)) + '</div></div><div class="mini-card"><span class="label">Files skipped</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.files_skipped) || 0)) + '</div></div><div class="mini-card"><span class="label">Last scan</span><div class="value">' + escapeHtml(formatDate(audit.scanned_at, true)) + '</div></div></div><div class="agent-boundary"><strong>Candidate categories:</strong> ' + escapeHtml(auditCategoryText(audit.categories)) + (audit.more_pending ? '<br><br><strong>Scan continuity:</strong> the next scheduled pass resumes after this local source window instead of rescanning the same first slice.' : audit.truncated ? '<br><br><strong>Bounded findings:</strong> this window reached its finding cap; its next pass still advances through the remaining source.' : '') + '<br><br>These are review leads, not automatic removals. A rule may be required, provider-enforced, duplicated, obsolete, project-specific, or waiting for a real test.</div></article>';
+      return '<article class="agent-card"><div class="agent-top"><div><p class="eyebrow">Constraint review target</p><h2>' + escapeHtml(audit.label || audit.id || "Unnamed audit") + '</h2><div class="agent-model">Published summary only — local paths and excerpts stay on the MSI.</div></div>' + badge(audit.state, stateLabel) + '</div><div class="agent-meta"><div class="mini-card"><span class="label">Files scanned</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.files_scanned) || 0)) + '</div></div><div class="mini-card"><span class="label">Candidates</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.candidate_count) || 0)) + '</div></div><div class="mini-card"><span class="label">Files skipped</span><div class="value">' + escapeHtml(compactNumber(numberValue(audit.files_skipped) || 0)) + '</div></div><div class="mini-card"><span class="label">Last scan</span><div class="value">' + escapeHtml(formatDate(audit.scanned_at, true)) + '</div></div></div><div class="agent-boundary"><strong>Candidate categories:</strong> ' + escapeHtml(auditCategoryText(audit.categories)) + '<br><br><strong>Recommended evidence tests:</strong><div class="review-plan">' + auditReviewPlan(audit.review_plan) + '</div>' + (audit.more_pending ? '<br><strong>Scan continuity:</strong> the next scheduled pass resumes after this local source window instead of rescanning the same first slice.' : audit.truncated ? '<br><strong>Bounded findings:</strong> this window reached its finding cap; its next pass still advances through the remaining source.' : '') + '<br><br>These are review leads, not automatic removals. A rule may be required, provider-enforced, duplicated, obsolete, project-specific, or waiting for a real test.</div></article>';
     }
 
     function renderEvidence() {

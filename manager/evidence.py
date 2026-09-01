@@ -348,6 +348,65 @@ CONSTRAINT_RULES = (
 )
 
 
+# These are evidence prompts, not permissions or automatic decisions.  Keep
+# them deterministic so an audit can resume after a restart and the public
+# dashboard can explain what a review lead means without exposing its source.
+AUDIT_REVIEW_PLAN = {
+    "approval_gate": {
+        "test_id": "approval-gate-check",
+        "recommended_test": (
+            "Test a harmless delegated action and record whether the platform "
+            "already owns the approval step."
+        ),
+    },
+    "autonomy_limit": {
+        "test_id": "delegated-capability-check",
+        "recommended_test": (
+            "Run one bounded capability test and record what the configured "
+            "worker actually permits."
+        ),
+    },
+    "scope_boundary": {
+        "test_id": "scope-boundary-check",
+        "recommended_test": (
+            "Verify the intended service, target, and technique boundary "
+            "before the representative test."
+        ),
+    },
+    "data_boundary": {
+        "test_id": "sanitized-egress-check",
+        "recommended_test": (
+            "Run the sanitized-publication regression test and confirm "
+            "sensitive details stay local."
+        ),
+    },
+}
+
+
+def review_plan_for_categories(categories: Mapping[str, Any] | None) -> list[dict[str, Any]]:
+    """Return deterministic, public-safe evidence tests for known categories."""
+    plan: list[dict[str, Any]] = []
+    for category, definition in AUDIT_REVIEW_PLAN.items():
+        value = (categories or {}).get(category)
+        if isinstance(value, bool):
+            continue
+        try:
+            count = int(value)
+        except (TypeError, ValueError):
+            continue
+        if count <= 0:
+            continue
+        plan.append(
+            {
+                "category": category,
+                "candidate_count": count,
+                "test_id": definition["test_id"],
+                "recommended_test": definition["recommended_test"],
+            }
+        )
+    return plan
+
+
 @dataclass(frozen=True)
 class ConstraintFinding:
     rule_id: str
@@ -385,6 +444,7 @@ class ConstraintAuditReport:
     findings: tuple[ConstraintFinding, ...]
 
     def local_record(self) -> dict[str, Any]:
+        categories = self.category_counts()
         return {
             "id": self.audit_id,
             "target_id": self.target_id,
@@ -398,7 +458,8 @@ class ConstraintAuditReport:
             "next_cursor": self.next_cursor,
             "scan_signature": self.scan_signature,
             "candidate_count": len(self.findings),
-            "categories": self.category_counts(),
+            "categories": categories,
+            "review_plan": review_plan_for_categories(categories),
             "findings": [item.local_record() for item in self.findings],
         }
 
@@ -740,7 +801,7 @@ class EvidenceCoordinator:
             if isinstance(raw_categories, Mapping):
                 for key, value in raw_categories.items():
                     clean_key = _safe_text(key, max_len=40)
-                    if clean_key and isinstance(value, (int, float)):
+                    if clean_key in AUDIT_REVIEW_PLAN and isinstance(value, (int, float)) and not isinstance(value, bool):
                         categories[clean_key] = max(0, int(value))
             summaries.append(
                 {
@@ -754,6 +815,7 @@ class EvidenceCoordinator:
                     "truncated": bool(record.get("truncated", False)),
                     "more_pending": bool(record.get("more_pending", False)),
                     "categories": categories,
+                    "review_plan": review_plan_for_categories(categories),
                 }
             )
         return summaries

@@ -492,6 +492,10 @@ class TelemetryTests(unittest.TestCase):
             self.assertGreaterEqual(categories["scope_boundary"], 1)
             self.assertGreaterEqual(categories["data_boundary"], 1)
             self.assertTrue(any(item.excerpt == "[redacted]" for item in report.findings))
+            review_plan = {item["category"]: item for item in report.local_record()["review_plan"]}
+            self.assertEqual(review_plan["autonomy_limit"]["test_id"], "delegated-capability-check")
+            self.assertIn("bounded capability test", review_plan["autonomy_limit"]["recommended_test"])
+            self.assertEqual(review_plan["data_boundary"]["candidate_count"], categories["data_boundary"])
             self.assertEqual(source.read_text(encoding="utf-8"), original)
 
     def test_constraint_audit_skips_local_secret_and_environment_sources(self) -> None:
@@ -1545,6 +1549,20 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("C:\\", json.dumps(latest))
             self.assertEqual(latest["worker_profiles"][0]["capabilities"][0]["summary"], "token: [redacted]")
             self.assertEqual(latest["constraint_audits"][0]["categories"], {"approval_gate": 2})
+            self.assertEqual(
+                latest["constraint_audits"][0]["review_plan"],
+                [
+                    {
+                        "category": "approval_gate",
+                        "candidate_count": 2,
+                        "test_id": "approval-gate-check",
+                        "recommended_test": (
+                            "Test a harmless delegated action and record whether the platform "
+                            "already owns the approval step."
+                        ),
+                    }
+                ],
+            )
             self.assertTrue(latest["constraint_audits"][0]["more_pending"])
             self.assertNotIn("C:\\", json.dumps(events))
             self.assertNotIn("pid", json.dumps(events))

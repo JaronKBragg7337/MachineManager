@@ -13,19 +13,24 @@ const start = dashboard.indexOf("function escapeHtml(value)");
 const end = dashboard.indexOf("function workProgress()", start);
 const resourceStart = dashboard.indexOf("function resourceMeterLabel(value, percent)", end);
 const resourceEnd = dashboard.indexOf("function renderWorkersTable", resourceStart);
+const auditStart = dashboard.indexOf("function auditCategoryText(categories)");
+const auditEnd = dashboard.indexOf("function renderEvidence()", auditStart);
 
 assert.ok(start >= 0, "dashboard helper section must exist");
 assert.ok(end > start, "dashboard helper section must have an end marker");
 assert.ok(resourceStart > end, "dashboard resource helper section must exist");
 assert.ok(resourceEnd > resourceStart, "dashboard resource helper section must have an end marker");
+assert.ok(auditStart > resourceEnd, "dashboard audit helper section must exist");
+assert.ok(auditEnd > auditStart, "dashboard audit helper section must have an end marker");
 
 // Execute only the dashboard helper section in an isolated context; no DOM or
 // browser globals are needed for these pure readout functions.
 const executionContext = { fixture, idleFixture, output: null };
 vm.createContext(executionContext);
 vm.runInContext(
-  dashboard.slice(start, end) +
+    dashboard.slice(start, end) +
     dashboard.slice(resourceStart, resourceEnd) +
+    dashboard.slice(auditStart, auditEnd) +
     "\noutput = {" +
     "gpuText: gpuActivityText(fixture.gpu)," +
     "gpuCard: gpuActivityCard(fixture.gpu)," +
@@ -35,7 +40,8 @@ vm.runInContext(
     "idleGpuCard: gpuActivityCard(idleFixture.gpu)," +
     "idleCpuText: cpuActivityText(idleFixture.system, idleFixture.gpu)," +
     "idleCpuCard: cpuActivityCard(idleFixture.system, idleFixture.gpu)," +
-    "numericLabel: resourceMeterLabel(\"86\", 86)" +
+    "numericLabel: resourceMeterLabel(\"86\", 86)," +
+    "reviewPlan: auditReviewPlan([{category: \"approval_gate\", candidate_count: 2, recommended_test: \"Run a harmless delegated action.\"}])" +
     "};",
   executionContext,
   { filename: path.join(root, "dashboard", "index.html") },
@@ -55,5 +61,7 @@ assert.match(output.idleCpuCard, /Raw CPU sample 0%; no active GPU evidence/);
 assert.ok(!output.idleGpuCard.includes('<span class="muted">0%</span>'));
 assert.ok(!output.idleCpuCard.includes('<span class="muted">0%</span>'));
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
+assert.match(output.reviewPlan, /approval gate · 2 candidates/);
+assert.match(output.reviewPlan, /Run a harmless delegated action/);
 
 console.log("dashboard readout fixture: OK");

@@ -17,6 +17,12 @@ review asks four things:
 The answer can be **keep**, **test**, **record as provider or service behavior**,
 or **consolidate after evidence**. It is never automatically "remove."
 
+Each completed audit now turns its known categories into a deterministic review
+plan. The plan is stored locally and projected publicly as category counts,
+stable test IDs, and a short recommended evidence test. Older audit records are
+reconstructed from their sanitized category counts, so a manager restart does
+not erase the next action.
+
 ## Data-boundary evidence
 
 The current evidence audit reports data-boundary candidates as a category-level

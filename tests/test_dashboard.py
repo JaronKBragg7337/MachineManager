@@ -37,6 +37,8 @@ class DashboardContractTests(unittest.TestCase):
             "No separate lifecycle events are retained",
             "latest 32 public task records",
             "kind-balanced window interleaves recent records",
+            "function auditReviewPlan(plan)",
+            "Recommended evidence tests:",
         ):
             self.assertIn(marker, self.dashboard)
 

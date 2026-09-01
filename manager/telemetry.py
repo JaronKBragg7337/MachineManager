@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from .evidence import review_plan_for_categories
 from .redaction import redact_text
 
 
@@ -558,6 +559,7 @@ class TelemetryPublisher:
                     "truncated": bool(audit.get("truncated", False)),
                     "more_pending": bool(audit.get("more_pending", False)),
                     "categories": categories,
+                    "review_plan": review_plan_for_categories(categories),
                 }
             )
         return public
