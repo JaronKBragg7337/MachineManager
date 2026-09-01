@@ -3,9 +3,7 @@
   "reference_id": "worker-death-001",
   "version": "1.0",
   "started_at": "2026-08-28T16:21:36.2614635-04:00",
-  "manager_pid": 648,
   "initial_state": {
-    "worker_pid": 18228,
     "search_active": true,
     "gpu": {
       "util_pct": 77,
@@ -37,7 +35,6 @@
     "cycle": 3,
     "launch_started_at": "2026-08-28T16:23:06.266585-04:00",
     "launch_confirmed_at": "2026-08-28T16:23:11-04:00",
-    "worker_pid": 16644,
     "recovery_time_s": 94.74,
     "confirmed_healthy_at": "2026-08-28T16:23:31.479773-04:00",
     "confirmed_healthy_gpu": {

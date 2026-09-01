@@ -9,6 +9,34 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class ScenarioArtifactTests(unittest.TestCase):
+    def test_json_artifacts_do_not_store_process_ids(self) -> None:
+        violations: list[str] = []
+
+        def walk(value: object, location: str) -> None:
+            if isinstance(value, dict):
+                for key, child in value.items():
+                    key_name = str(key)
+                    key_location = f"{location}.{key_name}" if location else key_name
+                    if "pid" in key_name.lower() and key_name.lower() != "pid_file":
+                        violations.append(key_location)
+                    walk(child, key_location)
+            elif isinstance(value, list):
+                for index, child in enumerate(value):
+                    walk(child, f"{location}[{index}]")
+
+        for path in REPO_ROOT.rglob("*.json"):
+            if ".git" in path.parts or "var" in path.parts:
+                continue
+            try:
+                document = json.loads(path.read_text(encoding="utf-8-sig"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                continue
+            before = len(violations)
+            walk(document, "")
+            violations[before:] = [f"{path}: {item}" for item in violations[before:]]
+
+        self.assertEqual(violations, [])
+
     def test_stalled_worker_artifacts_record_a_sanitized_pass(self) -> None:
         trace = json.loads(
             (REPO_ROOT / "scenarios" / "stalled-worker" / "trace-001.json").read_text(
