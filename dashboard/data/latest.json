@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:04:29.213Z",
+        "observed_at": "2026-09-01T06:18:42.252Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "coverage_pct": 0,
-        "keys_per_second": 746970000,
-        "uptime_s": 0.8,
-        "keys_tested": 4869637275648,
-        "sample_count": 1,
-        "batch_number": 1581,
-        "hashrate_mkey_s": 746.97,
-        "matches_found": 0
+        "sample_count": 18,
+        "batch_number": 1786,
+        "hashrate_mkey_s": 755.31,
+        "keys_per_second": 755310000,
+        "uptime_s": 279.8,
+        "matches_found": 0,
+        "keys_tested": 5495309991936
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:04:29.213Z",
+        "observed_at": "2026-09-01T06:18:42.252Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "coverage_pct": 0,
-        "keys_per_second": 746970000,
-        "uptime_s": 0.8,
-        "keys_tested": 4869637275648,
-        "sample_count": 1,
-        "batch_number": 1581,
-        "hashrate_mkey_s": 746.97,
-        "matches_found": 0
+        "sample_count": 18,
+        "batch_number": 1786,
+        "hashrate_mkey_s": 755.31,
+        "keys_per_second": 755310000,
+        "uptime_s": 279.8,
+        "matches_found": 0,
+        "keys_tested": 5495309991936
       }
     }
   ],
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
-      "last_action": "",
-      "last_reason": "",
-      "last_duration_s": null,
-      "started_at": "2026-09-01T06:04:29.990Z",
-      "elapsed_s": 0.0,
-      "tasks_completed": 0,
-      "last_run": "",
-      "next_run": ""
+      "last_action": "continue",
+      "last_reason": "System is healthy with no errors or resource constraints.",
+      "last_duration_s": 4.156,
+      "started_at": "",
+      "elapsed_s": null,
+      "tasks_completed": 1,
+      "last_run": "2026-09-01T06:14:24.051Z",
+      "next_run": "2026-09-01T06:19:24.051Z"
     }
   ],
   "capabilities": [
@@ -325,46 +325,46 @@
     }
   ],
   "autonomy": {
-    "developer_tools": true,
-    "outreach_opt_out": true,
-    "gpu_idle_use": true,
-    "transparent_outreach": true,
-    "account_enrollment": true,
-    "paid_work": true,
-    "public_submissions": true,
     "procurement_when_funded": true,
     "terms_aware_execution": true,
-    "mode": "EXECUTE_AND_REPORT",
-    "handoff_style": "service-required"
+    "transparent_outreach": true,
+    "account_enrollment": true,
+    "outreach_opt_out": true,
+    "developer_tools": true,
+    "public_submissions": true,
+    "gpu_idle_use": true,
+    "paid_work": true,
+    "handoff_style": "service-required",
+    "mode": "EXECUTE_AND_REPORT"
   },
   "queue": {},
   "gpu": {
-    "util_pct": 0.0,
+    "util_pct": 93.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 55.0,
-    "power_w": 73.96,
+    "temp_c": 63.0,
+    "power_w": 69.17,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 6.0
+    "cpu_pct": 5.3
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T06:04:29.213Z",
+    "observed_at": "2026-09-01T06:18:42.252Z",
     "reported": true,
     "active": true,
     "healthy": true,
     "coverage_pct": 0,
-    "keys_per_second": 746970000,
-    "uptime_s": 0.8,
-    "keys_tested": 4869637275648,
-    "sample_count": 1,
-    "batch_number": 1581,
-    "hashrate_mkey_s": 746.97,
-    "matches_found": 0
+    "sample_count": 18,
+    "batch_number": 1786,
+    "hashrate_mkey_s": 755.31,
+    "keys_per_second": 755310000,
+    "uptime_s": 279.8,
+    "matches_found": 0,
+    "keys_tested": 5495309991936
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T06:04:29.989Z"
+  "updated": "2026-09-01T06:18:43.022Z"
 }
