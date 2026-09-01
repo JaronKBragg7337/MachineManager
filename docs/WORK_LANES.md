@@ -45,6 +45,11 @@ Supported sources are:
 - `static` — records a deliberately registered mission state, including a
   completed milestone. It is not used to imply background execution.
 
+Agent-backed lanes also link their public card to the agent registry. When a
+specialist has a current or completed durable task, the Work view shows its
+run record alongside the observed lane state; the full sanitized AI timeline
+remains available from the Activity view.
+
 ## State meanings
 
 `RUNNING` means the linked source currently reports active work. `REVIEW` means
