@@ -54,6 +54,11 @@ class DashboardContractTests(unittest.TestCase):
         self.assertIn('["ACTIVE", "LOW", "--"].includes(semantic)', self.dashboard)
         self.assertIn("resourceMeterLabel(value, percent)", self.dashboard)
 
+    def test_resumed_mobile_pages_fetch_a_fresh_snapshot(self) -> None:
+        self.assertIn('document.addEventListener("visibilitychange"', self.dashboard)
+        self.assertIn('if (document.visibilityState === "visible") loadAll(false);', self.dashboard)
+        self.assertIn('window.addEventListener("pageshow"', self.dashboard)
+
 
 if __name__ == "__main__":
     unittest.main()

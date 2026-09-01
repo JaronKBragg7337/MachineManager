@@ -1821,6 +1821,10 @@
         document.getElementById("mobileMenuButton").setAttribute("aria-expanded", "false");
       }
     });
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible") loadAll(false);
+    });
+    window.addEventListener("pageshow", function () { loadAll(false); });
     setInterval(updateChrome, 15000);
     setInterval(function () { loadAll(false); }, 60000);
     render();
