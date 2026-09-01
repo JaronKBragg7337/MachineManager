@@ -121,6 +121,18 @@ The public snapshot also includes a bounded recent task ledger. It contains
 only task id, allowlisted kind, objective id, state, attempt count, and a
 sanitized timestamp; task payloads remain local in SQLite.
 
+## Research worker
+
+The optional `research_worker` configuration connects the durable `research`
+task kind to a bounded public-source handler. It accepts a task question and a
+short list of public HTTP(S) source URLs, limits response size and source count,
+rejects local/private URLs, and writes one local evidence artifact per task.
+With `mode: "ollama"`, the configured local model receives only the extracted
+source excerpts and runs with GPU layers disabled. With `mode: "evidence_only"`,
+the handler records source evidence without a model summary. The runner does
+not enable this lane by default; enabling it requires both
+`queue_dispatch.enabled` and `research_worker.enabled` in the local config.
+
 ## Visible work lanes
 
 The optional `workstreams` array is a public-safe ledger for missions beyond

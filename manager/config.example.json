@@ -14,6 +14,17 @@
     "defer_delay_s": 300,
     "max_attempts": 3
   },
+  "research_worker": {
+    "enabled": false,
+    "mode": "ollama",
+    "model": "qwen3.5:4b",
+    "base_url": "http://127.0.0.1:11434",
+    "artifact_dir": "../var/research",
+    "model_timeout_s": 30,
+    "source_timeout_s": 15,
+    "max_source_bytes": 120000,
+    "max_sources": 3
+  },
   "autonomy": {
     "mode": "EXECUTE_AND_REPORT",
     "allow_account_enrollment": true,

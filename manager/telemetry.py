@@ -128,6 +128,11 @@ PUBLIC_METRIC_KEYS = {
     "segment_total",
     "worker_tick",
     "matches_found",
+    "source_count",
+    "sources_fetched",
+    "sources_truncated",
+    "word_count",
+    "summary_available",
 }
 PUBLIC_QUEUE_KEYS = {
     "QUEUED",

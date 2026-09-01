@@ -20,6 +20,7 @@ from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
 from .probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe, nvidia_smi_probe
 from .public_upload import GitHubPagesPublisher, PublicUploadError
+from .research_worker import OllamaResearchHandler, PublicResearchHandler
 from .scheduler import WorkScheduler
 from .state_store import StateStore
 from .supervisor import WorkerSpec
@@ -561,6 +562,7 @@ def main() -> int:
         raw_dispatch = config.get("queue_dispatch", {})
         if raw_dispatch is None:
             raw_dispatch = {}
+        research_handlers: dict[str, Any] = {}
         try:
             if not isinstance(raw_dispatch, Mapping):
                 raise ValueError("config.queue_dispatch must be an object")
@@ -568,9 +570,40 @@ def main() -> int:
             queue_dispatch_limit = max(1, min(int(raw_dispatch.get("limit", 4)), 20))
             defer_delay_s = float(raw_dispatch.get("defer_delay_s", 300))
             max_attempts = int(raw_dispatch.get("max_attempts", 3))
+            raw_research = config.get("research_worker", {})
+            if raw_research is None:
+                raw_research = {}
+            if not isinstance(raw_research, Mapping):
+                raise ValueError("config.research_worker must be an object")
+            if bool(raw_research.get("enabled", False)):
+                mode = str(raw_research.get("mode", "ollama")).strip().lower()
+                artifact_dir = resolve_path(
+                    str(raw_research.get("artifact_dir", "var/research")),
+                    base=base,
+                )
+                if artifact_dir is None:
+                    raise ValueError("research artifact_dir is required")
+                if mode == "evidence_only":
+                    research_handlers["research"] = PublicResearchHandler(
+                        artifact_dir,
+                        max_sources=int(raw_research.get("max_sources", 3)),
+                    )
+                elif mode == "ollama":
+                    research_handlers["research"] = OllamaResearchHandler(
+                        artifact_dir,
+                        model=str(raw_research.get("model", "")),
+                        base_url=str(raw_research.get("base_url", "http://127.0.0.1:11434")),
+                        model_timeout_s=float(raw_research.get("model_timeout_s", 30)),
+                        source_timeout_s=float(raw_research.get("source_timeout_s", 15)),
+                        max_source_bytes=int(raw_research.get("max_source_bytes", 120000)),
+                        max_sources=int(raw_research.get("max_sources", 3)),
+                    )
+                else:
+                    raise ValueError("research_worker.mode must be ollama or evidence_only")
             if dispatch_enabled:
                 queue_dispatcher = WorkDispatcher(
                     scheduler,
+                    research_handlers,
                     defer_delay_s=defer_delay_s,
                     max_attempts=max_attempts,
                     actor=str(config.get("actor", "local-manager")),

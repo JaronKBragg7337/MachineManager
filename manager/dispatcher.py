@@ -7,7 +7,7 @@ without making the protected Puzzle #71 assignment mutable by accident.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import time
 from typing import Callable, Mapping
 import uuid
@@ -22,6 +22,7 @@ class DispatchOutcome:
 
     status: str = "COMPLETE"
     retry_after_s: float = 300.0
+    metrics: Mapping[str, int | float | bool] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -30,6 +31,7 @@ class DispatchResult:
     kind: str
     status: str
     attempts: int
+    metrics: Mapping[str, int | float | bool] = field(default_factory=dict)
 
 
 DispatchHandler = Callable[[WorkItem], DispatchOutcome]
@@ -120,9 +122,11 @@ class WorkDispatcher:
                 )
                 continue
 
+            result_metrics: Mapping[str, int | float | bool] = {}
             try:
                 outcome = handler(item)
                 status = str(outcome.status).upper()
+                result_metrics = dict(outcome.metrics)
                 if status not in self._TERMINAL and status != "RETRY":
                     raise ValueError(f"unsupported dispatch outcome: {status}")
                 if status == "COMPLETE":
@@ -133,6 +137,7 @@ class WorkDispatcher:
                         new_state="COMPLETE",
                         action="complete_queue_task",
                         outcome="handler_completed",
+                        metrics=result_metrics,
                     )
                 elif status == "RETRY":
                     retry_after = max(0.1, float(outcome.retry_after_s))
@@ -154,7 +159,7 @@ class WorkDispatcher:
                             new_state="QUEUED",
                             action="retry_queue_task",
                             outcome="handler_requested_retry",
-                            metrics={"retry_after_s": retry_after},
+                            metrics={**result_metrics, "retry_after_s": retry_after},
                         )
                 elif status == "FAILED":
                     self.scheduler.fail(item.task_id)
@@ -164,6 +169,7 @@ class WorkDispatcher:
                         new_state="FAILED",
                         action="fail_queue_task",
                         outcome="handler_reported_failure",
+                        metrics=result_metrics,
                     )
                 else:
                     self.scheduler.escalate(item.task_id)
@@ -173,6 +179,7 @@ class WorkDispatcher:
                         new_state="ESCALATED",
                         action="escalate_queue_task",
                         outcome="handler_requested_escalation",
+                        metrics=result_metrics,
                     )
             except Exception as error:
                 if item.attempts >= self.max_attempts:
@@ -197,5 +204,7 @@ class WorkDispatcher:
                     outcome=outcome,
                     error=type(error).__name__,
                 )
-            results.append(DispatchResult(item.task_id, item.kind, status, item.attempts))
+            results.append(
+                DispatchResult(item.task_id, item.kind, status, item.attempts, result_metrics)
+            )
         return results
