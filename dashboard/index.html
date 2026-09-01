@@ -1210,6 +1210,10 @@
     function renderMissionMap(latest, sets, worker, progress) {
       const active = hasCurrentWorkerEvidence(latest, worker);
       const agent = sets.agents[0] || {};
+      const agentWorking = upper(agent.state) === "WORKING";
+      const agentElapsed = numberValue(agent.elapsed_s);
+      const agentSignal = agentWorking ? (agentElapsed === null ? "In progress" : duration(agentElapsed * 1000)) : (agent.last_action || "Awaiting run");
+      const agentCopy = agentWorking ? "Processing the current sanitized snapshot; its bounded recommendation will be recorded when the run completes." : (agent.last_reason || "No bounded recommendation has been published yet.");
       const matching = numberValue(progress.matches_found);
       const matchSignal = matching === null ? "Awaiting report" : matching > 0 ? String(Math.round(matching)) + " signal(s)" : "No match reported";
       const current = freshness();
@@ -1220,7 +1224,7 @@
         missionStation({ icon: "cpu", kicker: "Primary worker", title: worker.id || "GPU search worker", state: worker.state || "UNKNOWN", copy: "Tests candidate batches in the active puzzle range. Only aggregate evidence is published.", signalLabel: "Reported rate", signal: missionRate(progress), visualTone: active ? "active" : "watch" }) +
         missionStation({ icon: "target", kicker: "Verification gate", title: "Result Gate", state: matching && matching > 0 ? "VERIFYING" : "WATCHING", badgeLabel: matching && matching > 0 ? "VERIFYING" : "WATCHING", copy: "A possible signal is independently re-derived before any result is treated as real.", signalLabel: "Current result", signal: matchSignal, visualTone: "watch" }) +
         missionStation({ icon: "flask", kicker: "Future work", title: "Research Bay", state: "STANDBY", copy: "Reserved for the next bounded research or revenue-oriented objective. Nothing is pretending to run here yet.", signalLabel: "Queue", signal: "Ready for objective", visualTone: "standby" }) +
-        missionStation({ icon: "bot", kicker: "Support specialist", title: agent.id || "AI reviewer", state: agent.state || "STANDBY", copy: agent.last_reason || "No bounded recommendation has been published yet.", signalLabel: "Last action", signal: agent.last_action || "Awaiting run", visualTone: agent.enabled ? "watch" : "standby" }) +
+        missionStation({ icon: "bot", kicker: "Support specialist", title: agent.id || "AI reviewer", state: agent.state || "STANDBY", copy: agentCopy, signalLabel: agentWorking ? "Run at snapshot" : "Last action", signal: agentSignal, visualTone: agentWorking ? "active" : agent.enabled ? "watch" : "standby" }) +
         missionStation({ icon: "activity", kicker: "Public evidence", title: "Dashboard Publisher", state: current.label, copy: "Publishes sanitized work evidence so the public page shows what the system is actually doing.", signalLabel: "Snapshot", signal: relative(latest.updated), visualTone: current.key === "fresh" ? "active" : "watch" }) +
         '</div></section>';
     }
@@ -1299,6 +1303,8 @@
     function renderWorkJournal(latest, sets, worker, progress) {
       const active = hasCurrentWorkerEvidence(latest, worker);
       const agent = sets.agents[0] || {};
+      const agentWorking = upper(agent.state) === "WORKING";
+      const agentElapsed = numberValue(agent.elapsed_s);
       const healthEvent = recentEvents(20, "health")[0] || {};
       const keys = numberValue(progress.keys_tested);
       const batch = numberValue(progress.batch_number);
@@ -1307,7 +1313,7 @@
       const rows = [
         journalRow("cpu", "", active ? "GPU search work is active" : "GPU search work is awaiting evidence", searchDetail + ".", progress.observed_at || latest.updated),
         journalRow("check", "", "Manager health decision: " + upper(latest.status || healthEvent.state || "UNKNOWN"), "The supervisor checks process state, recent heartbeat, accelerator activity, and reported progress together.", healthEvent.ts || latest.updated),
-        journalRow("bot", "agent", agent.id ? "AI reviewer: " + (agent.last_action || "awaiting action") : "AI reviewer is not yet published", agent.last_reason || "No bounded recommendation has been published yet.", agent.last_run || latest.updated),
+        journalRow("bot", "agent", agentWorking ? "AI reviewer is working" : agent.id ? "AI reviewer: " + (agent.last_action || "awaiting action") : "AI reviewer is not yet published", agentWorking ? "Processing the current sanitized snapshot; the bounded recommendation will appear when the run completes." + (agentElapsed === null ? "" : " Observed run time at snapshot: " + duration(agentElapsed * 1000) + ".") : (agent.last_reason || "No bounded recommendation has been published yet."), agentWorking ? agent.started_at || latest.updated : agent.last_run || latest.updated),
         journalRow("activity", "publish", "Public evidence snapshot published", "This page receives compact, sanitized telemetry; it never receives private keys, seeds, raw commands, or unrestricted model reasoning.", latest.updated)
       ];
       return '<section class="panel"><div class="panel-head"><h2>LIVE WORK JOURNAL</h2><span class="subhead">Readable summary, not private chain-of-thought</span></div><div class="panel-body"><div class="journal-list">' + rows.join("") + '</div><a class="panel-link" href="#/activity">Open the full published timeline →</a></div></section>';
@@ -1432,11 +1438,11 @@
         const working = upper(agent.state) === "WORKING";
         const elapsed = numberValue(agent.elapsed_s);
         const lastDuration = numberValue(agent.last_duration_s);
-        const runTiming = working ? (elapsed === null ? "In progress" : duration(elapsed * 1000)) : (lastDuration === null ? "--" : duration(lastDuration * 1000));
+        const runTiming = working ? (elapsed === null ? "In progress" : duration(elapsed * 1000) + " at snapshot") : (lastDuration === null ? "--" : duration(lastDuration * 1000));
         const runReference = working ? relative(agent.started_at) : relative(agent.last_run);
         const recommendationLabel = working ? "Current bounded run" : "Last bounded recommendation";
         const recommendation = working ? "This specialist is processing the current sanitized snapshot." : (agent.last_reason || "No recommendation summary published yet.");
-        return '<article class="agent-card"><div class="agent-top"><div><p class="eyebrow">' + escapeHtml(agent.role || "Bounded specialist") + '</p><h2>' + escapeHtml(agent.id || "Unnamed agent") + '</h2><div class="agent-model">' + escapeHtml(model) + '</div></div>' + badge(agent.state) + '</div><div class="agent-meta"><div class="mini-card"><span class="label">Completed tasks</span><div class="value">' + escapeHtml(agent.tasks_completed === undefined ? "--" : String(agent.tasks_completed)) + '</div></div><div class="mini-card"><span class="label">Last action</span><div class="value">' + escapeHtml(agent.last_action || "--") + '</div></div><div class="mini-card"><span class="label">' + (working ? "Running for" : "Last duration") + '</span><div class="value">' + escapeHtml(runTiming) + '</div></div><div class="mini-card"><span class="label">Next run</span><div class="value">' + escapeHtml(formatDate(agent.next_run, true)) + '</div></div></div><div class="agent-boundary"><strong>' + escapeHtml(recommendationLabel) + ':</strong> ' + escapeHtml(recommendation) + '<br><br><span class="muted">' + escapeHtml(working ? "Started " + runReference + "." : "Completed " + runReference + ".") + '</span><br><br>This specialist supplies bounded recommendations. The manager retains authority over worker lifecycle, retries, resource limits, and escalation.</div></article>';
+        return '<article class="agent-card"><div class="agent-top"><div><p class="eyebrow">' + escapeHtml(agent.role || "Bounded specialist") + '</p><h2>' + escapeHtml(agent.id || "Unnamed agent") + '</h2><div class="agent-model">' + escapeHtml(model) + '</div></div>' + badge(agent.state) + '</div><div class="agent-meta"><div class="mini-card"><span class="label">Completed tasks</span><div class="value">' + escapeHtml(agent.tasks_completed === undefined ? "--" : String(agent.tasks_completed)) + '</div></div><div class="mini-card"><span class="label">Last action</span><div class="value">' + escapeHtml(agent.last_action || "--") + '</div></div><div class="mini-card"><span class="label">' + (working ? "Run evidence" : "Last duration") + '</span><div class="value">' + escapeHtml(runTiming) + '</div></div><div class="mini-card"><span class="label">Next run</span><div class="value">' + escapeHtml(formatDate(agent.next_run, true)) + '</div></div></div><div class="agent-boundary"><strong>' + escapeHtml(recommendationLabel) + ':</strong> ' + escapeHtml(recommendation) + '<br><br><span class="muted">' + escapeHtml(working ? "Started " + runReference + "." : "Completed " + runReference + ".") + '</span><br><br>This specialist supplies bounded recommendations. The manager retains authority over worker lifecycle, retries, resource limits, and escalation.</div></article>';
       }).join("") : '<div class="error-state"><h2>No agents reported</h2><p>The agent registry is empty in this public snapshot.</p></div>';
       return pageHeading("Bounded specialists", "Agents support the manager", "Local and future cloud models can advise the runtime without becoming an unrestricted operator.", '<a class="btn" href="#/search">View workstream <span>→</span></a>') + snapshotStrip() + '<div class="agent-cards">' + cards + '</div><div class="section-grid"><div>' + renderAgentRuns(12) + '</div><section class="panel"><div class="panel-head"><h2>AGENT CONTRACT</h2><span class="subhead">designed for growth</span></div><div class="panel-body"><div class="facts-list"><div class="fact-row"><span>Authority</span><strong>Recommend only</strong></div><div class="fact-row"><span>Escalation</span><strong>Manager controlled</strong></div><div class="fact-row"><span>Resource policy</span><strong>Bounded slots</strong></div><div class="fact-row"><span>Public record</span><strong>Sanitized activity</strong></div></div></div></section></div>';
     }
