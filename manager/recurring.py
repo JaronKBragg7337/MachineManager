@@ -72,6 +72,7 @@ class RecurringTaskSeeder:
     """Schedule at most one due task per template and avoid overlapping runs."""
 
     _ACTIVE = {"QUEUED", "RUNNING"}
+    _STATUSES = {"QUEUED", "RUNNING", "COMPLETE", "FAILED", "ESCALATED", "CANCELLED"}
 
     def __init__(
         self,
@@ -201,3 +202,34 @@ class RecurringTaskSeeder:
                 }
             )
         return events
+
+    def snapshot(self, *, now: float | None = None) -> list[dict[str, Any]]:
+        """Return sanitized schedule state without exposing recurring payloads."""
+        current = time.time() if now is None else float(now)
+        records: list[dict[str, Any]] = []
+        for spec in self.specs:
+            state = self._state(spec)
+            next_at = self._number(state.get("next_at"), 0.0)
+            sequence = self._sequence(state.get("sequence"))
+            task_id = str(state.get("task_id", "")).strip()
+            if not _SAFE_ID.fullmatch(task_id):
+                task_id = ""
+            task_status = self.scheduler.store.task_status(task_id) if task_id else None
+            if task_status not in self._STATUSES:
+                task_status = "DISABLED" if not spec.enabled else ("NOT_STARTED" if not task_id else "UNKNOWN")
+            next_in_s = max(0.0, next_at - current) if next_at > 0 else None
+            records.append(
+                {
+                    "id": spec.recurring_id,
+                    "kind": spec.kind,
+                    "objective_id": spec.objective_id,
+                    "enabled": spec.enabled,
+                    "interval_s": spec.interval_s,
+                    "sequence": sequence,
+                    "next_at": next_at if next_at > 0 else None,
+                    "next_in_s": next_in_s,
+                    "last_task_id": task_id,
+                    "last_status": task_status,
+                }
+            )
+        return records

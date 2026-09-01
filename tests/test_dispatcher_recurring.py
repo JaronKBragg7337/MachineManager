@@ -112,6 +112,11 @@ class RecurringTaskSeederTests(unittest.TestCase):
                 self.assertEqual(len(first), 1)
                 self.assertEqual(store.task_status("recurring-research-lane-000001"), "QUEUED")
                 self.assertEqual(seeder.tick(now=1000.1), [])
+                schedule = seeder.snapshot(now=1000.1)
+                self.assertEqual(schedule[0]["last_task_id"], "recurring-research-lane-000001")
+                self.assertEqual(schedule[0]["last_status"], "QUEUED")
+                self.assertEqual(schedule[0]["sequence"], 1)
+                self.assertAlmostEqual(schedule[0]["next_in_s"], 9.9)
 
                 self.assertTrue(scheduler.start("recurring-research-lane-000001"))
                 self.assertEqual(seeder.tick(now=1011), [])

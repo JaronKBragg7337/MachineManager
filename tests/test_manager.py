@@ -1292,6 +1292,21 @@ class TelemetryTests(unittest.TestCase):
                             "updated_at": 1724875200.0,
                         },
                     ],
+                    "recurring": [
+                        {
+                            "id": "research-lane",
+                            "kind": "research",
+                            "objective_id": "research-objective",
+                            "enabled": True,
+                            "interval_s": 3600,
+                            "sequence": 2,
+                            "next_at": 1724878800.0,
+                            "next_in_s": 3600.0,
+                            "last_task_id": "task-research-1",
+                            "last_status": "COMPLETE",
+                            "payload": {"private_key": "do not publish"},
+                        }
+                    ],
                     "gpu": {"util_pct": 80, "power_w": 70, "resource_active": True, "private_key": "do not publish"},
                     "system": {"cpu_pct": 8.5, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
@@ -1328,6 +1343,9 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["queue_activity"][0]["kind"], "research")
             self.assertEqual(latest["queue_activity"][0]["status"], "COMPLETE")
             self.assertNotIn("payload", json.dumps(latest["queue_activity"]))
+            self.assertEqual(latest["recurring"][0]["id"], "research-lane")
+            self.assertEqual(latest["recurring"][0]["last_status"], "COMPLETE")
+            self.assertNotIn("payload", json.dumps(latest["recurring"]))
             self.assertTrue(latest["autonomy"]["developer_tools"])
             self.assertEqual(latest["system"]["cpu_pct"], 8.5)
             self.assertTrue(latest["gpu"]["resource_active"])

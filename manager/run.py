@@ -827,6 +827,7 @@ def main() -> int:
             snapshot["queue"] = scheduler.snapshot()
             snapshot["queue_kinds"] = scheduler.kind_snapshot()
             snapshot["queue_activity"] = scheduler.activity_snapshot(limit=20)
+            snapshot["recurring"] = recurring_seeder.snapshot() if recurring_seeder is not None else []
             _persist_runtime(manager, agents, store, seen_event_ids)
             public_events = merge_public_events(
                 public_events,

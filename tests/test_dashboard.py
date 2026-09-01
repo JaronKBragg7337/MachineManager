@@ -23,6 +23,9 @@ class DashboardContractTests(unittest.TestCase):
             "const agentRows = agents.length ? agents.map",
             "AI reviewer is working",
             "Processing the current sanitized snapshot",
+            "function renderRecurringSchedules(items)",
+            "UNATTENDED SCHEDULE",
+            "manager-owned cadence",
         ):
             self.assertIn(marker, self.dashboard)
 

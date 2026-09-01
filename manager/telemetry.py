@@ -151,6 +151,17 @@ PUBLIC_QUEUE_KIND_KEYS = {
     "outreach",
     "procurement",
 }
+PUBLIC_RECURRING_STATES = {
+    "DISABLED",
+    "NOT_STARTED",
+    "QUEUED",
+    "RUNNING",
+    "COMPLETE",
+    "FAILED",
+    "ESCALATED",
+    "CANCELLED",
+    "UNKNOWN",
+}
 PUBLIC_AUTONOMY_BOOL_KEYS = {
     "account_enrollment",
     "public_submissions",
@@ -299,6 +310,55 @@ def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[d
         )
         if len(safe) >= 20:
             break
+    return safe
+
+
+def _safe_recurring(recurring: Iterable[Mapping[str, Any]] | None) -> list[dict[str, Any]]:
+    """Publish recurring cadence and cursor state without task payloads."""
+    safe: list[dict[str, Any]] = []
+    for item in recurring or ():
+        if not isinstance(item, Mapping):
+            continue
+        recurring_id = _text(item.get("id"), max_len=64)
+        kind = _text(item.get("kind"), max_len=40).lower()
+        objective_id = _text(item.get("objective_id"), max_len=80)
+        if not recurring_id or kind not in PUBLIC_QUEUE_KIND_KEYS or not objective_id:
+            continue
+        interval_s = _number(item.get("interval_s"))
+        if interval_s is None or interval_s <= 0:
+            continue
+        sequence = _number(item.get("sequence"))
+        if sequence is None:
+            sequence = 0
+        next_in_s = _number(item.get("next_in_s"))
+        if next_in_s is not None:
+            next_in_s = max(0.0, next_in_s)
+        next_at = _number(item.get("next_at"))
+        next_run_at = ""
+        if next_at is not None and next_at > 0:
+            try:
+                next_run_at = dt.datetime.fromtimestamp(next_at, dt.timezone.utc).isoformat(
+                    timespec="milliseconds"
+                ).replace("+00:00", "Z")
+            except (OverflowError, OSError, ValueError):
+                next_run_at = ""
+        last_status = _text(item.get("last_status"), default="UNKNOWN", max_len=20).upper()
+        if last_status not in PUBLIC_RECURRING_STATES:
+            last_status = "UNKNOWN"
+        safe.append(
+            {
+                "id": recurring_id,
+                "kind": kind,
+                "objective_id": objective_id,
+                "enabled": bool(item.get("enabled")),
+                "interval_s": interval_s,
+                "sequence": max(0, int(sequence)),
+                "next_run_at": next_run_at,
+                "next_in_s": next_in_s,
+                "last_task_id": _text(item.get("last_task_id"), max_len=100),
+                "last_status": last_status,
+            }
+        )
     return safe
 
 
@@ -604,6 +664,7 @@ class TelemetryPublisher:
             "queue": _safe_queue(snapshot.get("queue")),
             "queue_kinds": _safe_queue_kinds(snapshot.get("queue_kinds")),
             "queue_activity": _safe_queue_activity(snapshot.get("queue_activity")),
+            "recurring": _safe_recurring(snapshot.get("recurring")),
             "gpu": gpu,
             "system": system,
             "progress": safe_workers[0].get("progress", {}) if safe_workers else {},
