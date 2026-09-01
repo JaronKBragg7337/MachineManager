@@ -50,6 +50,8 @@ vm.runInContext(
     "idleGpuCard: gpuActivityCard(idleFixture.gpu)," +
     "idleCpuText: cpuActivityText(idleFixture.system, idleFixture.gpu)," +
     "idleCpuCard: cpuActivityCard(idleFixture.system, idleFixture.gpu)," +
+    "unavailableGpuCard: gpuActivityCard({})," +
+    "unavailableCpuCard: cpuActivityCard({}, {})," +
     "numericLabel: resourceMeterLabel(\"86\", 86)," +
     "zeroGpuMetric: eventMetricChips({metrics: {util_pct: 0, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
     "queueEvidence: taskEvidenceLabel({message: \"Result summary\", outcome: \"handler_completed\"})," +
@@ -75,6 +77,10 @@ assert.strictEqual(output.idleCpuText, "IDLE");
 assert.match(output.idleCpuCard, /Raw CPU sample 0%; no active GPU evidence/);
 assert.ok(!output.idleGpuCard.includes('<span class="muted">0%</span>'));
 assert.ok(!output.idleCpuCard.includes('<span class="muted">0%</span>'));
+assert.match(output.unavailableGpuCard, /No verified live reading/);
+assert.match(output.unavailableCpuCard, /No verified live reading/);
+assert.match(output.unavailableGpuCard, /<div class="resource-value">--<small>%<\/small><\/div>/);
+assert.match(output.unavailableCpuCard, /<div class="resource-value">--<small><\/small><\/div>/);
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
 assert.match(output.zeroGpuMetric, /GPU ACTIVE \(diagnostic raw sample 0%; memory\/power confirm work\)/);
 assert.ok(!output.zeroGpuMetric.includes('GPU ACTIVE (raw 0%)'));
