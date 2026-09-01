@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T08:20:32.242Z",
+        "observed_at": "2026-09-01T08:20:54.144Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "coverage_pct": 0,
-        "batch_number": 3558,
-        "uptime_s": 0.9,
-        "keys_tested": 10917941084160,
-        "sample_count": 1,
+        "batch_number": 3575,
+        "uptime_s": 22.7,
+        "keys_tested": 10969078038528,
+        "sample_count": 2,
         "matches_found": 0,
-        "hashrate_mkey_s": 705.53,
-        "keys_per_second": 705530000
+        "hashrate_mkey_s": 748.39,
+        "keys_per_second": 748390000
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T08:20:32.242Z",
+        "observed_at": "2026-09-01T08:20:54.144Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "coverage_pct": 0,
-        "batch_number": 3558,
-        "uptime_s": 0.9,
-        "keys_tested": 10917941084160,
-        "sample_count": 1,
+        "batch_number": 3575,
+        "uptime_s": 22.7,
+        "keys_tested": 10969078038528,
+        "sample_count": 2,
         "matches_found": 0,
-        "hashrate_mkey_s": 705.53,
-        "keys_per_second": 705530000
+        "hashrate_mkey_s": 748.39,
+        "keys_per_second": 748390000
       }
     }
   ],
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
-      "last_action": "",
-      "last_reason": "",
-      "last_duration_s": null,
-      "started_at": "2026-09-01T08:20:33.132Z",
-      "elapsed_s": 0.0,
-      "tasks_completed": 0,
-      "last_run": "",
-      "next_run": ""
+      "last_action": "continue",
+      "last_reason": "System is healthy with no errors or resource constraints.",
+      "last_duration_s": 3.172,
+      "started_at": "",
+      "elapsed_s": null,
+      "tasks_completed": 1,
+      "last_run": "2026-09-01T08:20:54.977Z",
+      "next_run": "2026-09-01T08:25:54.977Z"
     }
   ],
   "capabilities": [
@@ -338,8 +338,7 @@
     "mode": "EXECUTE_AND_REPORT"
   },
   "queue": {
-    "COMPLETE": 29,
-    "RUNNING": 1
+    "COMPLETE": 30
   },
   "queue_kinds": {
     "agent_review": 28,
@@ -350,9 +349,9 @@
       "task_id": "agent-task-local-manager-brain-d0f402a89ff4",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "RUNNING",
+      "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T08:20:33.132Z"
+      "updated": "2026-09-01T08:20:54.975Z"
     },
     {
       "task_id": "agent-task-local-manager-brain-0cbb0b1645bc",
@@ -516,38 +515,38 @@
       "interval_s": 21600.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T13:48:50.946Z",
-      "next_in_s": 19697.799861431122,
+      "next_in_s": 19675.965753793716,
       "last_task_id": "recurring-machine-manager-capability-research-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
-    "util_pct": 0.0,
+    "util_pct": 87.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 54.0,
-    "power_w": 70.74,
+    "temp_c": 62.0,
+    "power_w": 68.61,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 9.7
+    "cpu_pct": 13.1
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T08:20:32.242Z",
+    "observed_at": "2026-09-01T08:20:54.144Z",
     "reported": true,
     "active": true,
     "healthy": true,
     "coverage_pct": 0,
-    "batch_number": 3558,
-    "uptime_s": 0.9,
-    "keys_tested": 10917941084160,
-    "sample_count": 1,
+    "batch_number": 3575,
+    "uptime_s": 22.7,
+    "keys_tested": 10969078038528,
+    "sample_count": 2,
     "matches_found": 0,
-    "hashrate_mkey_s": 705.53,
-    "keys_per_second": 705530000
+    "hashrate_mkey_s": 748.39,
+    "keys_per_second": 748390000
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T08:20:33.128Z"
+  "updated": "2026-09-01T08:20:54.974Z"
 }
