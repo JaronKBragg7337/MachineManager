@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T16:39:48.425Z",
+        "observed_at": "2026-09-01T16:40:25.925Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "hashrate_mkey_s": 740.73,
-        "sample_count": 9,
+        "uptime_s": 1.0,
         "keys_tested": 33371946221568,
-        "batch_number": 10880,
-        "keys_per_second": 740730000,
-        "uptime_s": 137.3,
+        "sample_count": 1,
         "matches_found": 0,
-        "coverage_pct": 0
+        "coverage_pct": 0,
+        "hashrate_mkey_s": 740.73,
+        "keys_per_second": 740730000,
+        "batch_number": 10880
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T16:39:48.425Z",
+        "observed_at": "2026-09-01T16:40:25.925Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "hashrate_mkey_s": 740.73,
-        "sample_count": 9,
+        "uptime_s": 1.0,
         "keys_tested": 33371946221568,
-        "batch_number": 10880,
-        "keys_per_second": 740730000,
-        "uptime_s": 137.3,
+        "sample_count": 1,
         "matches_found": 0,
-        "coverage_pct": 0
+        "coverage_pct": 0,
+        "hashrate_mkey_s": 740.73,
+        "keys_per_second": 740730000,
+        "batch_number": 10880
       }
     }
   ],
@@ -57,15 +57,15 @@
       "focus": "",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System is healthy with no errors; recent events show successful task recovery and synchronization.",
-      "last_duration_s": 7.875,
-      "started_at": "",
-      "elapsed_s": null,
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "started_at": "2026-09-01T16:40:26.923Z",
+      "elapsed_s": 0.0,
       "tasks_completed": 143,
-      "current_task_id": "",
+      "current_task_id": "agent-task-local-manager-brain-8ec44b22301a",
       "last_task_id": "agent-task-local-manager-brain-1b7fa28fe556",
       "last_run": "2026-09-01T16:37:55.644Z",
       "next_run": "2026-09-01T16:42:55.644Z"
@@ -76,15 +76,15 @@
       "focus": "Review capability evidence and identify one bounded research or work follow-up; never claim a test ran unless it is recorded.",
       "provider": "ollama",
       "model": "llama3.2:3b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "No immediate action required, continue monitoring the machine's status",
-      "last_duration_s": 8.641,
-      "started_at": "",
-      "elapsed_s": null,
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "started_at": "2026-09-01T16:40:26.923Z",
+      "elapsed_s": 0.0,
       "tasks_completed": 9,
-      "current_task_id": "",
+      "current_task_id": "agent-task-local-evidence-brain-c15a5ae754cb",
       "last_task_id": "agent-task-local-evidence-brain-6316c1a826d0",
       "last_run": "2026-09-01T16:37:55.647Z",
       "next_run": "2026-09-01T16:52:55.647Z"
@@ -404,7 +404,7 @@
       "title": "Health review specialist",
       "lane": "AI support team",
       "owner": "local-manager-brain",
-      "state": "WAITING",
+      "state": "RUNNING",
       "summary": "Reviews the current sanitized machine evidence and bounded recovery signals.",
       "next_action": "Complete the next scheduled health review and record its observed decision.",
       "source_kind": "agent",
@@ -412,7 +412,7 @@
       "metrics": {
         "tasks_completed": 143
       },
-      "updated": "2026-09-01T16:37:55.648Z"
+      "updated": "2026-09-01T16:40:26.947Z"
     },
     {
       "id": "local-evidence-brain-lane",
@@ -420,7 +420,7 @@
       "title": "Evidence review specialist",
       "lane": "AI support team",
       "owner": "local-evidence-brain",
-      "state": "WAITING",
+      "state": "RUNNING",
       "summary": "Reviews capability evidence and selects one bounded research or work follow-up.",
       "next_action": "Complete the next scheduled evidence review and record its sources and outcome.",
       "source_kind": "agent",
@@ -428,45 +428,39 @@
       "metrics": {
         "tasks_completed": 9
       },
-      "updated": "2026-09-01T16:37:55.648Z"
+      "updated": "2026-09-01T16:40:26.947Z"
     }
   ],
   "autonomy": {
+    "terms_aware_execution": true,
+    "transparent_outreach": true,
     "gpu_idle_use": true,
+    "outreach_opt_out": true,
+    "public_submissions": true,
+    "procurement_when_funded": true,
+    "paid_work": true,
     "developer_tools": true,
     "account_enrollment": true,
-    "public_submissions": true,
-    "terms_aware_execution": true,
-    "paid_work": true,
-    "outreach_opt_out": true,
-    "transparent_outreach": true,
-    "procurement_when_funded": true,
     "handoff_style": "service-required",
     "mode": "EXECUTE_AND_REPORT"
   },
   "queue": {
-    "COMPLETE": 159
+    "COMPLETE": 159,
+    "RUNNING": 2
   },
   "queue_kinds": {
-    "agent_review": 152,
+    "agent_review": 154,
     "research": 6,
     "verification": 1
   },
   "queue_activity": [
     {
-      "task_id": "agent-task-local-evidence-brain-6316c1a826d0",
+      "task_id": "agent-task-local-evidence-brain-c15a5ae754cb",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "COMPLETE",
+      "status": "RUNNING",
       "attempts": 1,
-      "updated": "2026-09-01T16:37:55.644Z",
-      "message": "No immediate action required, continue monitoring the machine's status",
-      "outcome": "recommendation",
-      "metrics": {
-        "tasks_completed": 9,
-        "fallback": false,
-        "duration_s": 8.641
-      }
+      "updated": "2026-09-01T16:40:26.924Z"
     },
     {
       "task_id": "recurring-machine-manager-capability-research-000002",
@@ -503,6 +497,63 @@
       }
     },
     {
+      "task_id": "agent-task-local-manager-brain-8ec44b22301a",
+      "kind": "agent_review",
+      "objective_id": "p71",
+      "status": "RUNNING",
+      "attempts": 1,
+      "updated": "2026-09-01T16:40:26.923Z"
+    },
+    {
+      "task_id": "revenue-lane-scout-refresh-20260901-v2",
+      "kind": "research",
+      "objective_id": "revenue-opportunities-refresh-v2",
+      "status": "COMPLETE",
+      "attempts": 2,
+      "updated": "2026-09-01T09:03:30.590Z",
+      "outcome": "handler_completed",
+      "metrics": {
+        "attempt": 2,
+        "source_count": 3,
+        "sources_fetched": 3,
+        "sources_truncated": 0,
+        "word_count": 10240,
+        "summary_available": true
+      }
+    },
+    {
+      "task_id": "agent-task-local-evidence-brain-6316c1a826d0",
+      "kind": "agent_review",
+      "objective_id": "p71",
+      "status": "COMPLETE",
+      "attempts": 1,
+      "updated": "2026-09-01T16:37:55.644Z",
+      "message": "No immediate action required, continue monitoring the machine's status",
+      "outcome": "recommendation",
+      "metrics": {
+        "tasks_completed": 9,
+        "fallback": false,
+        "duration_s": 8.641
+      }
+    },
+    {
+      "task_id": "revenue-lane-scout-refresh-20260901",
+      "kind": "research",
+      "objective_id": "revenue-opportunities-refresh",
+      "status": "COMPLETE",
+      "attempts": 1,
+      "updated": "2026-09-01T08:51:55.584Z",
+      "outcome": "handler_completed",
+      "metrics": {
+        "attempt": 1,
+        "source_count": 3,
+        "sources_fetched": 3,
+        "sources_truncated": 0,
+        "word_count": 10240,
+        "summary_available": true
+      }
+    },
+    {
       "task_id": "agent-task-local-manager-brain-1b7fa28fe556",
       "kind": "agent_review",
       "objective_id": "p71",
@@ -518,15 +569,15 @@
       }
     },
     {
-      "task_id": "revenue-lane-scout-refresh-20260901-v2",
+      "task_id": "recurring-revenue-lane-scout-000001",
       "kind": "research",
-      "objective_id": "revenue-opportunities-refresh-v2",
+      "objective_id": "revenue-opportunities",
       "status": "COMPLETE",
-      "attempts": 2,
-      "updated": "2026-09-01T09:03:30.590Z",
+      "attempts": 1,
+      "updated": "2026-09-01T08:25:40.878Z",
       "outcome": "handler_completed",
       "metrics": {
-        "attempt": 2,
+        "attempt": 1,
         "source_count": 3,
         "sources_fetched": 3,
         "sources_truncated": 0,
@@ -550,19 +601,19 @@
       }
     },
     {
-      "task_id": "revenue-lane-scout-refresh-20260901",
+      "task_id": "recurring-machine-manager-capability-research-000001",
       "kind": "research",
-      "objective_id": "revenue-opportunities-refresh",
+      "objective_id": "machine-manager-research",
       "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T08:51:55.584Z",
+      "attempts": 3,
+      "updated": "2026-09-01T08:00:08.195Z",
       "outcome": "handler_completed",
       "metrics": {
-        "attempt": 1,
+        "attempt": 3,
         "source_count": 3,
         "sources_fetched": 3,
-        "sources_truncated": 0,
-        "word_count": 10240,
+        "sources_truncated": 2,
+        "word_count": 916,
         "summary_available": true
       }
     },
@@ -582,19 +633,19 @@
       }
     },
     {
-      "task_id": "recurring-revenue-lane-scout-000001",
+      "task_id": "research-task-capability-lane-001",
       "kind": "research",
-      "objective_id": "revenue-opportunities",
+      "objective_id": "machine-manager-research-001",
       "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T08:25:40.878Z",
+      "updated": "2026-09-01T07:20:13.752Z",
       "outcome": "handler_completed",
       "metrics": {
         "attempt": 1,
         "source_count": 3,
         "sources_fetched": 3,
-        "sources_truncated": 0,
-        "word_count": 10240,
+        "sources_truncated": 2,
+        "word_count": 916,
         "summary_available": true
       }
     },
@@ -614,23 +665,6 @@
       }
     },
     {
-      "task_id": "recurring-machine-manager-capability-research-000001",
-      "kind": "research",
-      "objective_id": "machine-manager-research",
-      "status": "COMPLETE",
-      "attempts": 3,
-      "updated": "2026-09-01T08:00:08.195Z",
-      "outcome": "handler_completed",
-      "metrics": {
-        "attempt": 3,
-        "source_count": 3,
-        "sources_fetched": 3,
-        "sources_truncated": 2,
-        "word_count": 916,
-        "summary_available": true
-      }
-    },
-    {
       "task_id": "agent-task-local-manager-brain-efbc2c37a9ec",
       "kind": "agent_review",
       "objective_id": "p71",
@@ -643,23 +677,6 @@
         "tasks_completed": 141,
         "fallback": false,
         "duration_s": 4.86
-      }
-    },
-    {
-      "task_id": "research-task-capability-lane-001",
-      "kind": "research",
-      "objective_id": "machine-manager-research-001",
-      "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T07:20:13.752Z",
-      "outcome": "handler_completed",
-      "metrics": {
-        "attempt": 1,
-        "source_count": 3,
-        "sources_fetched": 3,
-        "sources_truncated": 2,
-        "word_count": 916,
-        "summary_available": true
       }
     },
     {
@@ -916,36 +933,6 @@
         "fallback": false,
         "duration_s": 6.671
       }
-    },
-    {
-      "task_id": "agent-task-local-manager-brain-e38cc9818aa7",
-      "kind": "agent_review",
-      "objective_id": "p71",
-      "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T15:32:25.658Z",
-      "message": "System healthy with no errors or resource constraints requiring intervention.",
-      "outcome": "recommendation",
-      "metrics": {
-        "tasks_completed": 129,
-        "fallback": false,
-        "duration_s": 3.828
-      }
-    },
-    {
-      "task_id": "agent-task-local-manager-brain-8a567e1331e0",
-      "kind": "agent_review",
-      "objective_id": "p71",
-      "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T15:27:16.388Z",
-      "message": "System is healthy with stable GPU utilization and no errors; objective progressing normally.",
-      "outcome": "recommendation",
-      "metrics": {
-        "tasks_completed": 128,
-        "fallback": false,
-        "duration_s": 5.359
-      }
     }
   ],
   "recurring": [
@@ -957,7 +944,7 @@
       "interval_s": 21600.0,
       "sequence": 2,
       "next_run_at": "2026-09-01T19:48:51.437Z",
-      "next_in_s": 11342.11164188385,
+      "next_in_s": 11304.461284637451,
       "last_task_id": "recurring-machine-manager-capability-research-000002",
       "last_status": "COMPLETE"
     },
@@ -969,7 +956,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 56708.61596250534,
+      "next_in_s": 56670.96560525894,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -981,30 +968,30 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 13879.077478647232,
+      "next_in_s": 13841.427121400833,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
-    "util_pct": 81.0,
-    "util_pct_recent_max": 81.0,
-    "util_pct_recent_avg": 68.2,
-    "util_pct_sample_count": 5,
+    "util_pct": 87.0,
+    "util_pct_recent_max": 87.0,
+    "util_pct_recent_avg": 78.0,
+    "util_pct_sample_count": 2,
     "util_pct_zero_samples": 0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 60.0,
-    "power_w": 66.36,
+    "temp_c": 64.0,
+    "power_w": 73.9,
     "resource_active": true,
     "activity_state": "ACTIVE",
     "activity_basis": "driver_utilization"
   },
   "system": {
-    "cpu_pct": 5.1,
-    "cpu_pct_recent_max": 6.5,
-    "cpu_pct_recent_avg": 5.7,
-    "cpu_pct_sample_count": 5,
+    "cpu_pct": 11.4,
+    "cpu_pct_recent_max": 11.4,
+    "cpu_pct_recent_avg": 11.4,
+    "cpu_pct_sample_count": 1,
     "cpu_pct_zero_samples": 0.0,
     "load_state": "ACTIVE",
     "load_basis": "host_counter"
@@ -1012,19 +999,19 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T16:39:48.425Z",
+    "observed_at": "2026-09-01T16:40:25.925Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "hashrate_mkey_s": 740.73,
-    "sample_count": 9,
+    "uptime_s": 1.0,
     "keys_tested": 33371946221568,
-    "batch_number": 10880,
-    "keys_per_second": 740730000,
-    "uptime_s": 137.3,
+    "sample_count": 1,
     "matches_found": 0,
-    "coverage_pct": 0
+    "coverage_pct": 0,
+    "hashrate_mkey_s": 740.73,
+    "keys_per_second": 740730000,
+    "batch_number": 10880
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T16:39:49.316Z"
+  "updated": "2026-09-01T16:40:26.922Z"
 }
