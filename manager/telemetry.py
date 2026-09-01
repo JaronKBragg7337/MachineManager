@@ -96,6 +96,7 @@ PUBLIC_METRIC_KEYS = {
     "restart_count",
     "max_restarts",
     "util_pct",
+    "cpu_pct",
     "mem_used_mib",
     "mem_total_mib",
     "temp_c",
@@ -498,6 +499,12 @@ class TelemetryPublisher:
             if number is not None:
                 gpu[target] = number
 
+        system_input = snapshot.get("system") if isinstance(snapshot.get("system"), Mapping) else {}
+        system: dict[str, int | float] = {}
+        cpu_pct = _number(system_input.get("cpu_pct"))
+        if cpu_pct is not None:
+            system["cpu_pct"] = max(0.0, min(100.0, cpu_pct))
+
         safe_workers = self._workers(snapshot.get("workers", []))
         safe_jobs = self._jobs(snapshot.get("jobs", []))
         latest = {
@@ -515,6 +522,7 @@ class TelemetryPublisher:
             "autonomy": _safe_autonomy(snapshot.get("autonomy")),
             "queue": _safe_queue(snapshot.get("queue")),
             "gpu": gpu,
+            "system": system,
             "progress": safe_workers[0].get("progress", {}) if safe_workers else {},
             "notes": "Sanitized public telemetry only. No secrets or raw logs.",
             "updated": _text(snapshot.get("updated"), default=utc_now(), max_len=40),

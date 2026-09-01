@@ -25,7 +25,7 @@ from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_
 from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, OutreachBlockedError, OutreachRegistry
 from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
-from manager.probes import gpu_resource_ok, keyhunt_progress_probe
+from manager.probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe
 from manager.state_store import StateStore
 
 
@@ -57,6 +57,15 @@ def synthetic_spec(directory: Path, mode: str, *, max_age: float = 0.12) -> Work
 
 
 class SupervisorTests(unittest.TestCase):
+    def test_cpu_usage_probe_reports_delta_without_inventing_a_first_sample(self) -> None:
+        probe = CpuUsageProbe()
+        probe._previous = None
+        with patch.object(probe, "_read_times", return_value=(100, 200)):
+            self.assertEqual(probe(), {})
+        probe._previous = (100, 1000)
+        with patch.object(probe, "_read_times", return_value=(120, 1200)):
+            self.assertEqual(probe(), {"cpu_pct": 90.0})
+
     def test_gpu_resource_probe_tolerates_transient_zero_utilization(self) -> None:
         self.assertTrue(
             gpu_resource_ok(
@@ -981,6 +990,7 @@ class TelemetryTests(unittest.TestCase):
                     "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "more_pending": True, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
                     "gpu": {"util_pct": 80, "power_w": 70, "private_key": "do not publish"},
+                    "system": {"cpu_pct": 8.5, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
                 },
                 events=[
@@ -1006,6 +1016,7 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["agents"][0]["last_reason"], "healthy")
             self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
             self.assertTrue(latest["autonomy"]["developer_tools"])
+            self.assertEqual(latest["system"]["cpu_pct"], 8.5)
             self.assertNotIn("private_note", json.dumps(latest))
             self.assertNotIn("private_path", json.dumps(latest))
             self.assertNotIn("findings", json.dumps(latest))

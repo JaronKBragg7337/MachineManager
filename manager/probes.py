@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import ctypes
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -37,6 +39,64 @@ def nvidia_smi_probe() -> dict[str, Any]:
         }
     except (OSError, ValueError, IndexError, subprocess.SubprocessError) as exc:
         return {"probe_error": type(exc).__name__}
+
+
+class CpuUsageProbe:
+    """Measure host CPU use from cumulative operating-system counters."""
+
+    def __init__(self) -> None:
+        self._previous = self._read_times()
+
+    def __call__(self) -> dict[str, float]:
+        current = self._read_times()
+        previous = self._previous
+        self._previous = current
+        if previous is None or current is None:
+            return {}
+        previous_idle, previous_total = previous
+        current_idle, current_total = current
+        delta_idle = current_idle - previous_idle
+        delta_total = current_total - previous_total
+        if delta_total <= 0 or delta_idle < 0:
+            return {}
+        used_pct = (1.0 - min(1.0, delta_idle / delta_total)) * 100.0
+        return {"cpu_pct": round(max(0.0, min(100.0, used_pct)), 1)}
+
+    @staticmethod
+    def _read_times() -> tuple[int, int] | None:
+        if os.name == "nt":
+            try:
+                class _FileTime(ctypes.Structure):
+                    _fields_ = [("dwLowDateTime", ctypes.c_uint32), ("dwHighDateTime", ctypes.c_uint32)]
+
+                idle = _FileTime()
+                kernel = _FileTime()
+                user = _FileTime()
+                if not ctypes.windll.kernel32.GetSystemTimes(
+                    ctypes.byref(idle), ctypes.byref(kernel), ctypes.byref(user)
+                ):
+                    return None
+
+                def ticks(value: _FileTime) -> int:
+                    return (int(value.dwHighDateTime) << 32) | int(value.dwLowDateTime)
+
+                idle_ticks = ticks(idle)
+                return idle_ticks, ticks(kernel) + ticks(user)
+            except (AttributeError, OSError, TypeError):
+                return None
+
+        try:
+            first_line = Path("/proc/stat").read_text(encoding="ascii").splitlines()[0]
+            fields = first_line.split()
+            if not fields or fields[0] != "cpu":
+                return None
+            values = [int(value) for value in fields[1:]]
+            if len(values) < 4:
+                return None
+            idle_ticks = values[3] + (values[4] if len(values) > 4 else 0)
+            return idle_ticks, sum(values)
+        except (IndexError, OSError, ValueError, UnicodeDecodeError):
+            return None
 
 
 def gpu_resource_ok(

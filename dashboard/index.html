@@ -911,6 +911,18 @@
       return dataSets().workers[0] || {};
     }
 
+    function hasCurrentWorkerEvidence(latest, worker) {
+      return freshness().key === "fresh" && upper(latest.status) === "HEALTHY" && upper(worker.state) === "RUNNING";
+    }
+
+    function currentResourceSignals(latest, worker) {
+      return hasCurrentWorkerEvidence(latest, worker) ? (latest.gpu || {}) : {};
+    }
+
+    function currentSystemSignals(latest, worker) {
+      return hasCurrentWorkerEvidence(latest, worker) ? (latest.system || {}) : {};
+    }
+
     function workProgress() {
       const worker = primaryWorker();
       const job = currentJob();
@@ -1045,7 +1057,9 @@
       const latest = state.latest || {};
       const sets = dataSets();
       const job = currentJob();
-      const gpu = latest.gpu || {};
+      const worker = primaryWorker();
+      const gpu = currentResourceSignals(latest, worker);
+      const system = currentSystemSignals(latest, worker);
       const passes = passStats(sets.scenarios);
       const vramTotal = numberValue(gpu.mem_total_mib);
       const vramUsed = numberValue(gpu.mem_used_mib);
@@ -1058,7 +1072,7 @@
       const progressText = progress === null ? "Health signal active" : String(Math.round(progress)) + "% reported";
       return pageHeading("Command center", "What is the system doing?", "A single operating view for the machine, the work it is running, and the evidence its manager has recorded.", '<a class="btn" href="#/jobs">Open work registry <span>→</span></a>') +
         snapshotStrip() +
-        '<div class="hero-grid"><section class="hero-card"><div class="hero-top"><p class="eyebrow">Active objective</p>' + badge(jobState) + '</div><h2>' + escapeHtml(latest.objective || "No active objective") + '</h2><p class="hero-description">The manager is supervising a bounded worker and evaluating more than process liveness: activity, heartbeat freshness, resource signals, and recorded progress.</p><div class="hero-meta"><div class="meta-item"><label>Job</label><strong>' + escapeHtml(job.id || "--") + '</strong></div><div class="meta-item"><label>Objective ID</label><strong>' + escapeHtml(job.objective_id || latest.objective_id || "--") + '</strong></div><div class="meta-item"><label>Manager</label><strong>v' + escapeHtml(latest.manager_version || "--") + '</strong></div></div><div class="signal-block"><div class="signal-label"><span>Execution signal</span><strong>' + escapeHtml(progressText) + '</strong></div><div class="signal-track">' + (progress === null && ["RUNNING", "WORKING"].includes(jobState) ? '<span class="signal-indeterminate"></span>' : '<span style="display:block;height:100%;width:' + (progress || 0) + '%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:inherit"></span>') + '</div><p class="signal-note">' + (progress === null ? "No numeric progress field is published, so this view does not invent one." : "Progress reported by the active job.") + '</p></div><a class="hero-link" href="#/search">Open search evidence <span>→</span></a></section><section class="panel resource-panel"><div class="panel-head"><h2>SYSTEM RESOURCES</h2><span class="subhead">sanitized signals</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", util === null ? "--" : String(Math.round(util)), "%", util === null ? "No reading" : "Current accelerator activity", util, "green") + resourceCard("VRAM used", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1), "GB", vramTotal === null ? "Capacity unknown" : "of " + (vramTotal / 1024).toFixed(1) + " GB", vramPercent, "") + resourceCard("GPU temperature", temp === null ? "--" : String(Math.round(temp)), "°C", temp === null ? "No reading" : "Thermal signal", temp === null ? null : Math.min(temp / 90 * 100, 100), temp !== null && temp >= 80 ? "amber" : "green") + resourceCard("Power draw", power === null ? "--" : String(Math.round(power)), "W", power === null ? "No reading" : "Current board draw", power === null ? null : Math.min(power / 140 * 100, 100), "") + '</div></div></section></div>' +
+        '<div class="hero-grid"><section class="hero-card"><div class="hero-top"><p class="eyebrow">Active objective</p>' + badge(jobState) + '</div><h2>' + escapeHtml(latest.objective || "No active objective") + '</h2><p class="hero-description">The manager is supervising a bounded worker and evaluating more than process liveness: activity, heartbeat freshness, resource signals, and recorded progress.</p><div class="hero-meta"><div class="meta-item"><label>Job</label><strong>' + escapeHtml(job.id || "--") + '</strong></div><div class="meta-item"><label>Objective ID</label><strong>' + escapeHtml(job.objective_id || latest.objective_id || "--") + '</strong></div><div class="meta-item"><label>Manager</label><strong>v' + escapeHtml(latest.manager_version || "--") + '</strong></div></div><div class="signal-block"><div class="signal-label"><span>Execution signal</span><strong>' + escapeHtml(progressText) + '</strong></div><div class="signal-track">' + (progress === null && ["RUNNING", "WORKING"].includes(jobState) ? '<span class="signal-indeterminate"></span>' : '<span style="display:block;height:100%;width:' + (progress || 0) + '%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:inherit"></span>') + '</div><p class="signal-note">' + (progress === null ? "No numeric progress field is published, so this view does not invent one." : "Progress reported by the active job.") + '</p></div><a class="hero-link" href="#/search">Open search evidence <span>→</span></a></section><section class="panel resource-panel"><div class="panel-head"><h2>SYSTEM RESOURCES</h2><span class="subhead">sanitized signals</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", util === null ? "--" : String(Math.round(util)), "%", util === null ? "No verified live reading" : "Current accelerator activity", util, "green") + resourceCard("VRAM used", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1), "GB", vramTotal === null ? "Capacity unknown" : "of " + (vramTotal / 1024).toFixed(1) + " GB", vramPercent, "") + resourceCard("GPU temperature", temp === null ? "--" : String(Math.round(temp)), "°C", temp === null ? "No verified live reading" : "Thermal signal", temp === null ? null : Math.min(temp / 90 * 100, 100), temp !== null && temp >= 80 ? "amber" : "green") + resourceCard("Power draw", power === null ? "--" : String(Math.round(power)), "W", power === null ? "No verified live reading" : "Current board draw", power === null ? null : Math.min(power / 140 * 100, 100), "") + resourceCard("CPU utilization", numberValue(system.cpu_pct) === null ? "--" : String(Math.round(system.cpu_pct)), "%", numberValue(system.cpu_pct) === null ? "No verified live reading" : "Current host activity", numberValue(system.cpu_pct), "") + '</div></div></section></div>' +
         '<div class="kpi-grid"><div class="kpi-card accent"><span class="label">Active jobs</span><div class="kpi-value">' + escapeHtml(String(sets.jobs.length)) + '</div><div class="kpi-note">' + escapeHtml(String(runningCount(sets.jobs))) + ' running now</div></div><div class="kpi-card success"><span class="label">Workers</span><div class="kpi-value">' + escapeHtml(String(sets.workers.length)) + '</div><div class="kpi-note">' + escapeHtml(String(runningCount(sets.workers))) + ' reporting active</div></div><div class="kpi-card"><span class="label">Agents</span><div class="kpi-value">' + escapeHtml(String(sets.agents.length)) + '</div><div class="kpi-note">' + escapeHtml(String(sets.agents.reduce(function (sum, agent) { return sum + (numberValue(agent.tasks_completed) || 0); }, 0))) + ' bounded tasks completed</div></div><div class="kpi-card ' + (passes.total && passes.rate === 100 ? "success" : "warn") + '"><span class="label">Evaluation pass rate</span><div class="kpi-value">' + escapeHtml(passes.total ? String(passes.rate) + "%" : "--") + '</div><div class="kpi-note">' + escapeHtml(passes.total ? String(passes.pass) + "/" + String(passes.total) + " published scenarios" : "No scenarios published") + "</div></div></div>" +
         '<div class="section-grid"><section class="panel"><div class="panel-head"><h2>WORKERS</h2><span class="subhead">' + escapeHtml(String(sets.workers.length)) + ' registered</span></div><div class="panel-body">' + renderWorkersTable(sets.workers) + '<a class="panel-link" href="#/workers">View worker health →</a></div></section><section class="panel"><div class="panel-head"><h2>AGENTS</h2><span class="subhead">bounded specialists</span></div><div class="panel-body">' + renderAgentsTable(sets.agents) + '<a class="panel-link" href="#/agents">View agent activity →</a></div></section></div>' +
         '<div class="section-grid"><div>' + renderEventPanel(7, false) + '</div><section class="panel"><div class="panel-head"><h2>CAPABILITY SURFACE</h2><span class="subhead">' + escapeHtml(String(sets.capabilities.filter(function (item) { return item.enabled; }).length)) + '/' + escapeHtml(String(sets.capabilities.length)) + ' enabled</span></div><div class="panel-body">' + renderCapabilities(sets.capabilities.slice(0, 5)) + '<a class="panel-link" href="#/operations">View runtime details →</a></div></section></div>';
@@ -1076,11 +1090,11 @@
     }
 
     function telemetryMotionProfile(latest, worker, progress) {
-      const gpu = latest.gpu || {};
+      const gpu = currentResourceSignals(latest, worker);
       const reportedUtil = numberValue(gpu.util_pct);
       const activeEvidence = progress.active === true || upper(worker.state) === "RUNNING";
       const current = freshness();
-      const live = activeEvidence && current.key === "fresh";
+      const live = activeEvidence && current.key === "fresh" && upper(latest.status) === "HEALTHY";
       const util = reportedUtil === null ? (live ? 45 : 0) : clampNumber(reportedUtil, 0, 100);
       return {
         live: live,
@@ -1147,7 +1161,7 @@
     }
 
     function renderMissionMap(latest, sets, worker, progress) {
-      const active = progress.active === true || upper(worker.state) === "RUNNING";
+      const active = hasCurrentWorkerEvidence(latest, worker);
       const agent = sets.agents[0] || {};
       const matching = numberValue(progress.matches_found);
       const matchSignal = matching === null ? "Awaiting report" : matching > 0 ? String(Math.round(matching)) + " signal(s)" : "No match reported";
@@ -1171,7 +1185,7 @@
     }
 
     function renderWorkJournal(latest, sets, worker, progress) {
-      const active = progress.active === true || upper(worker.state) === "RUNNING";
+      const active = hasCurrentWorkerEvidence(latest, worker);
       const agent = sets.agents[0] || {};
       const healthEvent = recentEvents(20, "health")[0] || {};
       const keys = numberValue(progress.keys_tested);
@@ -1192,8 +1206,9 @@
       const sets = dataSets();
       const worker = primaryWorker();
       const progress = workProgress();
-      const gpu = latest.gpu || {};
-      const active = progress.active === true || upper(worker.state) === "RUNNING";
+      const gpu = currentResourceSignals(latest, worker);
+      const system = currentSystemSignals(latest, worker);
+      const active = hasCurrentWorkerEvidence(latest, worker);
       const keys = numberValue(progress.keys_tested);
       const batch = numberValue(progress.batch_number);
       const matches = numberValue(progress.matches_found);
@@ -1201,10 +1216,10 @@
       const vramUsed = numberValue(gpu.mem_used_mib);
       const vramPercent = vramTotal ? vramUsed / vramTotal * 100 : null;
       return pageHeading("Mission Control", "Watch the real work move through the machine", "A spatial, public-safe view of the supervisor, GPU worker, verification gate, AI support, and the evidence this system publishes.", '<a class="btn" href="#/search">Inspect search evidence <span>→</span></a>') + snapshotStrip() +
-        '<div class="mission-layout"><div>' + renderMissionMap(latest, sets, worker, progress) + '</div><aside class="mission-side"><section class="mission-summary"><p class="eyebrow">Current work</p><h2>' + escapeHtml(latest.objective || "No active objective") + '</h2><p>' + escapeHtml(active ? "The GPU worker is publishing reported work evidence. This is a bounded numeric search, not a phrase-guessing task." : "The dashboard is waiting for current worker activity evidence.") + '</p><div class="live-readings">' + missionReading("Reported rate", missionRate(progress), "accent") + missionReading("Candidate checks", keys === null ? "Not reported" : compactNumber(keys), "accent") + missionReading("Current batch", batch === null ? "Not reported" : "#" + Math.round(batch), "") + missionReading("Result signal", matches === null ? "Awaiting report" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "No match", matches === 0 ? "success" : "") + '</div></section><section class="mission-summary"><p class="eyebrow">Live machine signal</p><h2>' + escapeHtml(upper(latest.status || "UNKNOWN")) + '</h2><p>The manager has a fresh record of the operating state. Resource readings below are machine-level evidence, not a claimed probability of success.</p><div class="live-readings">' + missionReading("GPU activity", numberValue(gpu.util_pct) === null ? "--" : Math.round(gpu.util_pct) + "%", "success") + missionReading("Temperature", numberValue(gpu.temp_c) === null ? "--" : Math.round(gpu.temp_c) + "°C", "") + missionReading("VRAM", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1) + " GB", "") + missionReading("Public age", relative(latest.updated), "") + '</div></section></aside></div>' +
+        '<div class="mission-layout"><div>' + renderMissionMap(latest, sets, worker, progress) + '</div><aside class="mission-side"><section class="mission-summary"><p class="eyebrow">Current work</p><h2>' + escapeHtml(latest.objective || "No active objective") + '</h2><p>' + escapeHtml(active ? "The GPU worker is publishing reported work evidence. This is a bounded numeric search, not a phrase-guessing task." : "The dashboard is waiting for current worker activity evidence.") + '</p><div class="live-readings">' + missionReading("Reported rate", missionRate(progress), "accent") + missionReading("Candidate checks", keys === null ? "Not reported" : compactNumber(keys), "accent") + missionReading("Current batch", batch === null ? "Not reported" : "#" + Math.round(batch), "") + missionReading("Result signal", matches === null ? "Awaiting report" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "No match", matches === 0 ? "success" : "") + '</div></section><section class="mission-summary"><p class="eyebrow">Live machine signal</p><h2>' + escapeHtml(upper(latest.status || "UNKNOWN")) + '</h2><p>The manager has a fresh record of the operating state. Resource readings below are machine-level evidence, not a claimed probability of success.</p><div class="live-readings">' + missionReading("GPU activity", numberValue(gpu.util_pct) === null ? "--" : Math.round(gpu.util_pct) + "%", "success") + missionReading("Temperature", numberValue(gpu.temp_c) === null ? "--" : Math.round(gpu.temp_c) + "°C", "") + missionReading("VRAM", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1) + " GB", "") + missionReading("CPU", numberValue(system.cpu_pct) === null ? "--" : Math.round(system.cpu_pct) + "%", "") + missionReading("Public age", relative(latest.updated), "") + '</div></section></aside></div>' +
         renderMotionDeck(latest, sets, worker, progress) +
         renderResultPath(progress, active) +
-        '<div class="section-grid"><div>' + renderWorkJournal(latest, sets, worker, progress) + '</div><section class="panel resource-panel"><div class="panel-head"><h2>MACHINE EVIDENCE</h2><span class="subhead">sanitized telemetry</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", numberValue(gpu.util_pct) === null ? "--" : String(Math.round(gpu.util_pct)), "%", "Current accelerator activity", numberValue(gpu.util_pct), "green") + resourceCard("VRAM used", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1), "GB", vramTotal === null ? "Capacity unknown" : "of " + (vramTotal / 1024).toFixed(1) + " GB", vramPercent, "") + resourceCard("GPU temperature", numberValue(gpu.temp_c) === null ? "--" : String(Math.round(gpu.temp_c)), "°C", "Thermal signal", numberValue(gpu.temp_c) === null ? null : Math.min(gpu.temp_c / 90 * 100, 100), numberValue(gpu.temp_c) !== null && gpu.temp_c >= 80 ? "amber" : "green") + resourceCard("Power draw", numberValue(gpu.power_w) === null ? "--" : String(Math.round(gpu.power_w)), "W", "Current board draw", numberValue(gpu.power_w) === null ? null : Math.min(gpu.power_w / 140 * 100, 100), "") + '</div></div></section></div>';
+        '<div class="section-grid"><div>' + renderWorkJournal(latest, sets, worker, progress) + '</div><section class="panel resource-panel"><div class="panel-head"><h2>MACHINE EVIDENCE</h2><span class="subhead">sanitized telemetry</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", numberValue(gpu.util_pct) === null ? "--" : String(Math.round(gpu.util_pct)), "%", "Current accelerator activity", numberValue(gpu.util_pct), "green") + resourceCard("VRAM used", vramUsed === null ? "--" : (vramUsed / 1024).toFixed(1), "GB", vramTotal === null ? "Capacity unknown" : "of " + (vramTotal / 1024).toFixed(1) + " GB", vramPercent, "") + resourceCard("GPU temperature", numberValue(gpu.temp_c) === null ? "--" : String(Math.round(gpu.temp_c)), "°C", "Thermal signal", numberValue(gpu.temp_c) === null ? null : Math.min(gpu.temp_c / 90 * 100, 100), numberValue(gpu.temp_c) !== null && gpu.temp_c >= 80 ? "amber" : "green") + resourceCard("Power draw", numberValue(gpu.power_w) === null ? "--" : String(Math.round(gpu.power_w)), "W", "Current board draw", numberValue(gpu.power_w) === null ? null : Math.min(gpu.power_w / 140 * 100, 100), "") + resourceCard("CPU utilization", numberValue(system.cpu_pct) === null ? "--" : String(Math.round(system.cpu_pct)), "%", numberValue(system.cpu_pct) === null ? "No verified live reading" : "Current host activity", numberValue(system.cpu_pct), "") + '</div></div></section></div>';
     }
 
     function lifecycle(stateValue) {
@@ -1254,15 +1269,17 @@
     function renderWorkers() {
       const sets = dataSets();
       const latest = state.latest || {};
-      const gpu = latest.gpu || {};
+      const primary = sets.workers[0] || {};
+      const gpu = currentResourceSignals(latest, primary);
+      const system = currentSystemSignals(latest, primary);
       const workers = sets.workers.length ? sets.workers.map(function (worker) {
         const progress = worker.progress || {};
-        const active = progress.active === true || upper(worker.state) === "RUNNING";
+        const active = hasCurrentWorkerEvidence(latest, worker);
         return '<article class="worker-card"><div class="worker-top"><div><p class="eyebrow">' + escapeHtml(worker.type || "Worker") + '</p><h2>' + escapeHtml(worker.id || "Unnamed worker") + '</h2><div class="worker-type">Managed execution process</div></div>' + badge(worker.state) + '</div><div class="worker-owner">Owner <strong>' + escapeHtml(worker.owner || "local manager") + "</strong></div>" + renderHealthSignals() + '<div class="progress-signal' + (active ? '' : ' warn') + '"><span class="status-dot"></span><div><strong>' + escapeHtml(workEvidenceLabel(progress, active)) + '</strong><br><span>' + escapeHtml(progress.reported ? "Aggregate progress is being reported." : "Process and resource activity are being verified; exact totals are not published.") + '</span></div></div><a class="panel-link" href="#/search">Open search evidence →</a></article>';
       }).join("") : '<div class="error-state"><h2>No workers reported</h2><p>The public snapshot contains no worker records right now.</p></div>';
       const gpuTotal = numberValue(gpu.mem_total_mib);
       const gpuUsed = numberValue(gpu.mem_used_mib);
-      return pageHeading("Execution layer", "Workers are more than processes", "Each worker is evaluated through multiple signals so a living process cannot quietly masquerade as useful work.", '<a class="btn" href="#/activity">Inspect activity <span>→</span></a>') + snapshotStrip() + '<div class="worker-cards">' + workers + '</div><div class="section-grid"><section class="panel"><div class="panel-head"><h2>RESOURCE CONTEXT</h2><span class="subhead">machine-level signals</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", numberValue(gpu.util_pct) === null ? "--" : String(Math.round(gpu.util_pct)), "%", "Published accelerator reading", numberValue(gpu.util_pct), "green") + resourceCard("VRAM used", gpuUsed === null ? "--" : (gpuUsed / 1024).toFixed(1), "GB", gpuTotal === null ? "Capacity unknown" : "of " + (gpuTotal / 1024).toFixed(1) + " GB", gpuTotal ? gpuUsed / gpuTotal * 100 : null, "") + resourceCard("Temperature", numberValue(gpu.temp_c) === null ? "--" : String(Math.round(gpu.temp_c)), "°C", "Published thermal reading", numberValue(gpu.temp_c) === null ? null : Math.min(gpu.temp_c / 90 * 100, 100), "green") + resourceCard("Power", numberValue(gpu.power_w) === null ? "--" : String(Math.round(gpu.power_w)), "W", "Published board draw", numberValue(gpu.power_w) === null ? null : Math.min(gpu.power_w / 140 * 100, 100), "") + '</div></div></section><section class="panel"><div class="panel-head"><h2>WHY THIS MATTERS</h2></div><div class="panel-body"><div class="ops-note"><strong>False liveness is a first-class failure.</strong><br>The manager records process state, heartbeat, resource activity, and progress evidence before it decides that a worker is healthy. That contract can later be reused for research, engineering, and revenue-oriented workers.</div></div></section></div>';
+      return pageHeading("Execution layer", "Workers are more than processes", "Each worker is evaluated through multiple signals so a living process cannot quietly masquerade as useful work.", '<a class="btn" href="#/activity">Inspect activity <span>→</span></a>') + snapshotStrip() + '<div class="worker-cards">' + workers + '</div><div class="section-grid"><section class="panel"><div class="panel-head"><h2>RESOURCE CONTEXT</h2><span class="subhead">machine-level signals</span></div><div class="panel-body"><div class="resource-grid">' + resourceCard("GPU utilization", numberValue(gpu.util_pct) === null ? "--" : String(Math.round(gpu.util_pct)), "%", "Published accelerator reading", numberValue(gpu.util_pct), "green") + resourceCard("VRAM used", gpuUsed === null ? "--" : (gpuUsed / 1024).toFixed(1), "GB", gpuTotal === null ? "Capacity unknown" : "of " + (gpuTotal / 1024).toFixed(1) + " GB", gpuTotal ? gpuUsed / gpuTotal * 100 : null, "") + resourceCard("Temperature", numberValue(gpu.temp_c) === null ? "--" : String(Math.round(gpu.temp_c)), "°C", "Published thermal reading", numberValue(gpu.temp_c) === null ? null : Math.min(gpu.temp_c / 90 * 100, 100), "green") + resourceCard("Power", numberValue(gpu.power_w) === null ? "--" : String(Math.round(gpu.power_w)), "W", "Published board draw", numberValue(gpu.power_w) === null ? null : Math.min(gpu.power_w / 140 * 100, 100), "") + resourceCard("CPU utilization", numberValue(system.cpu_pct) === null ? "--" : String(Math.round(system.cpu_pct)), "%", numberValue(system.cpu_pct) === null ? "No verified live reading" : "Current host activity", numberValue(system.cpu_pct), "") + '</div></div></section><section class="panel"><div class="panel-head"><h2>WHY THIS MATTERS</h2></div><div class="panel-body"><div class="ops-note"><strong>False liveness is a first-class failure.</strong><br>The manager records process state, heartbeat, resource activity, and progress evidence before it decides that a worker is healthy. That contract can later be reused for research, engineering, and revenue-oriented workers.</div></div></section></div>';
     }
 
     function renderSearch() {
@@ -1270,8 +1287,8 @@
       const worker = primaryWorker();
       const job = currentJob();
       const progress = workProgress();
-      const gpu = latest.gpu || {};
-      const active = progress.active === true || upper(worker.state) === "RUNNING";
+      const gpu = currentResourceSignals(latest, worker);
+      const active = hasCurrentWorkerEvidence(latest, worker);
       const signalLabel = workEvidenceLabel(progress, active);
       const workEvents = recentEvents(18, "work");
       const exactTotals = progressMetric(progress, ["keys_tested", "work_units_completed"]);

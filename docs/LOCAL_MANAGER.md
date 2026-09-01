@@ -64,8 +64,8 @@ python -m manager.run --config path/to/local-config.json \
 ```
 
 The runner can publish compact dashboard files on each observation. The
-publisher allowlists worker/job identifiers, states, numeric GPU metrics, and
-short event metadata. It can also publish aggregate worker progress such as
+publisher allowlists worker/job identifiers, states, numeric CPU/GPU metrics,
+and short event metadata. It can also publish aggregate worker progress such as
 hashrate, tested work units, coverage, batch number, and observation uptime when
 the worker reports them. It never copies raw logs, command lines, exception
 text, process paths, candidate values, or credentials into `dashboard/data/`.

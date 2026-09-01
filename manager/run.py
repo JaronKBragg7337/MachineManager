@@ -17,7 +17,7 @@ from .capabilities import CapabilityRegistry
 from .evidence import EvidenceCoordinator
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
-from .probes import gpu_resource_ok, keyhunt_progress_probe, nvidia_smi_probe
+from .probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe, nvidia_smi_probe
 from .public_upload import GitHubPagesPublisher, PublicUploadError
 from .scheduler import WorkScheduler
 from .state_store import StateStore
@@ -622,12 +622,14 @@ def main() -> int:
         objective = str(config.get("objective", primary_objective_id))
         public_event_limit = max(20, int(config.get("public_event_limit", 500)))
         manager.start_all()
+        cpu_probe = CpuUsageProbe()
 
         while True:
             statuses = manager.tick_all(auto_recover=True)
             snapshot = manager.snapshot(objective=objective)
             snapshot["objective_id"] = primary_objective_id
             snapshot["updated"] = utc_now()
+            snapshot["system"] = cpu_probe()
             for status in statuses.values():
                 health = status.get("health", {})
                 metrics = health.get("metrics", {}) if isinstance(health, Mapping) else {}
