@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-01T06:02:12.860Z",
+  "updated": "2026-09-01T06:04:29.989Z",
   "scenarios": [
     {
       "id": "healthy-operation-001",
@@ -56,6 +56,13 @@
       "result": "PASS",
       "score": 1,
       "recovery_s": 0.0
+    },
+    {
+      "id": "manager-restart-recovery-manager-001",
+      "actor": "local-manager-watchdog",
+      "result": "PASS",
+      "score": 1,
+      "recovery_s": 23.697
     }
   ]
 }
