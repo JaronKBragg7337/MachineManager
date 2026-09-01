@@ -25,6 +25,8 @@ class DashboardContractTests(unittest.TestCase):
             "Processing the current sanitized snapshot",
             "function renderRecurringSchedules(items)",
             "function gpuEvidenceActive(gpu)",
+            "function cpuActivityText(system, gpu)",
+            "function cpuActivityCard(system, gpu)",
             "UNATTENDED SCHEDULE",
             "UNATTENDED WORK CADENCE",
             "manager-owned cadence",
@@ -33,6 +35,10 @@ class DashboardContractTests(unittest.TestCase):
 
     def test_low_gpu_event_samples_keep_the_raw_value_visible(self) -> None:
         self.assertIn("GPU ACTIVE (raw ", self.dashboard)
+
+    def test_low_cpu_samples_explain_active_gpu_work(self) -> None:
+        self.assertIn("Raw CPU sample ", self.dashboard)
+        self.assertIn('missionReading("CPU", cpuActivityText(system, gpu)', self.dashboard)
 
 
 if __name__ == "__main__":
