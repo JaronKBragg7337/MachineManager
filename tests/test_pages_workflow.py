@@ -16,9 +16,12 @@ class PagesWorkflowTests(unittest.TestCase):
         self.assertIn("uses: actions/upload-pages-artifact@v3", workflow)
         self.assertIn("uses: actions/deploy-pages@v4", workflow)
         self.assertEqual(workflow.count(f"\n          name: {UNIQUE_ARTIFACT}"), 1)
-        self.assertEqual(workflow.count(f"\n          artifact_name: {UNIQUE_ARTIFACT}"), 1)
+        self.assertEqual(workflow.count(f"\n          artifact_name: {UNIQUE_ARTIFACT}"), 2)
         self.assertIn("github.run_id", workflow)
         self.assertIn("github.run_attempt", workflow)
+        self.assertIn("continue-on-error: true", workflow)
+        self.assertIn("Wait before Pages retry", workflow)
+        self.assertEqual(workflow.count("if: steps.deployment.outcome == 'failure'"), 2)
 
 
 if __name__ == "__main__":
