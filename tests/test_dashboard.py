@@ -40,6 +40,7 @@ class DashboardContractTests(unittest.TestCase):
             "function cpuActivityCard(system, gpu)",
             "function runAttemptLabel(item)",
             "function restartBudgetLabel(item)",
+            "function workerRecoveryDetails(worker)",
             "<th>Restarts / max</th>",
             "Worker attempt",
             "function taskKindLabel(value)",

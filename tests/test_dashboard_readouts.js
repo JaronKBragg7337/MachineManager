@@ -67,6 +67,7 @@ vm.runInContext(
     "numericLabel: resourceMeterLabel(\"86\", 86)," +
     "workerAttempt: runAttemptLabel({attempt: 4})," +
     "workerRestart: restartBudgetLabel({restart_count: 1, max_restarts: 3})," +
+    "workerDetails: workerRecoveryDetails({attempt: 4, restart_count: 1, max_restarts: 3})," +
     "workerTable: renderWorkersTable([{id: \"worker-demo\", type: \"SyntheticWorker\", state: \"RUNNING\", attempt: 4, restart_count: 1, max_restarts: 3, owner: \"manager\"}])," +
     "zeroGpuMetric: eventMetricChips({metrics: {util_pct: 0, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
     "zeroGpuMetricWithHistory: eventMetricChips({metrics: {util_pct: 0, util_pct_recent_max: 77, util_pct_sample_count: 3, util_pct_zero_samples: 1, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
@@ -117,6 +118,10 @@ assert.match(output.unavailableCpuCard, /<div class="resource-value">--<small><\
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
 assert.strictEqual(output.workerAttempt, "4");
 assert.strictEqual(output.workerRestart, "1 / 3");
+assert.match(output.workerDetails, /Run attempt/);
+assert.match(output.workerDetails, />4<\/div>/);
+assert.match(output.workerDetails, /Restarts \/ max/);
+assert.match(output.workerDetails, />1 \/ 3<\/div>/);
 assert.match(output.workerTable, /<th>Attempt<\/th>/);
 assert.match(output.workerTable, /<th>Restarts \/ max<\/th>/);
 assert.match(output.workerTable, /worker-demo/);

@@ -1163,6 +1163,10 @@
       return count + (budget === null ? "" : " / " + String(Math.max(0, Math.round(budget))));
     }
 
+    function workerRecoveryDetails(worker) {
+      return '<div class="agent-meta"><div class="mini-card"><span class="label">Run attempt</span><div class="value">' + escapeHtml(runAttemptLabel(worker)) + '</div></div><div class="mini-card"><span class="label">Restarts / max</span><div class="value">' + escapeHtml(restartBudgetLabel(worker)) + '</div></div></div>';
+    }
+
     function renderWorkersTable(workers) {
       if (!workers.length) return '<div class="empty-cell">No workers are included in this snapshot.</div>';
       return '<div class="table-wrap"><table><thead><tr><th>Worker</th><th>Type</th><th>State</th><th>Attempt</th><th>Restarts / max</th><th>Owner</th></tr></thead><tbody>' + workers.map(function (worker) {
@@ -1632,7 +1636,7 @@
       const workers = sets.workers.length ? sets.workers.map(function (worker) {
         const progress = worker.progress || {};
         const active = hasCurrentWorkerEvidence(latest, worker);
-        return '<article class="worker-card"><div class="worker-top"><div><p class="eyebrow">' + escapeHtml(worker.type || "Worker") + '</p><h2>' + escapeHtml(worker.id || "Unnamed worker") + '</h2><div class="worker-type">Managed execution process</div></div>' + badge(worker.state) + '</div><div class="worker-owner">Owner <strong>' + escapeHtml(worker.owner || "local manager") + "</strong></div>" + renderHealthSignals() + '<div class="progress-signal' + (active ? '' : ' warn') + '"><span class="status-dot"></span><div><strong>' + escapeHtml(workEvidenceLabel(progress, active)) + '</strong><br><span>' + escapeHtml(progress.reported ? "Aggregate progress is being reported." : "Process and resource activity are being verified; exact totals are not published.") + '</span></div></div><a class="panel-link" href="#/search">Open search evidence →</a></article>';
+        return '<article class="worker-card"><div class="worker-top"><div><p class="eyebrow">' + escapeHtml(worker.type || "Worker") + '</p><h2>' + escapeHtml(worker.id || "Unnamed worker") + '</h2><div class="worker-type">Managed execution process</div></div>' + badge(worker.state) + '</div><div class="worker-owner">Owner <strong>' + escapeHtml(worker.owner || "local manager") + "</strong></div>" + workerRecoveryDetails(worker) + renderHealthSignals() + '<div class="progress-signal' + (active ? '' : ' warn') + '"><span class="status-dot"></span><div><strong>' + escapeHtml(workEvidenceLabel(progress, active)) + '</strong><br><span>' + escapeHtml(progress.reported ? "Aggregate progress is being reported." : "Process and resource activity are being verified; exact totals are not published.") + '</span></div></div><a class="panel-link" href="#/search">Open search evidence →</a></article>';
       }).join("") : '<div class="error-state"><h2>No workers reported</h2><p>The public snapshot contains no worker records right now.</p></div>';
       const gpuTotal = numberValue(gpu.mem_total_mib);
       const gpuUsed = numberValue(gpu.mem_used_mib);
