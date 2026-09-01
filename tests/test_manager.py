@@ -1302,6 +1302,7 @@ class TelemetryTests(unittest.TestCase):
                         "task_id": "task-research-1",
                         "new_state": "RUNNING",
                         "action": "start",
+                        "artifact_refs": ["task:task-research-1"],
                         "error": "C:\\Users\\lilli\\secret-token.txt",
                         "metrics": {"util_pct": 80, "keys_tested": 99, "pid": 9999},
                     }

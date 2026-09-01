@@ -518,6 +518,15 @@ class TelemetryPublisher:
             message = _text(event.get("message"), max_len=160)
             if not message:
                 message = _text(" · ".join(part for part in (action, outcome) if part), default=event_type)
+            task_id = event.get("task_id")
+            if not task_id:
+                artifact_refs = event.get("artifact_refs")
+                if isinstance(artifact_refs, (list, tuple)):
+                    for reference in artifact_refs:
+                        reference_text = str(reference or "")
+                        if reference_text.startswith("task:"):
+                            task_id = reference_text[5:]
+                            break
             public.append(
                 {
                     "ts": _text(event.get("timestamp", event.get("ts")), default=utc_now(), max_len=40),
@@ -525,7 +534,7 @@ class TelemetryPublisher:
                     "actor": _text(event.get("actor"), default="system", max_len=60),
                     "kind": _text(event.get("kind"), max_len=60),
                     "objective_id": _text(event.get("objective_id"), max_len=100),
-                    "task_id": _text(event.get("task_id"), max_len=100),
+                    "task_id": _text(task_id, max_len=100),
                     "type": event_type,
                     "state": state,
                     "message": message,
