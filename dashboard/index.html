@@ -1028,9 +1028,12 @@
         ["temp_c", "°C", "Temp"],
         ["worker_uptime_s", "s", "Uptime"],
         ["sample_count", "", "Sample"],
+        ["batch_number", "", "Batch"],
         ["keys_tested", "", "Keys"],
         ["keys_per_second", "/s", "Rate"],
+        ["hashrate_mkey_s", " MKey/s", "Hashrate"],
         ["coverage_pct", "%", "Coverage"],
+        ["matches_found", "", "Matches"],
         ["duration_s", "s", "Duration"]
       ];
       const chips = definitions.map(function (definition) {
@@ -1108,10 +1111,19 @@
       const activeEvidence = progress.active === true || upper(worker.state) === "RUNNING";
       const current = freshness();
       const live = activeEvidence && current.key === "fresh" && upper(latest.status) === "HEALTHY";
-      const util = reportedUtil === null ? (live ? 45 : 0) : clampNumber(reportedUtil, 0, 100);
+      const confirmedActivity = live && gpu.resource_active === true;
+      const util = reportedUtil !== null && reportedUtil >= 15
+        ? clampNumber(reportedUtil, 0, 100)
+        : confirmedActivity
+          ? 55
+          : reportedUtil === null
+            ? (live ? 45 : 0)
+            : clampNumber(reportedUtil, 0, 100);
       return {
         live: live,
         util: util,
+        rawUtil: reportedUtil,
+        confirmedActivity: confirmedActivity,
         packetCount: live ? Math.round(clampNumber(3 + util / 16, 3, 8)) : 0,
         flowSpeed: clampNumber(3.05 - util / 47, .85, 2.8).toFixed(2),
         pulseSpeed: clampNumber(2.75 - util / 58, 1.05, 2.75).toFixed(2),
@@ -1129,7 +1141,10 @@
 
     function renderGpuMatrix(profile) {
       const activeCells = profile.live ? Math.round(clampNumber(profile.util / 5, 2, 20)) : 0;
-      return '<div class="gpu-matrix" aria-label="GPU activity pattern based on reported utilization">' + Array.from({ length: 20 }, function (_, index) {
+      const label = profile.confirmedActivity && profile.rawUtil !== null && profile.rawUtil < 15
+        ? "GPU activity pattern based on confirmed dedicated-memory and power activity; raw driver sample " + Math.round(profile.rawUtil) + "%"
+        : "GPU activity pattern based on reported utilization";
+      return '<div class="gpu-matrix" aria-label="' + escapeHtml(label) + '">' + Array.from({ length: 20 }, function (_, index) {
         const active = index < activeCells;
         const delay = -(index % 8) * .13;
         return '<span class="' + (active ? "active" : "") + '" style="--cell-delay:' + delay.toFixed(2) + 's"></span>';
@@ -1151,13 +1166,18 @@
       const resultSignal = matches === null ? "Awaiting report" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "No match reported";
       const packetRate = profile.live ? profile.packetCount + " active lanes" : "Paused";
       const sourceLabel = recent.type ? String(recent.type).replace(/_/g, " ") : "snapshot update";
+      const motionContract = profile.confirmedActivity && profile.rawUtil !== null && profile.rawUtil < 15
+        ? "this stream is moving because dedicated memory and power confirm active work even though the raw driver sample is " + Math.round(profile.rawUtil) + "%."
+        : profile.live
+          ? "this stream is moving because the current public snapshot reports active work and is fresh. Packet cadence follows the reported GPU activity (" + Math.round(profile.util) + "%), not an invented completion percent."
+          : "the stream is paused because the page does not have both a fresh snapshot and active worker evidence. It will resume automatically when both return.";
       const style = '--flow-speed:' + profile.flowSpeed + 's;--pulse-speed:' + profile.pulseSpeed + 's';
       return '<section class="motion-deck ' + (profile.live ? "is-live" : "is-paused") + '" style="' + style + '"><div class="panel-head"><h2>LIVE WORKFLOW MOTION</h2><span class="subhead">' + (profile.live ? "Telemetry-driven stream" : "Paused until fresh work evidence") + '</span></div><div class="motion-deck-stage"><div class="motion-lane motion-lane--upper">' + renderFlowPackets(profile, profile.packetCount) + '</div><div class="motion-lane motion-lane--lower">' + renderFlowPackets(profile, Math.max(2, profile.packetCount - 2)) + '</div><div class="motion-lane motion-lane--vertical">' + renderFlowPackets(profile, Math.max(2, profile.packetCount - 3)) + '</div><div class="motion-deck-grid">' +
         motionNode({ kicker: "01 · observe", title: "Supervisor Gate", state: latest.status || "UNKNOWN", copy: "Confirms process, heartbeat, resource activity, and a current report before work is shown as live.", label: "Health records", value: String(healthRecords) + " published", tone: profile.live && upper(latest.status) === "HEALTHY" ? "live" : "watch" }) +
         motionNode({ kicker: "02 · compute", title: worker.id || "GPU batch engine", state: profile.live ? "STREAMING" : worker.state || "WAITING", badgeLabel: profile.live ? "STREAMING" : undefined, copy: "Aggregate batch packets move only when the worker has fresh published activity evidence.", label: "Reported rate", value: missionRate(progress), visual: renderGpuMatrix(profile), tone: profile.live ? "live" : "watch" }) +
         motionNode({ kicker: "03 · compare", title: "Address Comparator", state: profile.live ? "CHECKING" : "WATCHING", badgeLabel: profile.live ? "CHECKING" : "WATCHING", copy: "The public view counts aggregate candidate checks. It never shows individual private candidates or keys.", label: "Candidate checks", value: keys === null ? "Not reported" : compactNumber(keys), tone: profile.live ? "live" : "watch" }) +
         motionNode({ kicker: "04 · verify", title: "Result Gate", state: matches !== null && matches > 0 ? "VERIFYING" : "WATCHING", badgeLabel: matches !== null && matches > 0 ? "VERIFYING" : "WATCHING", copy: matches !== null && matches > 0 ? "A possible signal requires independent re-derivation before it can be trusted." : "No raw result is displayed; the gate stays ready for an independently verified signal.", label: "Current result", value: resultSignal, tone: matches !== null && matches > 0 ? "result" : "watch" }) +
-        '</div></div><div class="motion-deck-footer"><div class="motion-explainer"><strong>Motion contract:</strong> ' + (profile.live ? 'this stream is moving because the current public snapshot reports active work and is fresh. Packet cadence follows the reported GPU activity (' + Math.round(profile.util) + '%), not an invented completion percent.' : 'the stream is paused because the page does not have both a fresh snapshot and active worker evidence. It will resume automatically when both return.') + '</div><div class="motion-source"><strong>Latest public signal:</strong> ' + escapeHtml(sourceLabel) + ' · ' + escapeHtml(packetRate) + (batch === null ? '' : ' · batch #' + escapeHtml(String(Math.round(batch)))) + '</div></div></section>';
+        '</div></div><div class="motion-deck-footer"><div class="motion-explainer"><strong>Motion contract:</strong> ' + escapeHtml(motionContract) + '</div><div class="motion-source"><strong>Latest public signal:</strong> ' + escapeHtml(sourceLabel) + ' · ' + escapeHtml(packetRate) + (batch === null ? '' : ' · batch #' + escapeHtml(String(Math.round(batch)))) + '</div></div></section>';
     }
 
     function missionStation(config) {
@@ -1195,6 +1215,31 @@
       const matching = numberValue(progress.matches_found);
       const hasSignal = matching !== null && matching > 0;
       return '<section class="panel"><div class="panel-head"><h2>HOW A REAL RESULT BECOMES TRUSTWORTHY</h2><span class="subhead">No fake completion claim</span></div><div class="panel-body"><div class="result-path"><div class="result-step ' + (active ? "current" : "") + '"><span>01 · Work</span><strong>Candidate batches tested</strong><small>Aggregate work is observed; raw candidate material stays local.</small></div><div class="result-step ' + (active ? "current" : "") + '"><span>02 · Compare</span><strong>Target address check</strong><small>Normal outcome: no target match reported.</small></div><div class="result-step ' + (hasSignal ? "current" : "waiting") + '"><span>03 · Verify</span><strong>Independent re-derivation</strong><small>' + escapeHtml(hasSignal ? "A signal requires a separate confirmation." : "Opens only if a potential signal appears.") + '</small></div><div class="result-step ' + (hasSignal ? "current" : "waiting") + '"><span>04 · Alert</span><strong>Verified-result record</strong><small>A real result is never exposed as a raw key on this public page.</small></div></div><div class="truth-note"><strong>What you are seeing:</strong> real system activity and safe aggregate work evidence. A moving visual is tied to a manager record, not a made-up progress animation.</div></div></section>';
+    }
+
+    function renderSearchSamples() {
+      const samples = recentEvents(40, "work").filter(function (event) {
+        const type = String(event.type || "").toLowerCase();
+        const metrics = event.metrics || {};
+        return (type.includes("health") || type.includes("progress")) && (metrics.batch_number !== undefined || metrics.keys_tested !== undefined);
+      }).slice(0, 12);
+      if (!samples.length) {
+        return '<section class="panel"><div class="panel-head"><h2>RECENT AGGREGATE SAMPLES</h2><span class="subhead">No batch records</span></div><div class="panel-body"><div class="empty-cell">No aggregate batch samples are in the current public snapshot yet.</div></div></section>';
+      }
+      const rows = samples.map(function (event) {
+        const metrics = event.metrics || {};
+        const batch = numberValue(metrics.batch_number);
+        const keys = numberValue(metrics.keys_tested);
+        const rate = numberValue(metrics.hashrate_mkey_s) !== null
+          ? compactNumber(metrics.hashrate_mkey_s) + " MKey/s"
+          : numberValue(metrics.keys_per_second) !== null
+            ? compactNumber(metrics.keys_per_second) + "/s"
+            : "--";
+        const matches = numberValue(metrics.matches_found);
+        const result = matches === null ? "--" : matches > 0 ? String(Math.round(matches)) + " signal(s)" : "None";
+        return '<tr><td class="mono">' + escapeHtml(formatDate(event.ts, true)) + '</td><td class="mono">' + escapeHtml(batch === null ? "--" : "#" + Math.round(batch)) + '</td><td class="mono">' + escapeHtml(keys === null ? "--" : compactNumber(keys)) + '</td><td class="mono">' + escapeHtml(rate) + '</td><td>' + escapeHtml(result) + '</td><td>' + badge(event.state || "UNKNOWN") + '</td></tr>';
+      }).join("");
+      return '<section class="panel"><div class="panel-head"><h2>RECENT AGGREGATE SAMPLES</h2><span class="subhead">' + escapeHtml(String(samples.length)) + ' published observations</span></div><div class="panel-body"><p class="ops-note" style="margin-top:0"><strong>What each row means:</strong> one sanitized observation of cumulative checks and the worker’s current batch. This is evidence of real search work, not a list of individual candidate values.</p><div class="table-wrap"><table><thead><tr><th>Observed</th><th>Batch</th><th>Checks</th><th>Rate</th><th>Matches</th><th>State</th></tr></thead><tbody>' + rows + '</tbody></table></div></div></section>';
     }
 
     function renderWorkJournal(latest, sets, worker, progress) {
@@ -1317,8 +1362,8 @@
       return pageHeading("Bitcoin workstream", "See what is actually being tested", "This is a bounded numeric address-comparison search, not a phrase-guessing task. KeyHunt supplies safe aggregate work evidence while the manager verifies the runtime.", '<a class="btn" href="#/activity">Open full activity <span>→</span></a>') + snapshotStrip() +
         '<div class="progress-grid">' + progressCard("Verified signal", active ? "ACTIVE" : "WAITING", signalLabel, active ? "success" : "warn") + progressCard("Observation samples", samples, "Manager observations retained in the local record", "accent") + progressCard("Search totals", exactTotals, progress.reported ? "Aggregate worker report" : "Exact count not reported by this worker") + progressCard("Work rate", rate, "Coverage " + coverage) + '</div>' +
         '<div class="progress-signal' + signalClass + '"><span class="status-dot"></span><div><strong>' + escapeHtml(signalLabel) + '</strong><br>' + escapeHtml((active ? "The manager has recent process and resource evidence for the active worker. " : "The public snapshot does not currently contain a verified active-work signal. ") + "Result gate: " + resultSignal + ".") + '</div></div>' +
-        '<div class="section-grid"><section class="panel"><div class="panel-head"><h2>WORKER EVIDENCE</h2><span class="subhead">' + escapeHtml(worker.id || job.id || "No worker") + '</span></div><div class="panel-body">' + progressDetail(progress) + '<div class="progress-note"><strong>What this means:</strong><br>' + escapeHtml(progress.reported ? "The worker has supplied allowlisted aggregate progress fields. Candidate values are never displayed here." : "This worker currently supplies process and GPU activity evidence, but no exact candidate-count report. The UI will not invent a number.") + '</div></div></section><section class="panel"><div class="panel-head"><h2>SEARCH BOUNDARY</h2><span class="subhead">public-safe view</span></div><div class="panel-body"><div class="facts-list"><div class="fact-row"><span>Job</span><strong>' + escapeHtml(job.id || "--") + '</strong></div><div class="fact-row"><span>Worker type</span><strong>' + escapeHtml(worker.type || "--") + '</strong></div><div class="fact-row"><span>GPU utilization</span><strong>' + escapeHtml(progressMetric(gpu, ["util_pct"], "%")) + '</strong></div><div class="fact-row"><span>Worker uptime</span><strong>' + escapeHtml(uptime) + '</strong></div><div class="fact-row"><span>Last observation</span><strong>' + escapeHtml(formatDate(progress.observed_at || latest.updated, true)) + '</strong></div></div><div class="ops-note"><strong>Audit rule:</strong><br>Aggregate batches, rates, and state transitions are useful evidence. Private keys, candidate values, raw command lines, and unrestricted model reasoning stay outside the public feed.</div></div></section></div>' +
-        '<section class="panel"><div class="panel-head"><h2>WORK OBSERVATION STREAM</h2><span class="subhead">' + escapeHtml(String(workEvents.length)) + ' recent records</span></div><div class="panel-body"><div class="event-list">' + eventMarkup + '</div></div></section>';
+        '<div class="section-grid"><section class="panel"><div class="panel-head"><h2>WORKER EVIDENCE</h2><span class="subhead">' + escapeHtml(worker.id || job.id || "No worker") + '</span></div><div class="panel-body">' + progressDetail(progress) + '<div class="progress-note"><strong>What this means:</strong><br>' + escapeHtml(progress.reported ? "The worker has supplied allowlisted aggregate progress fields. Candidate values are never displayed here." : "This worker currently supplies process and GPU activity evidence, but no exact candidate-count report. The UI will not invent a number.") + '</div></div></section><section class="panel"><div class="panel-head"><h2>SEARCH BOUNDARY</h2><span class="subhead">public-safe view</span></div><div class="panel-body"><div class="facts-list"><div class="fact-row"><span>Job</span><strong>' + escapeHtml(job.id || "--") + '</strong></div><div class="fact-row"><span>Worker type</span><strong>' + escapeHtml(worker.type || "--") + '</strong></div><div class="fact-row"><span>GPU activity</span><strong>' + escapeHtml(gpuActivityText(gpu)) + '</strong></div><div class="fact-row"><span>Raw driver sample</span><strong>' + escapeHtml(progressMetric(gpu, ["util_pct"], "%")) + '</strong></div><div class="fact-row"><span>Worker uptime</span><strong>' + escapeHtml(uptime) + '</strong></div><div class="fact-row"><span>Last observation</span><strong>' + escapeHtml(formatDate(progress.observed_at || latest.updated, true)) + '</strong></div></div><div class="ops-note"><strong>Audit rule:</strong><br>Aggregate batches, rates, and state transitions are useful evidence. Private keys, candidate values, raw command lines, and unrestricted model reasoning stay outside the public feed.</div></div></section></div>' +
+        renderSearchSamples() + '<section class="panel"><div class="panel-head"><h2>WORK OBSERVATION STREAM</h2><span class="subhead">' + escapeHtml(String(workEvents.length)) + ' recent records</span></div><div class="panel-body"><div class="event-list">' + eventMarkup + '</div></div></section>';
     }
 
     function renderAgentRuns(limit) {
