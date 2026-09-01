@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:19:47.740Z",
+        "observed_at": "2026-09-01T06:20:23.565Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 38.3,
-        "batch_number": 1803,
-        "keys_per_second": 763140000,
-        "coverage_pct": 0,
         "matches_found": 0,
-        "sample_count": 3,
         "hashrate_mkey_s": 763.14,
-        "keys_tested": 5547956895744
+        "uptime_s": 1.0,
+        "sample_count": 1,
+        "coverage_pct": 0,
+        "keys_per_second": 763140000,
+        "keys_tested": 5547956895744,
+        "batch_number": 1803
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:19:47.740Z",
+        "observed_at": "2026-09-01T06:20:23.565Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 38.3,
-        "batch_number": 1803,
-        "keys_per_second": 763140000,
-        "coverage_pct": 0,
         "matches_found": 0,
-        "sample_count": 3,
         "hashrate_mkey_s": 763.14,
-        "keys_tested": 5547956895744
+        "uptime_s": 1.0,
+        "sample_count": 1,
+        "coverage_pct": 0,
+        "keys_per_second": 763140000,
+        "keys_tested": 5547956895744,
+        "batch_number": 1803
       }
     }
   ],
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
-      "last_action": "continue",
-      "last_reason": "System healthy with no errors, high GPU utilization indicates active work is proceeding as expected.",
-      "last_duration_s": 7.609,
-      "started_at": "",
-      "elapsed_s": null,
-      "tasks_completed": 1,
-      "last_run": "2026-09-01T06:19:32.423Z",
-      "next_run": "2026-09-01T06:24:32.423Z"
+      "last_action": "",
+      "last_reason": "",
+      "last_duration_s": null,
+      "started_at": "2026-09-01T06:20:24.531Z",
+      "elapsed_s": 0.0,
+      "tasks_completed": 0,
+      "last_run": "",
+      "next_run": ""
     }
   ],
   "capabilities": [
@@ -325,46 +325,46 @@
     }
   ],
   "autonomy": {
-    "account_enrollment": true,
     "procurement_when_funded": true,
-    "developer_tools": true,
-    "public_submissions": true,
+    "gpu_idle_use": true,
+    "paid_work": true,
     "transparent_outreach": true,
     "outreach_opt_out": true,
     "terms_aware_execution": true,
-    "gpu_idle_use": true,
-    "paid_work": true,
-    "handoff_style": "service-required",
-    "mode": "EXECUTE_AND_REPORT"
+    "account_enrollment": true,
+    "public_submissions": true,
+    "developer_tools": true,
+    "mode": "EXECUTE_AND_REPORT",
+    "handoff_style": "service-required"
   },
   "queue": {},
   "gpu": {
-    "util_pct": 75.0,
+    "util_pct": 76.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 58.0,
-    "power_w": 67.95,
+    "temp_c": 64.0,
+    "power_w": 80.52,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 5.6
+    "cpu_pct": 9.1
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T06:19:47.740Z",
+    "observed_at": "2026-09-01T06:20:23.565Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 38.3,
-    "batch_number": 1803,
-    "keys_per_second": 763140000,
-    "coverage_pct": 0,
     "matches_found": 0,
-    "sample_count": 3,
     "hashrate_mkey_s": 763.14,
-    "keys_tested": 5547956895744
+    "uptime_s": 1.0,
+    "sample_count": 1,
+    "coverage_pct": 0,
+    "keys_per_second": 763140000,
+    "keys_tested": 5547956895744,
+    "batch_number": 1803
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T06:19:48.539Z"
+  "updated": "2026-09-01T06:20:24.531Z"
 }
