@@ -962,22 +962,35 @@
     function gpuRecentHistoryText(gpu) {
       const recentMax = numberValue(gpu.util_pct_recent_max);
       const sampleCount = numberValue(gpu.util_pct_sample_count);
-      const current = numberValue(gpu.util_pct);
       const zeroSamples = numberValue(gpu.util_pct_zero_samples) || 0;
+      const current = numberValue(gpu.util_pct);
+      if (sampleCount === null || sampleCount <= 1) return "";
+      const parts = [];
       const currentAlreadyExplainsPeak = current !== null && current >= 15 && recentMax !== null && recentMax - current < 5 && zeroSamples === 0;
-      if (recentMax !== null && sampleCount !== null && sampleCount > 1 && recentMax >= 15 && !currentAlreadyExplainsPeak) {
-        return "; recent peak " + Math.round(recentMax) + "% over " + Math.round(sampleCount) + " samples";
+      if (recentMax !== null && recentMax >= 15 && !currentAlreadyExplainsPeak) {
+        parts.push("recent peak " + Math.round(recentMax) + "% over " + Math.round(sampleCount) + " samples");
       }
-      return "";
+      if (zeroSamples > 0) {
+        parts.push(Math.round(zeroSamples) + " transient zero sample" + (zeroSamples === 1 ? "" : "s"));
+      }
+      return parts.length ? "; " + parts.join("; ") : "";
     }
 
     function cpuRecentHistoryText(system) {
       const recentMax = numberValue((system || {}).cpu_pct_recent_max);
       const sampleCount = numberValue((system || {}).cpu_pct_sample_count);
-      if (recentMax !== null && sampleCount !== null && sampleCount > 1 && recentMax >= 1) {
-        return "; recent host peak " + recentMax.toFixed(1) + "% over " + Math.round(sampleCount) + " samples";
+      const zeroSamples = numberValue((system || {}).cpu_pct_zero_samples) || 0;
+      const current = numberValue((system || {}).cpu_pct);
+      if (sampleCount === null || sampleCount <= 1) return "";
+      const parts = [];
+      const currentAlreadyExplainsPeak = current !== null && current >= 1 && recentMax !== null && recentMax - current < 1 && zeroSamples === 0;
+      if (recentMax !== null && recentMax >= 1 && !currentAlreadyExplainsPeak) {
+        parts.push("recent host peak " + recentMax.toFixed(1) + "% over " + Math.round(sampleCount) + " samples");
       }
-      return "";
+      if (zeroSamples > 0) {
+        parts.push(Math.round(zeroSamples) + " transient zero sample" + (zeroSamples === 1 ? "" : "s"));
+      }
+      return parts.length ? "; " + parts.join("; ") : "";
     }
 
     function gpuEvidenceActive(gpu) {

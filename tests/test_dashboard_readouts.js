@@ -72,12 +72,12 @@ vm.runInContext(
 
 const output = executionContext.output;
 assert.strictEqual(output.gpuText, "ACTIVE");
-assert.strictEqual(output.gpuObservation, "Diagnostic 0%; memory/power active; recent peak 86% over 5 samples");
-assert.strictEqual(output.gpuHighObservation, "70%; recent peak 86% over 5 samples");
+assert.strictEqual(output.gpuObservation, "Diagnostic 0%; memory/power active; recent peak 86% over 5 samples; 1 transient zero sample");
+assert.strictEqual(output.gpuHighObservation, "70%; recent peak 86% over 5 samples; 1 transient zero sample");
 assert.match(output.gpuHighCard, /Current accelerator activity; recent peak 86% over 5 samples/);
 assert.match(output.gpuCard, /Memory \+ power confirm work; diagnostic driver sample 0%/);
 assert.strictEqual(output.cpuText, "LOW");
-assert.strictEqual(output.cpuHighText, "5%; recent host peak 9.2% over 5 samples");
+assert.strictEqual(output.cpuHighText, "5%; recent host peak 9.2% over 5 samples; 2 transient zero samples");
 assert.match(output.cpuHighCard, /Current host activity; recent host peak 9\.2% over 5 samples/);
 assert.match(output.cpuCard, /Diagnostic CPU sample 0\.2%/);
 assert.match(output.cpuCard, /recent host peak 1\.2% over 5 samples/);
