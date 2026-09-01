@@ -1,36 +1,5 @@
 [
   {
-    "ts": "2026-09-01T01:24:22.265Z",
-    "event_id": "evt-bdb9b34ba4dc",
-    "actor": "local-manager-v2",
-    "type": "health_check",
-    "state": "RUNNING",
-    "message": "healthy",
-    "action": "",
-    "outcome": "healthy",
-    "metrics": {
-      "process_alive": true,
-      "heartbeat_fresh": true,
-      "resource_active": true,
-      "healthy": true,
-      "util_pct": 86.0,
-      "mem_used_mib": 2367.0,
-      "mem_total_mib": 8188.0,
-      "temp_c": 63.0,
-      "power_w": 81.72,
-      "sample_count": 356,
-      "worker_uptime_s": 5453.2,
-      "progress_reported": true,
-      "hashrate_mkey_s": 793.85,
-      "keys_per_second": 793850000,
-      "coverage_pct": 0,
-      "batch_number": 1325,
-      "keys_tested": 4300487000064,
-      "matches_found": 0
-    },
-    "error": false
-  },
-  {
     "ts": "2026-09-01T01:24:37.345Z",
     "event_id": "evt-ff3a89a9a8ff",
     "actor": "local-manager-v2",
@@ -14993,6 +14962,22 @@
       "tasks_completed": 43,
       "fallback": false,
       "duration_s": 3.375
+    },
+    "error": false
+  },
+  {
+    "ts": "2026-09-01T03:34:04.689Z",
+    "event_id": "agent-local-manager-brain-17882336446902",
+    "actor": "local-manager-brain",
+    "type": "agent_decision",
+    "state": "READY",
+    "message": "Retry limit reached with missing progress signals; attempting restart to reset worker state.",
+    "action": "restart",
+    "outcome": "recommendation",
+    "metrics": {
+      "tasks_completed": 44,
+      "fallback": false,
+      "duration_s": 6.11
     },
     "error": false
   }
