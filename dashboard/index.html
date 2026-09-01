@@ -1039,6 +1039,9 @@
       const chips = definitions.map(function (definition) {
         const value = numberValue(metrics[definition[0]]);
         if (value === null || (definition[0] === "coverage_pct" && value <= 0)) return "";
+        if (definition[0] === "util_pct" && metrics.resource_active === true && value < 15) {
+          return '<span class="event-metric">GPU ACTIVE (raw ' + escapeHtml(compactNumber(value) + "%") + ')</span>';
+        }
         return '<span class="event-metric">' + escapeHtml(definition[2] + " " + compactNumber(value) + definition[1]) + '</span>';
       }).filter(Boolean);
       if (typeof metrics.progress_reported === "boolean") chips.push('<span class="event-metric">Progress ' + (metrics.progress_reported ? "reported" : "activity") + '</span>');
