@@ -27,7 +27,14 @@ from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, Outreac
 from manager.capabilities import CapabilityRegistry
 from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
-from manager.probes import CpuUsageProbe, NvidiaSmiProbe, gpu_activity_basis, gpu_resource_ok, keyhunt_progress_probe
+from manager.probes import (
+    CpuUsageProbe,
+    NvidiaSmiProbe,
+    gpu_activity_basis,
+    gpu_resource_ok,
+    host_load_interpretation,
+    keyhunt_progress_probe,
+)
 from manager.state_store import StateStore
 from manager import DispatchOutcome, MachineManager, WorkDispatcher, WorkScheduler
 
@@ -171,6 +178,20 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(
             gpu_activity_basis({"util_pct": 0, "power_w": 3, "mem_used_mib": 0}, False),
             "not_confirmed",
+        )
+
+    def test_host_load_interpretation_distinguishes_gpu_offload_from_idle(self) -> None:
+        self.assertEqual(
+            host_load_interpretation({"cpu_pct": 0}, gpu_active=True),
+            {"load_state": "LOW", "load_basis": "gpu_worker_offload"},
+        )
+        self.assertEqual(
+            host_load_interpretation({"cpu_pct": 0}, gpu_active=False),
+            {"load_state": "IDLE", "load_basis": "host_counter"},
+        )
+        self.assertEqual(
+            host_load_interpretation({"cpu_pct": 8.5}, gpu_active=True),
+            {"load_state": "ACTIVE", "load_basis": "host_counter"},
         )
 
     def test_expected_image_name_resolves_posix_symlink_target(self) -> None:
@@ -1645,6 +1666,8 @@ class TelemetryTests(unittest.TestCase):
                         "private_key": "do not publish",
                     },
                     "system": {
+                        "load_state": "LOW",
+                        "load_basis": "gpu_worker_offload",
                         "cpu_pct": 8.5,
                         "cpu_pct_recent_max": 12.0,
                         "cpu_pct_recent_avg": 7.1,
@@ -1693,6 +1716,8 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["system"]["cpu_pct"], 8.5)
             self.assertEqual(latest["system"]["cpu_pct_recent_max"], 12.0)
             self.assertEqual(latest["system"]["cpu_pct_sample_count"], 5)
+            self.assertEqual(latest["system"]["load_state"], "LOW")
+            self.assertEqual(latest["system"]["load_basis"], "gpu_worker_offload")
             self.assertTrue(latest["gpu"]["resource_active"])
             self.assertEqual(latest["gpu"]["activity_state"], "ACTIVE")
             self.assertEqual(latest["gpu"]["activity_basis"], "dedicated_memory_and_power")

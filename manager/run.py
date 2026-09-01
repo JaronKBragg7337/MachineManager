@@ -23,6 +23,7 @@ from .probes import (
     NvidiaSmiProbe,
     gpu_activity_basis,
     gpu_resource_ok,
+    host_load_interpretation,
     keyhunt_progress_probe,
 )
 from .public_upload import GitHubPagesPublisher, PublicUploadError
@@ -851,6 +852,12 @@ def main() -> int:
                         snapshot["gpu"]["activity_state"] = "ACTIVE" if resource_active else "INACTIVE"
                         snapshot["gpu"]["activity_basis"] = gpu_activity_basis(metrics, resource_active)
                     break
+            if isinstance(snapshot.get("system"), dict):
+                gpu_snapshot = snapshot.get("gpu")
+                gpu_active = isinstance(gpu_snapshot, Mapping) and gpu_snapshot.get("resource_active") is True
+                snapshot["system"].update(
+                    host_load_interpretation(snapshot["system"], gpu_active=gpu_active)
+                )
             agents.tick(snapshot, events=store.recent_events(limit=20))
             if evidence is not None:
                 for event in evidence.tick():

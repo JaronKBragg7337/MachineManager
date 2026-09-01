@@ -51,7 +51,7 @@ class DashboardContractTests(unittest.TestCase):
         self.assertIn("GPU ACTIVE (diagnostic raw sample ", self.dashboard)
 
     def test_low_cpu_samples_explain_active_gpu_work(self) -> None:
-        self.assertIn("Diagnostic CPU sample ", self.dashboard)
+        self.assertIn("diagnostic CPU sample ", self.dashboard)
         self.assertIn('missionReading("CPU", cpuActivityText(system, gpu)', self.dashboard)
         self.assertIn('+ cpuActivityCard(system, gpu) +', self.dashboard)
         self.assertNotIn('resourceCard("CPU utilization", numberValue(system.cpu_pct) === null ? "--" : String(Math.round(system.cpu_pct))', self.dashboard)

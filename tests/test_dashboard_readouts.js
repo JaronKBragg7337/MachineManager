@@ -50,8 +50,10 @@ vm.runInContext(
     "gpuHighCard: gpuActivityCard(Object.assign({}, fixture.gpu, {util_pct: 70}))," +
     "gpuCard: gpuActivityCard(fixture.gpu)," +
     "cpuText: cpuActivityText(fixture.system, fixture.gpu)," +
+    "cpuBasis: cpuLoadBasisText(fixture.system, fixture.gpu)," +
+    "cpuIdleBasis: cpuLoadBasisText(idleFixture.system, idleFixture.gpu)," +
     "cpuHighText: cpuActivityText(Object.assign({}, fixture.system, {cpu_pct: 5.0, cpu_pct_recent_max: 9.2}), fixture.gpu)," +
-    "cpuHighCard: cpuActivityCard(Object.assign({}, fixture.system, {cpu_pct: 5.0, cpu_pct_recent_max: 9.2}), fixture.gpu)," +
+    "cpuHighCard: cpuActivityCard(Object.assign({}, fixture.system, {cpu_pct: 5.0, cpu_pct_recent_max: 9.2, load_state: \"ACTIVE\", load_basis: \"host_counter\"}), fixture.gpu)," +
     "cpuCard: cpuActivityCard(fixture.system, fixture.gpu)," +
     "idleGpuText: gpuActivityText(idleFixture.gpu)," +
     "idleGpuObservation: gpuObservationText(idleFixture.gpu)," +
@@ -82,9 +84,11 @@ assert.strictEqual(output.gpuHighObservation, "70%; activity confirmed by driver
 assert.match(output.gpuHighCard, /Current accelerator activity; recent peak 86% over 5 samples/);
 assert.match(output.gpuCard, /Confirmed by dedicated memory \+ power; diagnostic driver sample 0%/);
 assert.strictEqual(output.cpuText, "LOW");
+assert.strictEqual(output.cpuBasis, "GPU worker offload");
+assert.strictEqual(output.cpuIdleBasis, "host CPU counter");
 assert.strictEqual(output.cpuHighText, "5%; recent host peak 9.2% over 5 samples; 2 transient zero samples");
-assert.match(output.cpuHighCard, /Current host activity; recent host peak 9\.2% over 5 samples/);
-assert.match(output.cpuCard, /Diagnostic CPU sample 0\.2%/);
+assert.match(output.cpuHighCard, /Current host activity; source host CPU counter; recent host peak 9\.2% over 5 samples/);
+assert.match(output.cpuCard, /Confirmed by GPU worker offload; diagnostic CPU sample 0\.2%/);
 assert.match(output.cpuCard, /recent host peak 1\.2% over 5 samples/);
 assert.ok(!output.gpuCard.includes('<span class="muted">0%</span>'));
 assert.ok(!output.cpuCard.includes('<span class="muted">0%</span>'));
@@ -92,7 +96,7 @@ assert.strictEqual(output.idleGpuText, "IDLE");
 assert.strictEqual(output.idleGpuObservation, "0%; no independent activity evidence");
 assert.match(output.idleGpuCard, /Raw driver sample 0%; no independent activity evidence/);
 assert.strictEqual(output.idleCpuText, "IDLE");
-assert.match(output.idleCpuCard, /Raw CPU sample 0%; no active GPU evidence/);
+assert.match(output.idleCpuCard, /Observed by host CPU counter; raw CPU sample 0%; no active GPU evidence/);
 assert.ok(!output.idleGpuCard.includes('<span class="muted">0%</span>'));
 assert.ok(!output.idleCpuCard.includes('<span class="muted">0%</span>'));
 assert.match(output.unavailableGpuCard, /No verified live reading/);

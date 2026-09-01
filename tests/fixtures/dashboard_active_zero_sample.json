@@ -14,6 +14,8 @@
     "temp_c": 62
   },
   "system": {
+    "load_state": "LOW",
+    "load_basis": "gpu_worker_offload",
     "cpu_pct": 0.2,
     "cpu_pct_recent_max": 1.2,
     "cpu_pct_recent_avg": 0.4,

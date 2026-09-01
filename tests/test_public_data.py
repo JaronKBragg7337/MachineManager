@@ -106,6 +106,13 @@ class PublicDataContractTests(unittest.TestCase):
         for key in ("cpu_pct", "cpu_pct_recent_max", "cpu_pct_recent_avg"):
             if key in system:
                 self.assertLessEqual(system[key], 100, f"system.{key}")
+        if "load_state" in system:
+            self.assertIn(system["load_state"], {"ACTIVE", "LOW", "IDLE", "UNKNOWN"})
+        if "load_basis" in system:
+            self.assertIn(
+                system["load_basis"],
+                {"host_counter", "gpu_worker_offload", "not_confirmed", "unknown"},
+            )
 
         self.assertIsInstance(events, list)
         self.assertIsInstance(scenarios_document, dict)

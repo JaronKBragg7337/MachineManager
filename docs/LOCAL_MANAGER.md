@@ -46,6 +46,9 @@ The manager also records an allowlisted activity state and evidence basis beside
 the raw sample. The public resource cards and Search Evidence view show that
 interpretation and recent context when they add information beyond the current
 sample.
+Host CPU readings carry the same distinction: low load during confirmed GPU
+work is recorded as GPU-worker offload, while a zero reading without active GPU
+evidence remains host-counter idle.
 
 ## Synthetic worker
 

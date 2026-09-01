@@ -1038,17 +1038,32 @@
       return String(Math.round(cpu)) + "%" + cpuRecentHistoryText(system);
     }
 
+    function cpuLoadBasisText(system, gpu) {
+      const labels = {
+        gpu_worker_offload: "GPU worker offload",
+        host_counter: "host CPU counter",
+        not_confirmed: "not confirmed",
+        unknown: "unreported basis"
+      };
+      const basis = String((system || {}).load_basis || "").toLowerCase();
+      if (labels[basis]) return labels[basis];
+      const cpu = numberValue((system || {}).cpu_pct);
+      if (gpuEvidenceActive(gpu) && cpu !== null && cpu < 0.5) return "GPU worker offload";
+      if (cpu !== null) return "host CPU counter";
+      return "not confirmed";
+    }
+
     function cpuActivityCard(system, gpu) {
       const cpu = numberValue((system || {}).cpu_pct);
       if (cpu === null) return resourceCard("CPU utilization", "--", "", "No verified live reading", null, "");
       if (gpuEvidenceActive(gpu) && cpu < 0.5) {
-        return resourceCard("CPU utilization", "LOW", "", "Diagnostic CPU sample " + cpu.toFixed(1) + "%" + cpuRecentHistoryText(system) + "; GPU worker is active", 0, "");
+        return resourceCard("CPU utilization", "LOW", "", "Confirmed by " + cpuLoadBasisText(system, gpu) + "; diagnostic CPU sample " + cpu.toFixed(1) + "%" + cpuRecentHistoryText(system), 0, "");
       }
       if (cpu === 0) {
-        return resourceCard("CPU utilization", "IDLE", "", "Raw CPU sample 0%; no active GPU evidence", 0, "");
+        return resourceCard("CPU utilization", "IDLE", "", "Observed by " + cpuLoadBasisText(system, gpu) + "; raw CPU sample 0%; no active GPU evidence", 0, "");
       }
       if (cpu > 0 && cpu < 1) return resourceCard("CPU utilization", "<1", "%", "Low measured host activity" + cpuRecentHistoryText(system), cpu, "");
-      return resourceCard("CPU utilization", String(Math.round(cpu)), "%", "Current host activity" + cpuRecentHistoryText(system), cpu, "");
+      return resourceCard("CPU utilization", String(Math.round(cpu)), "%", "Current host activity; source " + cpuLoadBasisText(system, gpu) + cpuRecentHistoryText(system), cpu, "");
     }
 
     function workProgress() {

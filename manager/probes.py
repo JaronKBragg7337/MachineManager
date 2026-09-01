@@ -112,6 +112,21 @@ def gpu_activity_basis(metrics: Mapping[str, Any], resource_active: bool) -> str
     return "resource_probe"
 
 
+def host_load_interpretation(metrics: Mapping[str, Any], *, gpu_active: bool) -> dict[str, str]:
+    """Classify a host CPU sample without mistaking GPU offload for idleness."""
+    try:
+        cpu = float(metrics.get("cpu_pct"))
+    except (TypeError, ValueError):
+        return {}
+    if not math.isfinite(cpu):
+        return {}
+    if gpu_active and cpu < 0.5:
+        return {"load_state": "LOW", "load_basis": "gpu_worker_offload"}
+    if cpu == 0:
+        return {"load_state": "IDLE", "load_basis": "host_counter"}
+    return {"load_state": "ACTIVE", "load_basis": "host_counter"}
+
+
 class CpuUsageProbe:
     """Measure host CPU use from cumulative operating-system counters."""
 

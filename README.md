@@ -44,6 +44,7 @@ The repository-level Python runtime in [`manager/`](manager/) currently provides
 - Explicit job states: `QUEUED`, `STARTING`, `VERIFYING`, `RUNNING`, `COMPLETE`, `STALLED`, `FAILED`, `RETRYING`, `ESCALATED`, and `CANCELLED`.
 - Multi-signal health checks: a worker must be alive and, when configured, show fresh progress plus a passing resource probe. A process alone is not treated as proof of useful work.
 - Truthful machine telemetry: the public snapshot can show measured host CPU activity alongside GPU signals; a missing reading is displayed as unavailable rather than invented as `0%`.
+- Explicit host-load interpretation: a low or zero CPU sample records whether the manager observed normal GPU-worker offload or genuine idle host load, keeping CPU telemetry as evidence instead of a misleading standalone percentage.
 - GPU activity presentation: when a driver reports a transient low utilization sample but the resource probe confirms active dedicated memory and power, the dashboard labels the signal `ACTIVE` and retains the raw sample in its explanation.
 - Explicit GPU evidence basis: each current public GPU snapshot records whether activity was established by driver utilization, dedicated memory plus power, or an unconfirmed resource probe, so the dashboard does not have to infer what a raw `0%` means.
 - Clear idle semantics: an unconfirmed zero sample is labeled `IDLE` instead of a bare `0%`, while the raw sample remains visible in the explanation so a phone view cannot confuse missing activity with active work.

@@ -10,6 +10,8 @@
     "temp_c": 39
   },
   "system": {
+    "load_state": "IDLE",
+    "load_basis": "host_counter",
     "cpu_pct": 0
   }
 }

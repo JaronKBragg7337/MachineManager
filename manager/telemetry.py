@@ -222,6 +222,8 @@ PUBLIC_GPU_ACTIVITY_BASES = {
     "not_confirmed",
     "unknown",
 }
+PUBLIC_HOST_LOAD_STATES = {"ACTIVE", "LOW", "IDLE", "UNKNOWN"}
+PUBLIC_HOST_LOAD_BASES = {"host_counter", "gpu_worker_offload", "not_confirmed", "unknown"}
 
 
 def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | bool]:
@@ -708,7 +710,7 @@ class TelemetryPublisher:
             gpu["activity_basis"] = activity_basis
 
         system_input = snapshot.get("system") if isinstance(snapshot.get("system"), Mapping) else {}
-        system: dict[str, int | float] = {}
+        system: dict[str, int | float | str] = {}
         for source, target in (
             ("cpu_pct", "cpu_pct"),
             ("cpu_pct_recent_max", "cpu_pct_recent_max"),
@@ -719,6 +721,12 @@ class TelemetryPublisher:
             number = _number(system_input.get(source))
             if number is not None:
                 system[target] = max(0.0, min(100.0, number))
+        load_state = _text(system_input.get("load_state"), max_len=20).upper()
+        if load_state in PUBLIC_HOST_LOAD_STATES:
+            system["load_state"] = load_state
+        load_basis = _text(system_input.get("load_basis"), max_len=40).lower()
+        if load_basis in PUBLIC_HOST_LOAD_BASES:
+            system["load_basis"] = load_basis
 
         safe_workers = self._workers(snapshot.get("workers", []))
         safe_jobs = self._jobs(snapshot.get("jobs", []))
