@@ -946,7 +946,7 @@
       if (activeEvidence && util !== null && util < 15) return "ACTIVE";
       if (util === 0) return "IDLE";
       if (util === null) return "--";
-      return String(Math.round(util)) + "%";
+      return String(Math.round(util)) + "%" + gpuRecentHistoryText(gpu);
     }
 
     function gpuObservationText(gpu) {
@@ -956,13 +956,16 @@
         return "Diagnostic " + Math.round(util) + "%; memory/power active" + gpuRecentHistoryText(gpu);
       }
       if (util === 0) return "0%; no independent activity evidence";
-      return String(Math.round(util)) + "%";
+      return String(Math.round(util)) + "%" + gpuRecentHistoryText(gpu);
     }
 
     function gpuRecentHistoryText(gpu) {
       const recentMax = numberValue(gpu.util_pct_recent_max);
       const sampleCount = numberValue(gpu.util_pct_sample_count);
-      if (recentMax !== null && sampleCount !== null && sampleCount > 1 && recentMax >= 15) {
+      const current = numberValue(gpu.util_pct);
+      const zeroSamples = numberValue(gpu.util_pct_zero_samples) || 0;
+      const currentAlreadyExplainsPeak = current !== null && current >= 15 && recentMax !== null && recentMax - current < 5 && zeroSamples === 0;
+      if (recentMax !== null && sampleCount !== null && sampleCount > 1 && recentMax >= 15 && !currentAlreadyExplainsPeak) {
         return "; recent peak " + Math.round(recentMax) + "% over " + Math.round(sampleCount) + " samples";
       }
       return "";
@@ -993,7 +996,7 @@
       if (util === 0) {
         return resourceCard("GPU activity", "IDLE", "", "Raw driver sample 0%; no independent activity evidence", 0, "");
       }
-      return resourceCard("GPU utilization", util === null ? "--" : String(Math.round(util)), "%", util === null ? "No verified live reading" : "Current accelerator activity", util, "green");
+      return resourceCard("GPU utilization", util === null ? "--" : String(Math.round(util)), "%", util === null ? "No verified live reading" : "Current accelerator activity" + gpuRecentHistoryText(gpu), util, "green");
     }
 
     function cpuActivityText(system, gpu) {
@@ -1001,8 +1004,8 @@
       if (cpu === null) return "--";
       if (gpuEvidenceActive(gpu) && cpu < 0.5) return "LOW";
       if (cpu === 0) return "IDLE";
-      if (cpu > 0 && cpu < 1) return "<1%";
-      return String(Math.round(cpu)) + "%";
+      if (cpu > 0 && cpu < 1) return "<1%" + cpuRecentHistoryText(system);
+      return String(Math.round(cpu)) + "%" + cpuRecentHistoryText(system);
     }
 
     function cpuActivityCard(system, gpu) {
@@ -1014,8 +1017,8 @@
       if (cpu === 0) {
         return resourceCard("CPU utilization", "IDLE", "", "Raw CPU sample 0%; no active GPU evidence", 0, "");
       }
-      if (cpu > 0 && cpu < 1) return resourceCard("CPU utilization", "<1", "%", "Low measured host activity", cpu, "");
-      return resourceCard("CPU utilization", String(Math.round(cpu)), "%", "Current host activity", cpu, "");
+      if (cpu > 0 && cpu < 1) return resourceCard("CPU utilization", "<1", "%", "Low measured host activity" + cpuRecentHistoryText(system), cpu, "");
+      return resourceCard("CPU utilization", String(Math.round(cpu)), "%", "Current host activity" + cpuRecentHistoryText(system), cpu, "");
     }
 
     function workProgress() {

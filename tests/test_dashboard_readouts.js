@@ -44,8 +44,12 @@ vm.runInContext(
     "\noutput = {" +
     "gpuText: gpuActivityText(fixture.gpu)," +
     "gpuObservation: gpuObservationText(fixture.gpu)," +
+    "gpuHighObservation: gpuObservationText(Object.assign({}, fixture.gpu, {util_pct: 70}))," +
+    "gpuHighCard: gpuActivityCard(Object.assign({}, fixture.gpu, {util_pct: 70}))," +
     "gpuCard: gpuActivityCard(fixture.gpu)," +
     "cpuText: cpuActivityText(fixture.system, fixture.gpu)," +
+    "cpuHighText: cpuActivityText(Object.assign({}, fixture.system, {cpu_pct: 5.0, cpu_pct_recent_max: 9.2}), fixture.gpu)," +
+    "cpuHighCard: cpuActivityCard(Object.assign({}, fixture.system, {cpu_pct: 5.0, cpu_pct_recent_max: 9.2}), fixture.gpu)," +
     "cpuCard: cpuActivityCard(fixture.system, fixture.gpu)," +
     "idleGpuText: gpuActivityText(idleFixture.gpu)," +
     "idleGpuObservation: gpuObservationText(idleFixture.gpu)," +
@@ -69,8 +73,12 @@ vm.runInContext(
 const output = executionContext.output;
 assert.strictEqual(output.gpuText, "ACTIVE");
 assert.strictEqual(output.gpuObservation, "Diagnostic 0%; memory/power active; recent peak 86% over 5 samples");
+assert.strictEqual(output.gpuHighObservation, "70%; recent peak 86% over 5 samples");
+assert.match(output.gpuHighCard, /Current accelerator activity; recent peak 86% over 5 samples/);
 assert.match(output.gpuCard, /Memory \+ power confirm work; diagnostic driver sample 0%/);
 assert.strictEqual(output.cpuText, "LOW");
+assert.strictEqual(output.cpuHighText, "5%; recent host peak 9.2% over 5 samples");
+assert.match(output.cpuHighCard, /Current host activity; recent host peak 9\.2% over 5 samples/);
 assert.match(output.cpuCard, /Diagnostic CPU sample 0\.2%/);
 assert.match(output.cpuCard, /recent host peak 1\.2% over 5 samples/);
 assert.ok(!output.gpuCard.includes('<span class="muted">0%</span>'));

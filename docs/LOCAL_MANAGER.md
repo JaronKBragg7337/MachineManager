@@ -42,6 +42,8 @@ The in-memory resource probe also retains a bounded five-observation summary:
 the current driver sample remains visible, while recent maximum, average,
 sample count, and zero-sample count make transient readings auditable without
 turning a probe error into a fabricated zero.
+The public resource cards and Search Evidence view show that recent context
+when it adds information beyond the current sample.
 
 ## Synthetic worker
 
