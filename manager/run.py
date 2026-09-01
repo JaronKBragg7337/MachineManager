@@ -680,6 +680,7 @@ def main() -> int:
             else:
                 snapshot["workstreams"] = []
             snapshot["queue"] = scheduler.snapshot()
+            snapshot["queue_kinds"] = scheduler.kind_snapshot()
             _persist_runtime(manager, agents, store, seen_event_ids)
             public_events = merge_public_events(
                 public_events,
@@ -757,6 +758,7 @@ def main() -> int:
                 stopped["worker_profiles"] = evidence.public_profiles() if evidence else []
                 stopped["constraint_audits"] = evidence.public_audits() if evidence else []
                 stopped["queue"] = scheduler.snapshot()
+                stopped["queue_kinds"] = scheduler.kind_snapshot()
                 public_events = merge_public_events(
                     public_events,
                     store.recent_events(limit=public_event_limit),

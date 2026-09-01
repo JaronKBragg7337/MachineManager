@@ -75,3 +75,7 @@ class WorkScheduler:
 
     def snapshot(self) -> dict[str, int]:
         return self.store.task_counts()
+
+    def kind_snapshot(self) -> dict[str, int]:
+        """Return durable task totals grouped by their work kind."""
+        return self.store.task_kind_counts()

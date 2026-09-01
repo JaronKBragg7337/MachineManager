@@ -137,6 +137,15 @@ PUBLIC_QUEUE_KEYS = {
     "ESCALATED",
     "CANCELLED",
 }
+PUBLIC_QUEUE_KIND_KEYS = {
+    "agent_review",
+    "objective_change",
+    "research",
+    "build",
+    "verification",
+    "outreach",
+    "procurement",
+}
 PUBLIC_AUTONOMY_BOOL_KEYS = {
     "account_enrollment",
     "public_submissions",
@@ -231,6 +240,18 @@ def _safe_queue(queue: Mapping[str, Any] | None) -> dict[str, int]:
     for key, value in (queue or {}).items():
         clean_key = _text(key, max_len=20).upper()
         if clean_key not in PUBLIC_QUEUE_KEYS:
+            continue
+        number = _number(value)
+        if number is not None:
+            safe[clean_key] = max(0, int(number))
+    return safe
+
+
+def _safe_queue_kinds(queue_kinds: Mapping[str, Any] | None) -> dict[str, int]:
+    safe: dict[str, int] = {}
+    for key, value in (queue_kinds or {}).items():
+        clean_key = _text(key, max_len=40).lower()
+        if clean_key not in PUBLIC_QUEUE_KIND_KEYS:
             continue
         number = _number(value)
         if number is not None:
@@ -526,6 +547,7 @@ class TelemetryPublisher:
             "workstreams": self._workstreams(snapshot.get("workstreams", [])),
             "autonomy": _safe_autonomy(snapshot.get("autonomy")),
             "queue": _safe_queue(snapshot.get("queue")),
+            "queue_kinds": _safe_queue_kinds(snapshot.get("queue_kinds")),
             "gpu": gpu,
             "system": system,
             "progress": safe_workers[0].get("progress", {}) if safe_workers else {},

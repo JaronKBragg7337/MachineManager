@@ -550,6 +550,14 @@ class StateStore:
             ).fetchall()
         return {str(row["status"]): int(row["count"]) for row in rows}
 
+    def task_kind_counts(self) -> dict[str, int]:
+        """Return durable task totals grouped by their declared work kind."""
+        with self._lock:
+            rows = self._connection.execute(
+                "SELECT kind, COUNT(*) AS count FROM tasks GROUP BY kind ORDER BY kind"
+            ).fetchall()
+        return {str(row["kind"]): int(row["count"]) for row in rows}
+
     def upsert_workstream(self, snapshot: Mapping[str, Any]) -> None:
         stream_id = str(snapshot.get("id", snapshot.get("stream_id", "")))
         if not stream_id:

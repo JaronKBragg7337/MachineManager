@@ -797,6 +797,7 @@ class TelemetryTests(unittest.TestCase):
                 )
                 self.assertEqual(task_id, "task-agent-1")
                 self.assertEqual(scheduler.snapshot(), {"QUEUED": 1})
+                self.assertEqual(scheduler.kind_snapshot(), {"agent_review": 1})
                 self.assertTrue(scheduler.start(task_id))
                 self.assertFalse(scheduler.start(task_id))
                 self.assertEqual(scheduler.snapshot(), {"RUNNING": 1})
@@ -1179,6 +1180,8 @@ class TelemetryTests(unittest.TestCase):
                     "worker_profiles": [{"id": "profile-1", "provider": "test", "model": "safe", "model_version": "v1", "state": "READY", "retest_required": False, "private_path": "C:\\Users\\lilli\\private", "capabilities": [{"id": "safe-capability", "status": "TESTED_PASS", "summary": "token=not-for-publication", "private_note": "do not publish"}]}],
                     "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "more_pending": True, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
+                    "queue": {"QUEUED": 3, "COMPLETE": 2, "pid": 9999},
+                    "queue_kinds": {"agent_review": 2, "objective_change": 1, "private_kind": 99},
                     "gpu": {"util_pct": 80, "power_w": 70, "resource_active": True, "private_key": "do not publish"},
                     "system": {"cpu_pct": 8.5, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
@@ -1205,6 +1208,8 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("private_key", json.dumps(latest))
             self.assertEqual(latest["agents"][0]["last_reason"], "healthy")
             self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
+            self.assertEqual(latest["queue"], {"QUEUED": 3, "COMPLETE": 2})
+            self.assertEqual(latest["queue_kinds"], {"agent_review": 2, "objective_change": 1})
             self.assertTrue(latest["autonomy"]["developer_tools"])
             self.assertEqual(latest["system"]["cpu_pct"], 8.5)
             self.assertTrue(latest["gpu"]["resource_active"])
