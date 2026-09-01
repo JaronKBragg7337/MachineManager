@@ -1,23 +1,23 @@
-# Enabling the Dashboard
+# GitHub Pages dashboard
 
-The visual control center lives in `/dashboard`.
+The visual control center lives in `/dashboard` and is deployed by the
+repository's GitHub Actions workflow at [`.github/workflows/pages.yml`](../.github/workflows/pages.yml).
 
-The repository is currently published through the legacy branch source:
+## One-time Pages setup
 
-1. Go to https://github.com/JaronKBragg7337/MachineManager/settings/pages
-2. Source: Deploy from a branch
-3. Branch: main / folder: /
-4. Save
+If Pages has not been enabled for the repository yet:
 
-The repository root forwards visitors to the direct control-center path:
-https://jaronkbragg7337.github.io/MachineManager/dashboard/
+1. Open the repository's [Pages settings](https://github.com/JaronKBragg7337/MachineManager/settings/pages).
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+3. Save. A push to `main` that changes `dashboard/` or the Pages workflow starts the deployment.
 
-Once live the URL will be:
-https://jaronkbragg7337.github.io/MachineManager/
+The public URLs are:
 
-(or with /dashboard if configured that way)
+- [Mission Control](https://jaronkbragg7337.github.io/MachineManager/dashboard/)
+- [Repository landing page](https://jaronkbragg7337.github.io/MachineManager/), which forwards visitors to Mission Control
 
-The dashboard is deliberately sanitized — no tokens, secrets, or private keys are ever published.
+The dashboard is deliberately sanitized: no tokens, secrets, private keys,
+raw logs, or unrestricted model output are published.
 
 ## Live machine updates
 
@@ -42,6 +42,10 @@ to the same remote commit when the checkout contains only the three generated
 dashboard files as unstaged changes. Staged, unrelated, untracked, or diverged
 local work causes the mirror step to defer; the remote upload still succeeds and
 no local work is overwritten.
+
+The Pages workflow cancels obsolete overlapping deployments and retries a
+transient deployment collision once. The public page is considered updated only
+after the Pages deployment itself succeeds.
 
 This makes the dashboard public and remotely viewable whenever the machine is
 online. It is not a substitute for an always-on host: a sleeping or powered-off
