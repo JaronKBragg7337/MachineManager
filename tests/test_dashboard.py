@@ -31,6 +31,7 @@ class DashboardContractTests(unittest.TestCase):
             "Deterministic fallback",
             "function workstreamAgent(stream, agents)",
             "workstreamCard(stream, agents)",
+            "Agent result:",
             "Run record:</strong>",
             "function renderRecurringSchedules(items)",
             "function gpuEvidenceActive(gpu)",
