@@ -10,6 +10,7 @@ from manager.research_worker import (
     BoundedSourceFetcher,
     LocalOllamaResearchSummarizer,
     PublicResearchHandler,
+    ResearchRetryableError,
     ResearchTaskError,
 )
 from manager.scheduler import WorkItem
@@ -21,6 +22,22 @@ class _FakeFetcher:
 
     def fetch(self, source):
         self.calls.append(dict(source))
+        return {
+            "url": source["url"],
+            "title": source.get("title") or "Example source",
+            "content_type": "text/html",
+            "status": "FETCHED",
+            "word_count": 12,
+            "sha256": "a" * 64,
+            "excerpt": "Public source evidence.",
+        }
+
+
+class _PartialFetcher(_FakeFetcher):
+    def fetch(self, source):
+        self.calls.append(dict(source))
+        if source["url"].endswith("/unavailable"):
+            raise ResearchRetryableError("source temporarily unavailable")
         return {
             "url": source["url"],
             "title": source.get("title") or "Example source",
@@ -131,6 +148,40 @@ class ResearchWorkerTests(unittest.TestCase):
                         },
                     )
                 )
+
+    def test_research_handler_completes_with_partial_public_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            fetcher = _PartialFetcher()
+            handler = PublicResearchHandler(
+                Path(raw),
+                fetcher=fetcher,
+                summarizer=lambda _question, sources: {"summary": f"Used {len(sources)} source."},
+            )
+            outcome = handler(
+                WorkItem(
+                    task_id="task-research-partial",
+                    kind="research",
+                    objective_id="research-objective",
+                    attempts=1,
+                    payload={
+                        "question": "What changed?",
+                        "sources": [
+                            {"url": "https://example.org/one", "title": "One"},
+                            {"url": "https://example.org/unavailable", "title": "Unavailable"},
+                        ],
+                    },
+                )
+            )
+            artifact = json.loads(
+                (Path(raw) / "task-research-partial.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(outcome.status, "COMPLETE")
+            self.assertEqual(outcome.metrics["source_count"], 1)
+            self.assertEqual(outcome.metrics["sources_failed"], 1)
+            self.assertTrue(outcome.metrics["partial_evidence"])
+            self.assertEqual(len(artifact["sources"]), 1)
+            self.assertEqual(len(artifact["source_failures"]), 1)
+            self.assertEqual(artifact["source_failures"][0]["error_type"], "ResearchRetryableError")
 
     def test_ollama_research_summary_requests_cpu_only_json(self) -> None:
         summarizer = LocalOllamaResearchSummarizer(model="qwen3.5:4b")

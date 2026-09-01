@@ -299,7 +299,23 @@ class PublicResearchHandler:
         if not question:
             raise ResearchTaskError("research task requires a question")
         sources = self._sources(payload)
-        fetched = [self.fetcher.fetch(source) for source in sources]
+        fetched: list[dict[str, Any]] = []
+        source_failures: list[dict[str, str]] = []
+        for source in sources:
+            try:
+                fetched.append(self.fetcher.fetch(source))
+            except (ResearchRetryableError, ResearchTaskError) as error:
+                source_failures.append(
+                    {
+                        "url": source["url"],
+                        "title": source["title"],
+                        "error_type": type(error).__name__,
+                    }
+                )
+        if not fetched:
+            if any(item["error_type"] == ResearchRetryableError.__name__ for item in source_failures):
+                raise ResearchRetryableError("all research sources unavailable")
+            raise ResearchTaskError("all research sources failed")
         summary: Mapping[str, Any] = {}
         if self.summarizer is not None:
             summary = self.summarizer(question, fetched)
@@ -310,6 +326,7 @@ class PublicResearchHandler:
             "question": question,
             "completed_at": utc_now(),
             "source_count": len(fetched),
+            "source_failures": source_failures,
             "sources": fetched,
             "summary": dict(summary),
         }
@@ -318,6 +335,8 @@ class PublicResearchHandler:
         metrics: dict[str, int | float | bool] = {
             "source_count": len(fetched),
             "sources_fetched": len(fetched),
+            "sources_failed": len(source_failures),
+            "partial_evidence": bool(source_failures),
             "sources_truncated": sum(bool(source.get("truncated")) for source in fetched),
             "word_count": sum(int(source.get("word_count", 0)) for source in fetched),
             "summary_available": bool(summary),
