@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T12:00:21.850Z",
+        "observed_at": "2026-09-01T12:00:43.085Z",
         "reported": true,
         "active": true,
         "healthy": true,
@@ -22,8 +22,8 @@
         "keys_tested": 20831010816000,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 304.5,
-        "sample_count": 19
+        "uptime_s": 325.8,
+        "sample_count": 20
       }
     }
   ],
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T12:00:21.850Z",
+        "observed_at": "2026-09-01T12:00:43.085Z",
         "reported": true,
         "active": true,
         "healthy": true,
@@ -45,8 +45,8 @@
         "keys_tested": 20831010816000,
         "coverage_pct": 0,
         "matches_found": 0,
-        "uptime_s": 304.5,
-        "sample_count": 19
+        "uptime_s": 325.8,
+        "sample_count": 20
       }
     }
   ],
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is healthy with stable GPU utilization and no errors detected.",
-      "last_duration_s": 7.407,
-      "started_at": "2026-09-01T12:00:22.793Z",
-      "elapsed_s": 0.0,
-      "tasks_completed": 81,
-      "last_run": "2026-09-01T11:55:41.393Z",
-      "next_run": "2026-09-01T12:00:41.393Z"
+      "last_reason": "System is healthy with stable resources and no errors detected.",
+      "last_duration_s": 3.313,
+      "started_at": "",
+      "elapsed_s": null,
+      "tasks_completed": 82,
+      "last_run": "2026-09-01T12:00:43.996Z",
+      "next_run": "2026-09-01T12:05:43.996Z"
     }
   ],
   "capabilities": [
@@ -229,45 +229,15 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NEEDS_EVIDENCE_REVIEW",
-      "scanned_at": "2026-09-01T11:00:11.011Z",
-      "files_scanned": 2084,
-      "files_skipped": 18,
-      "candidate_count": 9,
+      "state": "NO_CANDIDATES",
+      "scanned_at": "2026-09-01T12:00:39.939Z",
+      "files_scanned": 2997,
+      "files_skipped": 3,
+      "candidate_count": 0,
       "truncated": false,
-      "more_pending": false,
-      "categories": {
-        "approval_gate": 2,
-        "autonomy_limit": 5,
-        "data_boundary": 1,
-        "scope_boundary": 1
-      },
-      "review_plan": [
-        {
-          "category": "approval_gate",
-          "candidate_count": 2,
-          "test_id": "approval-gate-check",
-          "recommended_test": "Test a harmless delegated action and record whether the platform already owns the approval step."
-        },
-        {
-          "category": "autonomy_limit",
-          "candidate_count": 5,
-          "test_id": "delegated-capability-check",
-          "recommended_test": "Run one bounded capability test and record what the configured worker actually permits."
-        },
-        {
-          "category": "scope_boundary",
-          "candidate_count": 1,
-          "test_id": "scope-boundary-check",
-          "recommended_test": "Verify the intended service, target, and technique boundary before the representative test."
-        },
-        {
-          "category": "data_boundary",
-          "candidate_count": 1,
-          "test_id": "sanitized-egress-check",
-          "recommended_test": "Run the sanitized-publication regression test and confirm sensitive details stay local."
-        }
-      ]
+      "more_pending": true,
+      "categories": {},
+      "review_plan": []
     },
     {
       "id": "machine-manager-source",
@@ -337,16 +307,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "REVIEW",
+      "state": "WAITING",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 9,
-        "files_scanned": 2084,
-        "more_pending": false
+        "candidate_count": 0,
+        "files_scanned": 2997,
+        "more_pending": true
       },
-      "updated": "2026-09-01T11:00:20.463Z"
+      "updated": "2026-09-01T12:00:44.005Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -415,8 +385,7 @@
     "handoff_style": "service-required"
   },
   "queue": {
-    "COMPLETE": 87,
-    "RUNNING": 1
+    "COMPLETE": 88
   },
   "queue_kinds": {
     "agent_review": 82,
@@ -428,9 +397,9 @@
       "task_id": "agent-task-local-manager-brain-7a27990283c5",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "RUNNING",
+      "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T12:00:22.793Z"
+      "updated": "2026-09-01T12:00:43.996Z"
     },
     {
       "task_id": "revenue-lane-scout-refresh-20260901-v2",
@@ -690,7 +659,7 @@
       "interval_s": 21600.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T13:48:50.946Z",
-      "next_in_s": 6508.14451789856,
+      "next_in_s": 6486.933945894241,
       "last_task_id": "recurring-machine-manager-capability-research-000001",
       "last_status": "COMPLETE"
     },
@@ -702,7 +671,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 73475.13919091225,
+      "next_in_s": 73453.92861890793,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -714,26 +683,26 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 30645.60070705414,
+      "next_in_s": 30624.39013504982,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
-    "util_pct": 80.0,
+    "util_pct": 78.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 57.0,
-    "power_w": 68.63,
+    "temp_c": 64.0,
+    "power_w": 80.95,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 5.1
+    "cpu_pct": 17.1
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T12:00:21.850Z",
+    "observed_at": "2026-09-01T12:00:43.085Z",
     "reported": true,
     "active": true,
     "healthy": true,
@@ -743,9 +712,9 @@
     "keys_tested": 20831010816000,
     "coverage_pct": 0,
     "matches_found": 0,
-    "uptime_s": 304.5,
-    "sample_count": 19
+    "uptime_s": 325.8,
+    "sample_count": 20
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T12:00:22.792Z"
+  "updated": "2026-09-01T12:00:43.995Z"
 }
