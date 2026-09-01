@@ -24,6 +24,7 @@ class DashboardContractTests(unittest.TestCase):
             "AI reviewer is working",
             "Processing the current sanitized snapshot",
             "function renderRecurringSchedules(items)",
+            "function gpuEvidenceActive(gpu)",
             "UNATTENDED SCHEDULE",
             "UNATTENDED WORK CADENCE",
             "manager-owned cadence",

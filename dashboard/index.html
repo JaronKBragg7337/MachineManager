@@ -937,12 +937,21 @@
 
     function gpuActivityText(gpu) {
       const util = numberValue(gpu.util_pct);
-      return gpu.resource_active === true && util !== null && util < 15 ? "ACTIVE" : util === null ? "--" : String(Math.round(util)) + "%";
+      const activeEvidence = gpuEvidenceActive(gpu);
+      return activeEvidence && util !== null && util < 15 ? "ACTIVE" : util === null ? "--" : String(Math.round(util)) + "%";
+    }
+
+    function gpuEvidenceActive(gpu) {
+      if (gpu.resource_active === true) return true;
+      if (gpu.resource_active === false) return false;
+      const memory = numberValue(gpu.mem_used_mib);
+      const power = numberValue(gpu.power_w);
+      return memory !== null && memory >= 512 && power !== null && power >= 40;
     }
 
     function gpuActivityCard(gpu) {
       const util = numberValue(gpu.util_pct);
-      if (gpu.resource_active === true && util !== null && util < 15) {
+      if (gpuEvidenceActive(gpu) && util !== null && util < 15) {
         return resourceCard("GPU activity", "ACTIVE", "", "Dedicated memory + power confirm work; raw driver sample " + Math.round(util) + "%", 100, "green");
       }
       return resourceCard("GPU utilization", util === null ? "--" : String(Math.round(util)), "%", util === null ? "No verified live reading" : "Current accelerator activity", util, "green");
@@ -1076,7 +1085,7 @@
       const chips = definitions.map(function (definition) {
         const value = numberValue(metrics[definition[0]]);
         if (value === null || (definition[0] === "coverage_pct" && value <= 0)) return "";
-        if (definition[0] === "util_pct" && metrics.resource_active === true && value < 15) {
+        if (definition[0] === "util_pct" && gpuEvidenceActive(metrics) && value < 15) {
           return '<span class="event-metric">GPU ACTIVE (raw ' + escapeHtml(compactNumber(value) + "%") + ')</span>';
         }
         return '<span class="event-metric">' + escapeHtml(definition[2] + " " + compactNumber(value) + definition[1]) + '</span>';
