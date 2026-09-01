@@ -175,6 +175,18 @@
       "interval_s": 300,
       "timeout_s": 15,
       "keep_gpu_free": true
+    },
+    {
+      "id": "local-evidence-brain",
+      "role": "evidence-review-specialist",
+      "focus": "Review capability evidence and identify one bounded research or work follow-up; never claim a test ran unless it is recorded.",
+      "provider": "ollama",
+      "model": "llama3.2:3b",
+      "base_url": "http://127.0.0.1:11434",
+      "enabled": false,
+      "interval_s": 900,
+      "timeout_s": 15,
+      "keep_gpu_free": true
     }
   ],
   "workstreams": [
@@ -189,6 +201,32 @@
       "source": {
         "kind": "constraint_audit",
         "id": "machine-manager-source"
+      }
+    },
+    {
+      "id": "local-manager-brain-lane",
+      "objective_id": "machine-manager-operations",
+      "title": "Health review specialist",
+      "lane": "AI support team",
+      "owner": "local-manager-brain",
+      "summary": "Reviews the current sanitized machine evidence and bounded recovery signals.",
+      "next_action": "Complete the next scheduled health review and record its observed decision.",
+      "source": {
+        "kind": "agent",
+        "id": "local-manager-brain"
+      }
+    },
+    {
+      "id": "local-evidence-brain-lane",
+      "objective_id": "machine-manager-research",
+      "title": "Evidence review specialist",
+      "lane": "AI support team",
+      "owner": "local-evidence-brain",
+      "summary": "Reviews capability evidence and selects one bounded research or work follow-up.",
+      "next_action": "Complete the next scheduled evidence review and record its sources and outcome.",
+      "source": {
+        "kind": "agent",
+        "id": "local-evidence-brain"
       }
     }
   ],
