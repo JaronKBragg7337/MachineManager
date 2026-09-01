@@ -218,6 +218,7 @@ PUBLIC_GPU_ACTIVITY_STATES = {"ACTIVE", "INACTIVE", "UNKNOWN"}
 PUBLIC_GPU_ACTIVITY_BASES = {
     "driver_utilization",
     "dedicated_memory_and_power",
+    "recent_driver_utilization",
     "resource_probe",
     "not_confirmed",
     "unknown",

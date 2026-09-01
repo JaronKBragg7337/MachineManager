@@ -81,6 +81,13 @@ hashrate, tested work units, coverage, batch number, and observation uptime when
 the worker reports them. It never copies raw logs, command lines, exception
 text, process paths, candidate values, or credentials into `dashboard/data/`.
 
+GPU health also uses the probe's bounded recent utilization window. A complete
+zeroed driver sample can be tolerated only when at least two recent samples
+contain meaningful utilization; the process and heartbeat checks still apply,
+and the window expires as new idle samples arrive. Public telemetry labels this
+case as `recent_driver_utilization` so a dashboard reader can distinguish it
+from both a current driver reading and an unsupported activity claim.
+
 The optional `progress_file` is a separate worker-owned JSON report. Only the
 allowlisted numeric progress fields are read; it should not be the same file as
 the liveness heartbeat on Windows because the worker may need to atomically

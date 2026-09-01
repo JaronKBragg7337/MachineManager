@@ -1001,19 +1001,28 @@
       if (gpu.resource_active === false) return false;
       const memory = numberValue(gpu.mem_used_mib);
       const power = numberValue(gpu.power_w);
-      return memory !== null && memory >= 512 && power !== null && power >= 40;
+      if (memory !== null && memory >= 512 && power !== null && power >= 40) return true;
+      const recentMax = numberValue(gpu.util_pct_recent_max);
+      const sampleCount = numberValue(gpu.util_pct_sample_count);
+      return sampleCount !== null && sampleCount >= 2 && recentMax !== null && recentMax >= 15;
     }
 
     function gpuActivityBasisText(gpu) {
       const labels = {
         driver_utilization: "driver utilization",
         dedicated_memory_and_power: "dedicated memory + power",
+        recent_driver_utilization: "recent driver utilization",
         resource_probe: "manager resource probe",
         not_confirmed: "no independent activity evidence",
         unknown: "unreported basis"
       };
       const basis = String(gpu.activity_basis || "").toLowerCase();
       if (labels[basis]) return labels[basis];
+      const recentMax = numberValue(gpu.util_pct_recent_max);
+      const sampleCount = numberValue(gpu.util_pct_sample_count);
+      if (sampleCount !== null && sampleCount >= 2 && recentMax !== null && recentMax >= 15) {
+        return "recent driver utilization";
+      }
       if (gpuEvidenceActive(gpu)) return "resource signals";
       return "no independent activity evidence";
     }

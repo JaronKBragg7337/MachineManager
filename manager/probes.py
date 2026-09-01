@@ -107,6 +107,11 @@ def gpu_activity_basis(metrics: Mapping[str, Any], resource_active: bool) -> str
             and float(metrics.get("power_w", 0)) >= 40
         ):
             return "dedicated_memory_and_power"
+        if (
+            int(metrics.get("util_pct_sample_count", 0)) >= 2
+            and float(metrics.get("util_pct_recent_max", 0)) >= 15
+        ):
+            return "recent_driver_utilization"
     except (TypeError, ValueError):
         return "resource_probe"
     return "resource_probe"
@@ -203,17 +208,24 @@ def gpu_resource_ok(
     Some NVIDIA driver samples briefly report zero utilization while a CUDA
     worker still owns its working memory and draws active power. The fallback
     accepts that narrow pattern, while an idle device with no dedicated memory
-    remains unhealthy even if its power reading is noisy.
+    remains unhealthy even if its power reading is noisy. A bounded recent
+    utilization window also tolerates one complete zeroed driver sample; the
+    supervisor still requires a live process and fresh heartbeat, and the
+    five-sample window expires quickly if the worker really stops.
     """
     try:
         util = float(metrics.get("util_pct", 0))
         power = float(metrics.get("power_w", 0))
         memory = float(metrics.get("mem_used_mib", 0))
+        recent_max = float(metrics.get("util_pct_recent_max", 0))
+        sample_count = int(metrics.get("util_pct_sample_count", 0))
         if power < min_power_w:
-            return False
+            return sample_count >= 2 and recent_max >= min_util_pct
         if util >= min_util_pct:
             return True
-        return power >= min_active_power_w and memory >= min_mem_used_mib
+        if power >= min_active_power_w and memory >= min_mem_used_mib:
+            return True
+        return sample_count >= 2 and recent_max >= min_util_pct
     except (TypeError, ValueError):
         return False
 

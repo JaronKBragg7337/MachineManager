@@ -45,6 +45,8 @@ vm.runInContext(
     "gpuText: gpuActivityText(fixture.gpu)," +
     "gpuBasis: gpuActivityBasisText(fixture.gpu)," +
     "gpuBasisFallback: gpuActivityBasisText({resource_active: true, mem_used_mib: 2367, power_w: 80})," +
+    "gpuRecentBasisFallback: gpuActivityBasisText({util_pct: 0, util_pct_recent_max: 82, util_pct_sample_count: 3, mem_used_mib: 0, power_w: 3})," +
+    "gpuRecentCardFallback: gpuActivityCard({util_pct: 0, util_pct_recent_max: 82, util_pct_sample_count: 3, mem_used_mib: 0, power_w: 3})," +
     "gpuObservation: gpuObservationText(fixture.gpu)," +
     "gpuHighObservation: gpuObservationText(Object.assign({}, fixture.gpu, {util_pct: 70, activity_basis: \"driver_utilization\"}))," +
     "gpuHighCard: gpuActivityCard(Object.assign({}, fixture.gpu, {util_pct: 70}))," +
@@ -79,6 +81,8 @@ const output = executionContext.output;
 assert.strictEqual(output.gpuText, "ACTIVE");
 assert.strictEqual(output.gpuBasis, "dedicated memory + power");
 assert.strictEqual(output.gpuBasisFallback, "resource signals");
+assert.strictEqual(output.gpuRecentBasisFallback, "recent driver utilization");
+assert.match(output.gpuRecentCardFallback, /Confirmed by recent driver utilization; diagnostic driver sample 0%/);
 assert.strictEqual(output.gpuObservation, "Diagnostic 0%; activity confirmed by dedicated memory + power; recent peak 86% over 5 samples; 1 transient zero sample");
 assert.strictEqual(output.gpuHighObservation, "70%; activity confirmed by driver utilization; recent peak 86% over 5 samples; 1 transient zero sample");
 assert.match(output.gpuHighCard, /Current accelerator activity; recent peak 86% over 5 samples/);

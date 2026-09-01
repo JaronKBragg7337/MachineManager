@@ -86,6 +86,7 @@ class PublicDataContractTests(unittest.TestCase):
                 {
                     "driver_utilization",
                     "dedicated_memory_and_power",
+                    "recent_driver_utilization",
                     "resource_probe",
                     "not_confirmed",
                     "unknown",

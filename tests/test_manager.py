@@ -165,6 +165,28 @@ class SupervisorTests(unittest.TestCase):
                 {"util_pct": 0, "power_w": 590, "mem_used_mib": 0}
             )
         )
+        self.assertTrue(
+            gpu_resource_ok(
+                {
+                    "util_pct": 0,
+                    "power_w": 3,
+                    "mem_used_mib": 0,
+                    "util_pct_recent_max": 82,
+                    "util_pct_sample_count": 3,
+                }
+            )
+        )
+        self.assertFalse(
+            gpu_resource_ok(
+                {
+                    "util_pct": 0,
+                    "power_w": 3,
+                    "mem_used_mib": 0,
+                    "util_pct_recent_max": 82,
+                    "util_pct_sample_count": 1,
+                }
+            )
+        )
 
     def test_gpu_activity_basis_records_the_signal_that_qualified_work(self) -> None:
         self.assertEqual(
@@ -178,6 +200,19 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(
             gpu_activity_basis({"util_pct": 0, "power_w": 3, "mem_used_mib": 0}, False),
             "not_confirmed",
+        )
+        self.assertEqual(
+            gpu_activity_basis(
+                {
+                    "util_pct": 0,
+                    "power_w": 3,
+                    "mem_used_mib": 0,
+                    "util_pct_recent_max": 82,
+                    "util_pct_sample_count": 3,
+                },
+                True,
+            ),
+            "recent_driver_utilization",
         )
 
     def test_host_load_interpretation_distinguishes_gpu_offload_from_idle(self) -> None:
