@@ -26,7 +26,7 @@ from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_
 from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, OutreachBlockedError, OutreachRegistry
 from manager.capabilities import CapabilityRegistry
 from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
-from manager.public_upload import GitHubPagesPublisher, PublicUploadError
+from manager.public_upload import MAX_FILE_BYTES, GitHubPagesPublisher, PublicUploadError
 from manager.probes import (
     CpuUsageProbe,
     NvidiaSmiProbe,
@@ -1461,7 +1461,31 @@ class TelemetryTests(unittest.TestCase):
                     with patch.object(publisher, "_request") as request:
                         with self.assertRaises(PublicUploadError):
                             publisher.publish()
-                    request.assert_not_called()
+                        request.assert_not_called()
+
+    def test_public_upload_accepts_bounded_snapshot_with_task_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            data = dashboard / "data"
+            data.mkdir(parents=True)
+            payload = {
+                "status": "HEALTHY",
+                "evidence": "x" * 33_000,
+            }
+            (data / "latest.json").write_text(json.dumps(payload), encoding="utf-8")
+            (data / "events.json").write_text("[]", encoding="utf-8")
+            (data / "scenarios.json").write_text("[]", encoding="utf-8")
+            publisher = GitHubPagesPublisher(
+                dashboard,
+                owner="owner",
+                repository="repo",
+            )
+
+            files = publisher._read_files()
+
+            self.assertGreater(len(files["latest.json"]), 32_000)
+            self.assertLessEqual(len(files["latest.json"]), MAX_FILE_BYTES["latest.json"])
+            self.assertEqual(MAX_FILE_BYTES["latest.json"], 48_000)
 
     def test_public_upload_coalesces_state_change_requests_during_cadence(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

@@ -22,7 +22,9 @@ PUBLIC_FILES = (
     "scenarios.json",
 )
 MAX_FILE_BYTES = {
-    "latest.json": 32_000,
+    # The public snapshot stays bounded, but needs room for the task ledger and
+    # aggregate evidence from the configured specialist slots.
+    "latest.json": 48_000,
     "events.json": 512_000,
     "scenarios.json": 256_000,
 }
