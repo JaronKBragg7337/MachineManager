@@ -1187,11 +1187,33 @@
       return outcome ? outcome.replace(/_/g, " ") : "No public result yet";
     }
 
+    function taskEvidenceMetricChips(item) {
+      const metrics = item && item.metrics && typeof item.metrics === "object" ? item.metrics : {};
+      const definitions = [
+        ["source_count", "Sources", ""],
+        ["sources_fetched", "Fetched", ""],
+        ["sources_failed", "Failed", ""],
+        ["word_count", "Words", ""],
+        ["checks_run", "Checks", ""],
+        ["tests_run", "Tests", ""],
+        ["passed", "Passed", ""],
+        ["listings_found", "Listings", ""],
+        ["eligible_listings", "Eligible", ""],
+        ["duration_s", "Duration", "s"]
+      ];
+      const chips = definitions.map(function (definition) {
+        const value = numberValue(metrics[definition[0]]);
+        if (value === null) return "";
+        return '<span class="event-metric">' + escapeHtml(definition[1] + " " + compactNumber(value) + definition[2]) + '</span>';
+      }).filter(Boolean);
+      return chips.length ? '<div class="event-metrics" aria-label="Public task evidence metrics">' + chips.join("") + '</div>' : "";
+    }
+
     function renderQueueActivity(items) {
       if (!items.length) return '<div class="empty-cell">No durable task records are in this published snapshot.</div>';
       return '<div class="table-wrap"><table><thead><tr><th>Task</th><th>Type</th><th>Objective</th><th>Updated</th><th>State</th><th>Attempts</th><th>Latest evidence</th></tr></thead><tbody>' + items.map(function (item) {
         const kind = taskKindLabel(item.kind);
-        return '<tr><td class="mono">' + escapeHtml(item.task_id || "--") + '</td><td>' + escapeHtml(kind) + '</td><td class="mono">' + escapeHtml(item.objective_id || "--") + '</td><td class="mono">' + escapeHtml(formatDate(item.updated, true)) + '</td><td>' + badge(item.status) + '</td><td class="mono">' + escapeHtml(item.attempts === undefined ? "--" : String(item.attempts)) + '</td><td class="queue-evidence">' + escapeHtml(taskEvidenceLabel(item)) + '</td></tr>';
+        return '<tr><td class="mono">' + escapeHtml(item.task_id || "--") + '</td><td>' + escapeHtml(kind) + '</td><td class="mono">' + escapeHtml(item.objective_id || "--") + '</td><td class="mono">' + escapeHtml(formatDate(item.updated, true)) + '</td><td>' + badge(item.status) + '</td><td class="mono">' + escapeHtml(item.attempts === undefined ? "--" : String(item.attempts)) + '</td><td class="queue-evidence">' + escapeHtml(taskEvidenceLabel(item)) + taskEvidenceMetricChips(item) + '</td></tr>';
       }).join("") + "</tbody></table></div>";
     }
 

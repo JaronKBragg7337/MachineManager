@@ -70,6 +70,7 @@ vm.runInContext(
     "zeroGpuMetricRecentOnly: eventMetricChips({metrics: {util_pct: 0, util_pct_recent_max: 77, util_pct_sample_count: 3, util_pct_zero_samples: 1, mem_used_mib: 0, power_w: 3}})," +
     "queueEvidence: taskEvidenceLabel({message: \"Result summary\", outcome: \"handler_completed\"})," +
     "queueEvidenceFallback: taskEvidenceLabel({outcome: \"handler_completed\"})," +
+    "queueMetricChips: taskEvidenceMetricChips({metrics: {source_count: 3, sources_fetched: 2, word_count: 42, private_metric: 999}})," +
     "queueTable: renderQueueActivity([{task_id: \"task-demo\", kind: \"research\", objective_id: \"demo\", status: \"COMPLETE\", attempts: 1, updated: \"2026-09-01T12:34:56Z\", message: \"Recorded\"}])," +
     "reviewPlan: auditReviewPlan([{category: \"approval_gate\", candidate_count: 2, recommended_test: \"Run a harmless delegated action.\"}])," +
     "reviewPlanSingular: auditReviewPlan([{category: \"scope_boundary\", candidate_count: 1, recommended_test: \"Run a bounded scope test.\"}])," +
@@ -116,6 +117,10 @@ assert.match(output.zeroGpuMetricWithHistory, /GPU ACTIVE \(diagnostic raw sampl
 assert.match(output.zeroGpuMetricRecentOnly, /GPU ACTIVE \(diagnostic raw sample 0%; recent peak 77% over 3 samples; 1 transient zero sample; activity confirmed by recent driver utilization\)/);
 assert.strictEqual(output.queueEvidence, "Result summary");
 assert.strictEqual(output.queueEvidenceFallback, "handler completed");
+assert.match(output.queueMetricChips, /Sources 3/);
+assert.match(output.queueMetricChips, /Fetched 2/);
+assert.match(output.queueMetricChips, /Words 42/);
+assert.ok(!output.queueMetricChips.includes("private_metric"));
 assert.match(output.queueTable, /<th>Updated<\/th>/);
 assert.match(output.queueTable, /task-demo/);
 assert.match(output.queueTable, /Recorded/);

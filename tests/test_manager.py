@@ -972,6 +972,7 @@ class TelemetryTests(unittest.TestCase):
                         "artifact_refs": ["task:task-research-1"],
                         "message": "Public result summary",
                         "outcome": "handler_completed",
+                        "metrics": {"source_count": 3, "word_count": 42},
                     }
                 )
                 activity = scheduler.activity_snapshot(limit=5)
@@ -981,6 +982,7 @@ class TelemetryTests(unittest.TestCase):
                 self.assertIsInstance(activity[0]["updated_at"], float)
                 self.assertEqual(activity[0]["message"], "Public result summary")
                 self.assertEqual(activity[0]["outcome"], "handler_completed")
+                self.assertEqual(activity[0]["metrics"], {"source_count": 3, "word_count": 42})
 
     def test_scheduler_activity_keeps_each_kind_visible_under_task_flood(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -1063,6 +1065,7 @@ class TelemetryTests(unittest.TestCase):
                             "updated_at": 1724875200.0,
                             "message": "Result summary token=private-value C:\\Users\\lilli\\private.txt",
                             "outcome": "handler_completed",
+                            "metrics": {"source_count": 3, "word_count": 42, "private_metric": 999},
                         }
                     ]
                 }
@@ -1071,6 +1074,7 @@ class TelemetryTests(unittest.TestCase):
             entry = latest["queue_activity"][0]
             self.assertIn("Result summary", entry["message"])
             self.assertEqual(entry["outcome"], "handler_completed")
+            self.assertEqual(entry["metrics"], {"source_count": 3, "word_count": 42})
             self.assertNotIn("private-value", json.dumps(latest))
             self.assertNotIn("C:\\Users\\lilli", json.dumps(latest))
 

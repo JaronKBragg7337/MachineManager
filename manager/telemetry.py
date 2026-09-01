@@ -328,6 +328,7 @@ def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[d
             continue
         message = _text(item.get("message"), max_len=180).strip()
         outcome = _text(item.get("outcome"), max_len=80).strip()
+        metrics = _safe_metrics(item.get("metrics"))
         safe_item: dict[str, Any] = {
             "task_id": task_id,
             "kind": kind,
@@ -340,6 +341,8 @@ def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[d
             safe_item["message"] = message
         if outcome:
             safe_item["outcome"] = outcome
+        if metrics:
+            safe_item["metrics"] = metrics
         safe.append(safe_item)
     if len(safe) <= PUBLIC_QUEUE_ACTIVITY_LIMIT:
         return safe

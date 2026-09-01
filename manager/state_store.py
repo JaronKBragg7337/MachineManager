@@ -617,7 +617,7 @@ class StateStore:
                 break
         rows = balanced
         task_ids = {str(row["task_id"]) for row in rows}
-        event_summaries: dict[str, dict[str, str]] = {}
+        event_summaries: dict[str, dict[str, Any]] = {}
         if task_ids:
             with self._lock:
                 event_rows = self._connection.execute(
@@ -649,12 +649,22 @@ class StateStore:
                     continue
                 message = str(event.get("message", "") or "").strip()
                 outcome = str(event.get("outcome", "") or "").strip()
-                if not message and not outcome:
+                raw_metrics = event.get("metrics")
+                metrics: dict[str, int | float | bool] = {}
+                if isinstance(raw_metrics, Mapping):
+                    for key, value in raw_metrics.items():
+                        if isinstance(value, bool):
+                            metrics[str(key)[:40]] = value
+                        elif isinstance(value, (int, float)) and not isinstance(value, bool):
+                            metrics[str(key)[:40]] = value
+                if not message and not outcome and not metrics:
                     continue
                 summary = {
                     "message": redact_text(message, max_len=220) if message else "",
                     "outcome": redact_text(outcome, max_len=100) if outcome else "",
                 }
+                if metrics:
+                    summary["metrics"] = metrics
                 for task_id in referenced_ids:
                     event_summaries.setdefault(task_id, summary)
         return [
