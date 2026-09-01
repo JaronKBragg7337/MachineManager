@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T00:50:05.939Z",
+        "observed_at": "2026-09-01T00:54:42.290Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "matches_found": 0,
-        "keys_per_second": 792450000,
+        "keys_per_second": 792550000,
         "coverage_pct": 0,
-        "sample_count": 222,
-        "keys_tested": 2690729902080,
-        "batch_number": 829,
-        "hashrate_mkey_s": 792.45,
-        "uptime_s": 3397.0
+        "sample_count": 240,
+        "keys_tested": 2914454077440,
+        "batch_number": 898,
+        "hashrate_mkey_s": 792.55,
+        "uptime_s": 3673.3
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T00:50:05.939Z",
+        "observed_at": "2026-09-01T00:54:42.290Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "matches_found": 0,
-        "keys_per_second": 792450000,
+        "keys_per_second": 792550000,
         "coverage_pct": 0,
-        "sample_count": 222,
-        "keys_tested": 2690729902080,
-        "batch_number": 829,
-        "hashrate_mkey_s": 792.45,
-        "uptime_s": 3397.0
+        "sample_count": 240,
+        "keys_tested": 2914454077440,
+        "batch_number": 898,
+        "hashrate_mkey_s": 792.55,
+        "uptime_s": 3673.3
       }
     }
   ],
@@ -207,14 +207,18 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NO_CANDIDATES",
-      "scanned_at": "2026-08-31T23:53:50.614Z",
-      "files_scanned": 2997,
-      "files_skipped": 3,
-      "candidate_count": 0,
+      "state": "NEEDS_EVIDENCE_REVIEW",
+      "scanned_at": "2026-09-01T00:54:41.111Z",
+      "files_scanned": 2989,
+      "files_skipped": 11,
+      "candidate_count": 16,
       "truncated": false,
       "more_pending": true,
-      "categories": {}
+      "categories": {
+        "approval_gate": 5,
+        "autonomy_limit": 7,
+        "scope_boundary": 4
+      }
     },
     {
       "id": "machine-manager-source",
@@ -258,16 +262,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "WAITING",
+      "state": "REVIEW",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 0,
-        "files_scanned": 2997,
+        "candidate_count": 16,
+        "files_scanned": 2989,
         "more_pending": true
       },
-      "updated": "2026-08-31T23:53:51.313Z"
+      "updated": "2026-09-01T00:54:42.449Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -337,28 +341,28 @@
   },
   "queue": {},
   "gpu": {
-    "util_pct": 84.0,
+    "util_pct": 85.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 62.0,
-    "power_w": 81.95
+    "temp_c": 65.0,
+    "power_w": 82.39
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T00:50:05.939Z",
+    "observed_at": "2026-09-01T00:54:42.290Z",
     "reported": true,
     "active": true,
     "healthy": true,
     "matches_found": 0,
-    "keys_per_second": 792450000,
+    "keys_per_second": 792550000,
     "coverage_pct": 0,
-    "sample_count": 222,
-    "keys_tested": 2690729902080,
-    "batch_number": 829,
-    "hashrate_mkey_s": 792.45,
-    "uptime_s": 3397.0
+    "sample_count": 240,
+    "keys_tested": 2914454077440,
+    "batch_number": 898,
+    "hashrate_mkey_s": 792.55,
+    "uptime_s": 3673.3
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T00:50:06.025Z"
+  "updated": "2026-09-01T00:54:42.415Z"
 }
