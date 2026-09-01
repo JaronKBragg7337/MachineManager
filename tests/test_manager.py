@@ -1686,6 +1686,7 @@ class TelemetryTests(unittest.TestCase):
                     "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234, "progress": {"kind": "reported_progress", "sample_count": 4, "keys_tested": 99, "private_key": "do not publish"}}],
                     "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "command": "do not publish"}],
                     "agents": [{"id": "agent-1", "role": "evidence-review-specialist", "focus": "Review evidence only.", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_duration_s": 0.4, "last_task_id": "agent-task-agent-1-demo"}],
+                    "workstreams": [{"id": "agent-lane", "objective_id": "obj-1", "title": "Agent lane", "lane": "Runtime", "owner": "agent-1", "state": "WAITING", "summary": "Review current evidence.", "next_action": "Record the next bounded result.", "source_kind": "agent", "source_id": "agent-1", "metrics": {"tasks_completed": 3}, "updated": "2026-08-28T20:00:00Z", "private_path": "C:\\Users\\lilli\\private"}],
                     "worker_profiles": [{"id": "profile-1", "provider": "test", "model": "safe", "model_version": "v1", "state": "READY", "retest_required": False, "private_path": "C:\\Users\\lilli\\private", "capabilities": [{"id": "safe-capability", "status": "TESTED_PASS", "summary": "token=not-for-publication", "private_note": "do not publish"}]}],
                     "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "more_pending": True, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
@@ -1776,6 +1777,8 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["agents"][0]["last_reason"], "healthy")
             self.assertEqual(latest["agents"][0]["focus"], "Review evidence only.")
             self.assertEqual(latest["agents"][0]["last_task_id"], "agent-task-agent-1-demo")
+            self.assertEqual(latest["workstreams"][0]["source_id"], "agent-1")
+            self.assertEqual(latest["workstreams"][0]["metrics"], {"tasks_completed": 3})
             self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
             self.assertEqual(latest["queue"], {"QUEUED": 3, "COMPLETE": 2})
             self.assertEqual(latest["queue_kinds"], {"agent_review": 2, "objective_change": 1})

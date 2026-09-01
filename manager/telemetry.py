@@ -628,6 +628,7 @@ class TelemetryPublisher:
                     "summary": _text(stream.get("summary"), max_len=220),
                     "next_action": _text(stream.get("next_action"), max_len=180),
                     "source_kind": source_kind,
+                    "source_id": _text(stream.get("source_id"), max_len=100),
                     "metrics": metrics,
                     "updated": _text(stream.get("updated"), max_len=40),
                 }

@@ -112,7 +112,7 @@ class WorkstreamRegistryTests(unittest.TestCase):
             self.assertEqual(stream["summary"], "[local-path]")
             self.assertEqual(stream["metrics"], {"candidate_count": 4})
             self.assertNotIn("private", stream)
-            self.assertNotIn("source_id", stream)
+            self.assertEqual(stream["source_id"], "not-public")
 
 
 if __name__ == "__main__":
