@@ -12,16 +12,16 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T13:01:43.740Z",
+        "observed_at": "2026-09-01T13:02:38.571Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 255.8,
+        "uptime_s": 310.7,
         "keys_tested": 23583044665344,
         "hashrate_mkey_s": 744.19,
         "coverage_pct": 0,
         "keys_per_second": 744190000,
-        "sample_count": 16,
+        "sample_count": 19,
         "matches_found": 0,
         "batch_number": 7688
       }
@@ -35,16 +35,16 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T13:01:43.740Z",
+        "observed_at": "2026-09-01T13:02:38.571Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 255.8,
+        "uptime_s": 310.7,
         "keys_tested": 23583044665344,
         "hashrate_mkey_s": 744.19,
         "coverage_pct": 0,
         "keys_per_second": 744190000,
-        "sample_count": 16,
+        "sample_count": 19,
         "matches_found": 0,
         "batch_number": 7688
       }
@@ -56,13 +56,13 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WAITING",
+      "state": "WORKING",
       "enabled": true,
       "last_action": "continue",
       "last_reason": "System is healthy with no errors or evidence review failures; continuing current Bitcoin Puzzle #71 search.",
       "last_duration_s": 5.093,
-      "started_at": "",
-      "elapsed_s": null,
+      "started_at": "2026-09-01T13:02:39.465Z",
+      "elapsed_s": 0.0,
       "tasks_completed": 95,
       "last_run": "2026-09-01T12:57:51.702Z",
       "next_run": "2026-09-01T13:02:51.702Z"
@@ -408,23 +408,22 @@
     "handoff_style": "service-required"
   },
   "queue": {
-    "COMPLETE": 101
+    "COMPLETE": 101,
+    "RUNNING": 1
   },
   "queue_kinds": {
-    "agent_review": 95,
+    "agent_review": 96,
     "research": 5,
     "verification": 1
   },
   "queue_activity": [
     {
-      "task_id": "agent-task-local-manager-brain-5cf6781adfe9",
+      "task_id": "agent-task-local-manager-brain-3208657a83a4",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "COMPLETE",
+      "status": "RUNNING",
       "attempts": 1,
-      "updated": "2026-09-01T12:57:51.702Z",
-      "message": "System is healthy with no errors or evidence review failures; continuing current Bitcoin Puzzle #71 search.",
-      "outcome": "recommendation"
+      "updated": "2026-09-01T13:02:39.465Z"
     },
     {
       "task_id": "revenue-lane-scout-refresh-20260901-v2",
@@ -445,6 +444,25 @@
       "outcome": "handler_completed"
     },
     {
+      "task_id": "agent-task-local-manager-brain-5cf6781adfe9",
+      "kind": "agent_review",
+      "objective_id": "p71",
+      "status": "COMPLETE",
+      "attempts": 1,
+      "updated": "2026-09-01T12:57:51.702Z",
+      "message": "System is healthy with no errors or evidence review failures; continuing current Bitcoin Puzzle #71 search.",
+      "outcome": "recommendation"
+    },
+    {
+      "task_id": "revenue-lane-scout-refresh-20260901",
+      "kind": "research",
+      "objective_id": "revenue-opportunities-refresh",
+      "status": "COMPLETE",
+      "attempts": 1,
+      "updated": "2026-09-01T08:51:55.584Z",
+      "outcome": "handler_completed"
+    },
+    {
       "task_id": "agent-task-local-manager-brain-8c6adf4ee3f5",
       "kind": "agent_review",
       "objective_id": "p71",
@@ -455,12 +473,12 @@
       "outcome": "recommendation"
     },
     {
-      "task_id": "revenue-lane-scout-refresh-20260901",
+      "task_id": "recurring-revenue-lane-scout-000001",
       "kind": "research",
-      "objective_id": "revenue-opportunities-refresh",
+      "objective_id": "revenue-opportunities",
       "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T08:51:55.584Z",
+      "updated": "2026-09-01T08:25:40.878Z",
       "outcome": "handler_completed"
     },
     {
@@ -474,12 +492,12 @@
       "outcome": "recommendation"
     },
     {
-      "task_id": "recurring-revenue-lane-scout-000001",
+      "task_id": "recurring-machine-manager-capability-research-000001",
       "kind": "research",
-      "objective_id": "revenue-opportunities",
+      "objective_id": "machine-manager-research",
       "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T08:25:40.878Z",
+      "attempts": 3,
+      "updated": "2026-09-01T08:00:08.195Z",
       "outcome": "handler_completed"
     },
     {
@@ -493,12 +511,12 @@
       "outcome": "recommendation"
     },
     {
-      "task_id": "recurring-machine-manager-capability-research-000001",
+      "task_id": "research-task-capability-lane-001",
       "kind": "research",
-      "objective_id": "machine-manager-research",
+      "objective_id": "machine-manager-research-001",
       "status": "COMPLETE",
-      "attempts": 3,
-      "updated": "2026-09-01T08:00:08.195Z",
+      "attempts": 1,
+      "updated": "2026-09-01T07:20:13.752Z",
       "outcome": "handler_completed"
     },
     {
@@ -510,15 +528,6 @@
       "updated": "2026-09-01T12:38:37.453Z",
       "message": "System is healthy with consistent health check outcomes and no evidence reviews pending.",
       "outcome": "recommendation"
-    },
-    {
-      "task_id": "research-task-capability-lane-001",
-      "kind": "research",
-      "objective_id": "machine-manager-research-001",
-      "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T07:20:13.752Z",
-      "outcome": "handler_completed"
     },
     {
       "task_id": "agent-task-local-manager-brain-c4adc7b69709",
@@ -719,16 +728,6 @@
       "updated": "2026-09-01T11:10:55.476Z",
       "message": "System is healthy with stable GPU utilization and no errors detected.",
       "outcome": "recommendation"
-    },
-    {
-      "task_id": "agent-task-local-manager-brain-1c8a38dd1297",
-      "kind": "agent_review",
-      "objective_id": "p71",
-      "status": "COMPLETE",
-      "attempts": 1,
-      "updated": "2026-09-01T11:05:31.600Z",
-      "message": "System is healthy and actively processing Bitcoin Puzzle #71 with no errors or resource constraints.",
-      "outcome": "recommendation"
     }
   ],
   "recurring": [
@@ -740,7 +739,7 @@
       "interval_s": 21600.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T13:48:50.946Z",
-      "next_in_s": 2826.294017791748,
+      "next_in_s": 2771.4717729091644,
       "last_task_id": "recurring-machine-manager-capability-research-000001",
       "last_status": "COMPLETE"
     },
@@ -752,7 +751,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 69793.28869080544,
+      "next_in_s": 69738.46644592285,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -764,38 +763,38 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 26963.750206947327,
+      "next_in_s": 26908.927962064743,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
-    "util_pct": 88.0,
+    "util_pct": 75.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 60.0,
-    "power_w": 82.15,
+    "temp_c": 59.0,
+    "power_w": 80.77,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 7.4
+    "cpu_pct": 5.7
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T13:01:43.740Z",
+    "observed_at": "2026-09-01T13:02:38.571Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 255.8,
+    "uptime_s": 310.7,
     "keys_tested": 23583044665344,
     "hashrate_mkey_s": 744.19,
     "coverage_pct": 0,
     "keys_per_second": 744190000,
-    "sample_count": 16,
+    "sample_count": 19,
     "matches_found": 0,
     "batch_number": 7688
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T13:01:44.631Z"
+  "updated": "2026-09-01T13:02:39.464Z"
 }
