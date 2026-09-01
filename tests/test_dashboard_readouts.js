@@ -13,6 +13,8 @@ const start = dashboard.indexOf("function escapeHtml(value)");
 const end = dashboard.indexOf("function workProgress()", start);
 const resourceStart = dashboard.indexOf("function resourceMeterLabel(value, percent)", end);
 const resourceEnd = dashboard.indexOf("function renderWorkersTable", resourceStart);
+const metricStart = dashboard.indexOf("function compactNumber(value)", end);
+const metricEnd = dashboard.indexOf("function eventRow(event)", metricStart);
 const queueStart = dashboard.indexOf("function taskKindLabel(value)");
 const queueEnd = dashboard.indexOf("function renderRecurringSchedules", queueStart);
 const auditStart = dashboard.indexOf("function auditCategoryText(categories)");
@@ -22,6 +24,8 @@ assert.ok(start >= 0, "dashboard helper section must exist");
 assert.ok(end > start, "dashboard helper section must have an end marker");
 assert.ok(resourceStart > end, "dashboard resource helper section must exist");
 assert.ok(resourceEnd > resourceStart, "dashboard resource helper section must have an end marker");
+assert.ok(metricStart > end, "dashboard metric helper section must exist");
+assert.ok(metricEnd > metricStart, "dashboard metric helper section must have an end marker");
 assert.ok(queueStart > resourceEnd, "dashboard queue helper section must exist");
 assert.ok(queueEnd > queueStart, "dashboard queue helper section must have an end marker");
 assert.ok(auditStart > resourceEnd, "dashboard audit helper section must exist");
@@ -34,6 +38,7 @@ vm.createContext(executionContext);
 vm.runInContext(
     dashboard.slice(start, end) +
     dashboard.slice(resourceStart, resourceEnd) +
+    dashboard.slice(metricStart, metricEnd) +
     dashboard.slice(queueStart, queueEnd) +
     dashboard.slice(auditStart, auditEnd) +
     "\noutput = {" +
@@ -46,6 +51,7 @@ vm.runInContext(
     "idleCpuText: cpuActivityText(idleFixture.system, idleFixture.gpu)," +
     "idleCpuCard: cpuActivityCard(idleFixture.system, idleFixture.gpu)," +
     "numericLabel: resourceMeterLabel(\"86\", 86)," +
+    "zeroGpuMetric: eventMetricChips({metrics: {util_pct: 0, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
     "queueEvidence: taskEvidenceLabel({message: \"Result summary\", outcome: \"handler_completed\"})," +
     "queueEvidenceFallback: taskEvidenceLabel({outcome: \"handler_completed\"})," +
     "reviewPlan: auditReviewPlan([{category: \"approval_gate\", candidate_count: 2, recommended_test: \"Run a harmless delegated action.\"}])," +
@@ -70,6 +76,8 @@ assert.match(output.idleCpuCard, /Raw CPU sample 0%; no active GPU evidence/);
 assert.ok(!output.idleGpuCard.includes('<span class="muted">0%</span>'));
 assert.ok(!output.idleCpuCard.includes('<span class="muted">0%</span>'));
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
+assert.match(output.zeroGpuMetric, /GPU ACTIVE \(diagnostic raw sample 0%; memory\/power confirm work\)/);
+assert.ok(!output.zeroGpuMetric.includes('GPU ACTIVE (raw 0%)'));
 assert.strictEqual(output.queueEvidence, "Result summary");
 assert.strictEqual(output.queueEvidenceFallback, "handler completed");
 assert.match(output.reviewPlan, /approval gate · 2 candidates/);
