@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:57:33.375Z",
+        "observed_at": "2026-09-01T06:58:11.383Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "keys_per_second": 743540000,
-        "sample_count": 20,
-        "batch_number": 2349,
+        "keys_per_second": 771840000,
+        "sample_count": 22,
+        "batch_number": 2366,
         "matches_found": 0,
         "coverage_pct": 0,
-        "hashrate_mkey_s": 743.54,
-        "uptime_s": 314.0,
-        "keys_tested": 7218162302976
+        "hashrate_mkey_s": 771.84,
+        "uptime_s": 352.1,
+        "keys_tested": 7270557548544
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T06:57:33.375Z",
+        "observed_at": "2026-09-01T06:58:11.383Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "keys_per_second": 743540000,
-        "sample_count": 20,
-        "batch_number": 2349,
+        "keys_per_second": 771840000,
+        "sample_count": 22,
+        "batch_number": 2366,
         "matches_found": 0,
         "coverage_pct": 0,
-        "hashrate_mkey_s": 743.54,
-        "uptime_s": 314.0,
-        "keys_tested": 7218162302976
+        "hashrate_mkey_s": 771.84,
+        "uptime_s": 352.1,
+        "keys_tested": 7270557548544
       }
     }
   ],
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is healthy with stable GPU utilization and no errors detected.",
-      "last_duration_s": 4.266,
-      "started_at": "2026-09-01T06:57:34.248Z",
-      "elapsed_s": 0.0,
-      "tasks_completed": 1,
-      "last_run": "2026-09-01T06:52:42.287Z",
-      "next_run": "2026-09-01T06:57:42.287Z"
+      "last_reason": "System healthy, objective running, resources within limits.",
+      "last_duration_s": 6.468,
+      "started_at": "",
+      "elapsed_s": null,
+      "tasks_completed": 2,
+      "last_run": "2026-09-01T06:57:56.048Z",
+      "next_run": "2026-09-01T07:02:56.048Z"
     }
   ],
   "capabilities": [
@@ -209,14 +209,19 @@
     {
       "id": "active-project-workspace",
       "label": "Active project workspace",
-      "state": "NO_CANDIDATES",
-      "scanned_at": "2026-09-01T05:57:23.189Z",
-      "files_scanned": 2994,
-      "files_skipped": 6,
-      "candidate_count": 0,
+      "state": "NEEDS_EVIDENCE_REVIEW",
+      "scanned_at": "2026-09-01T06:58:01.641Z",
+      "files_scanned": 2084,
+      "files_skipped": 18,
+      "candidate_count": 9,
       "truncated": false,
-      "more_pending": true,
-      "categories": {}
+      "more_pending": false,
+      "categories": {
+        "approval_gate": 2,
+        "autonomy_limit": 5,
+        "data_boundary": 1,
+        "scope_boundary": 1
+      }
     },
     {
       "id": "machine-manager-source",
@@ -260,16 +265,16 @@
       "title": "Active workspace constraint audit",
       "lane": "Cross-project evidence",
       "owner": "evidence-coordinator",
-      "state": "WAITING",
+      "state": "REVIEW",
       "summary": "Maps the registered active-project workspace into review leads without changing source files.",
       "next_action": "Group leads by operation and test one representative path at a time.",
       "source_kind": "constraint_audit",
       "metrics": {
-        "candidate_count": 0,
-        "files_scanned": 2994,
-        "more_pending": true
+        "candidate_count": 9,
+        "files_scanned": 2084,
+        "more_pending": false
       },
-      "updated": "2026-09-01T05:57:24.267Z"
+      "updated": "2026-09-01T06:58:12.326Z"
     },
     {
       "id": "audit-triage-20260830",
@@ -338,8 +343,7 @@
     "mode": "EXECUTE_AND_REPORT"
   },
   "queue": {
-    "COMPLETE": 6,
-    "RUNNING": 1
+    "COMPLETE": 7
   },
   "queue_kinds": {
     "agent_review": 7
@@ -349,9 +353,9 @@
       "task_id": "agent-task-local-manager-brain-9ac87d6678e6",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "RUNNING",
+      "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T06:57:34.248Z"
+      "updated": "2026-09-01T06:57:56.048Z"
     },
     {
       "task_id": "agent-task-local-manager-brain-efcbcd1debf4",
@@ -403,32 +407,32 @@
     }
   ],
   "gpu": {
-    "util_pct": 72.0,
+    "util_pct": 74.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 64.0,
-    "power_w": 81.54,
+    "temp_c": 62.0,
+    "power_w": 81.65,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 6.0
+    "cpu_pct": 5.9
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T06:57:33.375Z",
+    "observed_at": "2026-09-01T06:58:11.383Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "keys_per_second": 743540000,
-    "sample_count": 20,
-    "batch_number": 2349,
+    "keys_per_second": 771840000,
+    "sample_count": 22,
+    "batch_number": 2366,
     "matches_found": 0,
     "coverage_pct": 0,
-    "hashrate_mkey_s": 743.54,
-    "uptime_s": 314.0,
-    "keys_tested": 7218162302976
+    "hashrate_mkey_s": 771.84,
+    "uptime_s": 352.1,
+    "keys_tested": 7270557548544
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T06:57:34.248Z"
+  "updated": "2026-09-01T06:58:12.315Z"
 }
