@@ -307,16 +307,21 @@ def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[d
             ).replace("+00:00", "Z")
         except (OverflowError, OSError, ValueError):
             continue
-        safe.append(
-            {
-                "task_id": task_id,
-                "kind": kind,
-                "objective_id": _text(item.get("objective_id"), max_len=80),
-                "status": status,
-                "attempts": max(0, int(attempts)),
-                "updated": updated,
-            }
-        )
+        message = _text(item.get("message"), max_len=180).strip()
+        outcome = _text(item.get("outcome"), max_len=80).strip()
+        safe_item: dict[str, Any] = {
+            "task_id": task_id,
+            "kind": kind,
+            "objective_id": _text(item.get("objective_id"), max_len=80),
+            "status": status,
+            "attempts": max(0, int(attempts)),
+            "updated": updated,
+        }
+        if message:
+            safe_item["message"] = message
+        if outcome:
+            safe_item["outcome"] = outcome
+        safe.append(safe_item)
     if len(safe) <= PUBLIC_QUEUE_ACTIVITY_LIMIT:
         return safe
 

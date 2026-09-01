@@ -15,6 +15,8 @@ import time
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
+from .redaction import redact_text
+
 
 class StateStore:
     """SQLite-backed state, event, agent, and work-queue store."""
@@ -565,10 +567,12 @@ class StateStore:
         return count
 
     def task_activity(self, *, limit: int = 20) -> list[dict[str, Any]]:
-        """Return recent task metadata without loading private task payloads.
+        """Return recent task metadata and safe result summaries.
 
         Recent rows are interleaved by kind. This keeps a busy specialist from
         hiding every other work lane in a compact public activity snapshot.
+        Result text is derived from lifecycle events and redacted; task payloads
+        remain local and are never included.
         """
         limit = max(1, min(int(limit), 100))
         with self._lock:
@@ -612,6 +616,47 @@ class StateStore:
             if not added:
                 break
         rows = balanced
+        task_ids = {str(row["task_id"]) for row in rows}
+        event_summaries: dict[str, dict[str, str]] = {}
+        if task_ids:
+            with self._lock:
+                event_rows = self._connection.execute(
+                    """
+                    SELECT payload FROM events
+                    WHERE job_id IN ('task-queue', 'agent-coordinator')
+                    ORDER BY timestamp DESC, rowid DESC
+                    LIMIT ?
+                    """,
+                    (self.event_retention,),
+                ).fetchall()
+            for event_row in event_rows:
+                try:
+                    event = self._object(event_row["payload"])
+                except (TypeError, json.JSONDecodeError):
+                    continue
+                referenced_ids: set[str] = set()
+                direct_task_id = str(event.get("task_id", "")).strip()
+                if direct_task_id:
+                    referenced_ids.add(direct_task_id)
+                artifact_refs = event.get("artifact_refs")
+                if isinstance(artifact_refs, (list, tuple)):
+                    for reference in artifact_refs:
+                        reference_text = str(reference or "")
+                        if reference_text.startswith("task:"):
+                            referenced_ids.add(reference_text[5:])
+                referenced_ids.intersection_update(task_ids)
+                if not referenced_ids:
+                    continue
+                message = str(event.get("message", "") or "").strip()
+                outcome = str(event.get("outcome", "") or "").strip()
+                if not message and not outcome:
+                    continue
+                summary = {
+                    "message": redact_text(message, max_len=220) if message else "",
+                    "outcome": redact_text(outcome, max_len=100) if outcome else "",
+                }
+                for task_id in referenced_ids:
+                    event_summaries.setdefault(task_id, summary)
         return [
             {
                 "task_id": str(row["task_id"]),
@@ -620,6 +665,7 @@ class StateStore:
                 "status": str(row["status"]),
                 "attempts": int(row["attempts"]),
                 "updated_at": float(row["updated"]),
+                **event_summaries.get(str(row["task_id"]), {}),
             }
             for row in rows
         ]

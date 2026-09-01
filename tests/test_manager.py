@@ -839,11 +839,25 @@ class TelemetryTests(unittest.TestCase):
                     payload={"private_note": "not for publication"},
                     task_id="task-research-1",
                 )
+                store.append_event(
+                    {
+                        "timestamp": "2026-08-30T00:00:00Z",
+                        "event_id": "evt-task-research-1",
+                        "job_id": "task-queue",
+                        "event_type": "queue_task_completed",
+                        "new_state": "COMPLETE",
+                        "artifact_refs": ["task:task-research-1"],
+                        "message": "Public result summary",
+                        "outcome": "handler_completed",
+                    }
+                )
                 activity = scheduler.activity_snapshot(limit=5)
                 self.assertEqual(activity[0]["task_id"], "task-research-1")
                 self.assertEqual(activity[0]["status"], "QUEUED")
                 self.assertNotIn("payload", activity[0])
                 self.assertIsInstance(activity[0]["updated_at"], float)
+                self.assertEqual(activity[0]["message"], "Public result summary")
+                self.assertEqual(activity[0]["outcome"], "handler_completed")
 
     def test_scheduler_activity_keeps_each_kind_visible_under_task_flood(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -910,6 +924,32 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(len(latest["queue_activity"]), 32)
             self.assertIn("research", {item["kind"] for item in latest["queue_activity"]})
             self.assertIn("verification", {item["kind"] for item in latest["queue_activity"]})
+
+    def test_public_queue_activity_includes_redacted_result_summary(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            dashboard = Path(raw) / "dashboard"
+            TelemetryPublisher(dashboard).publish(
+                {
+                    "queue_activity": [
+                        {
+                            "task_id": "task-result-1",
+                            "kind": "research",
+                            "objective_id": "research-objective",
+                            "status": "COMPLETE",
+                            "attempts": 1,
+                            "updated_at": 1724875200.0,
+                            "message": "Result summary token=private-value C:\\Users\\lilli\\private.txt",
+                            "outcome": "handler_completed",
+                        }
+                    ]
+                }
+            )
+            latest = json.loads((dashboard / "data/latest.json").read_text(encoding="utf-8"))
+            entry = latest["queue_activity"][0]
+            self.assertIn("Result summary", entry["message"])
+            self.assertEqual(entry["outcome"], "handler_completed")
+            self.assertNotIn("private-value", json.dumps(latest))
+            self.assertNotIn("C:\\Users\\lilli", json.dumps(latest))
 
     def test_dispatcher_leaves_coordinator_owned_agent_reviews_untouched(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

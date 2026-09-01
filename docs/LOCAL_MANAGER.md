@@ -125,8 +125,10 @@ from the durable task ledger on startup, so the public agent registry does not
 reset its history when the manager process restarts.
 
 The public snapshot also includes a bounded recent task ledger. It contains
-only task id, allowlisted kind, objective id, state, attempt count, and a
-sanitized timestamp; task payloads remain local in SQLite.
+only task id, allowlisted kind, objective id, state, attempt count, a sanitized
+timestamp, and (when a lifecycle event supplied one) a short redacted result
+summary or outcome. Task payloads and unrestricted model output remain local in
+SQLite.
 
 Registered task handlers may also return a short `public_message`. The dispatcher
 redacts and length-limits that note before it is written to the lifecycle event,

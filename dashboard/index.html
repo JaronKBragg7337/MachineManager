@@ -308,6 +308,7 @@
     th, td { padding: 11px 8px; border-bottom: 1px solid rgba(39, 79, 119, .43); text-align: left; vertical-align: middle; }
     th { color: var(--muted-2); font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
     td { color: #d6e3f5; }
+    .queue-evidence { min-width: 240px; max-width: 520px; color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
     tr:last-child td { border-bottom: 0; }
     .mono { color: #c6d8ee; font: 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
     .muted { color: var(--muted); }
@@ -1089,11 +1090,18 @@
       return labels[key] || key.replace(/_/g, " ");
     }
 
+    function taskEvidenceLabel(item) {
+      const message = String(item && item.message || "").trim();
+      if (message) return message;
+      const outcome = String(item && item.outcome || "").trim();
+      return outcome ? outcome.replace(/_/g, " ") : "No public result yet";
+    }
+
     function renderQueueActivity(items) {
       if (!items.length) return '<div class="empty-cell">No durable task records are in this published snapshot.</div>';
-      return '<div class="table-wrap"><table><thead><tr><th>Task</th><th>Type</th><th>Objective</th><th>State</th><th>Attempts</th></tr></thead><tbody>' + items.map(function (item) {
+      return '<div class="table-wrap"><table><thead><tr><th>Task</th><th>Type</th><th>Objective</th><th>State</th><th>Attempts</th><th>Latest evidence</th></tr></thead><tbody>' + items.map(function (item) {
         const kind = taskKindLabel(item.kind);
-        return '<tr><td class="mono">' + escapeHtml(item.task_id || "--") + '</td><td>' + escapeHtml(kind) + '</td><td class="mono">' + escapeHtml(item.objective_id || "--") + '</td><td>' + badge(item.status) + '</td><td class="mono">' + escapeHtml(item.attempts === undefined ? "--" : String(item.attempts)) + '</td></tr>';
+        return '<tr><td class="mono">' + escapeHtml(item.task_id || "--") + '</td><td>' + escapeHtml(kind) + '</td><td class="mono">' + escapeHtml(item.objective_id || "--") + '</td><td>' + badge(item.status) + '</td><td class="mono">' + escapeHtml(item.attempts === undefined ? "--" : String(item.attempts)) + '</td><td class="queue-evidence">' + escapeHtml(taskEvidenceLabel(item)) + '</td></tr>';
       }).join("") + "</tbody></table></div>";
     }
 
