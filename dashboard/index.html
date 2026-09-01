@@ -1189,9 +1189,9 @@
 
     function renderQueueActivity(items) {
       if (!items.length) return '<div class="empty-cell">No durable task records are in this published snapshot.</div>';
-      return '<div class="table-wrap"><table><thead><tr><th>Task</th><th>Type</th><th>Objective</th><th>State</th><th>Attempts</th><th>Latest evidence</th></tr></thead><tbody>' + items.map(function (item) {
+      return '<div class="table-wrap"><table><thead><tr><th>Task</th><th>Type</th><th>Objective</th><th>Updated</th><th>State</th><th>Attempts</th><th>Latest evidence</th></tr></thead><tbody>' + items.map(function (item) {
         const kind = taskKindLabel(item.kind);
-        return '<tr><td class="mono">' + escapeHtml(item.task_id || "--") + '</td><td>' + escapeHtml(kind) + '</td><td class="mono">' + escapeHtml(item.objective_id || "--") + '</td><td>' + badge(item.status) + '</td><td class="mono">' + escapeHtml(item.attempts === undefined ? "--" : String(item.attempts)) + '</td><td class="queue-evidence">' + escapeHtml(taskEvidenceLabel(item)) + '</td></tr>';
+        return '<tr><td class="mono">' + escapeHtml(item.task_id || "--") + '</td><td>' + escapeHtml(kind) + '</td><td class="mono">' + escapeHtml(item.objective_id || "--") + '</td><td class="mono">' + escapeHtml(formatDate(item.updated, true)) + '</td><td>' + badge(item.status) + '</td><td class="mono">' + escapeHtml(item.attempts === undefined ? "--" : String(item.attempts)) + '</td><td class="queue-evidence">' + escapeHtml(taskEvidenceLabel(item)) + '</td></tr>';
       }).join("") + "</tbody></table></div>";
     }
 
