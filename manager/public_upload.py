@@ -216,6 +216,9 @@ class GitHubPagesPublisher:
                 path = line[3:] if len(line) >= 3 else ""
                 if len(line) < 3 or line[0] != " " or line[1] != "M" or path not in allowed_paths:
                     return "deferred"
+            fetched = git("fetch", "--quiet", "origin", self.branch)
+            if fetched.returncode != 0:
+                return "deferred"
             ancestor = git("merge-base", "--is-ancestor", local_sha, remote_sha)
             if ancestor.returncode != 0:
                 return "deferred"
