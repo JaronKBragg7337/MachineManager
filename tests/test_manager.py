@@ -1097,6 +1097,15 @@ class TelemetryTests(unittest.TestCase):
             "workers": [{"id": "worker-1", "state": "RUNNING", "progress": {"keys_tested": 1}}],
             "jobs": [{"id": "job-1", "state": "RUNNING"}],
             "workstreams": [{"id": "lane-1", "state": "RUNNING"}],
+            "queue_activity": [
+                {
+                    "task_id": "task-1",
+                    "kind": "research",
+                    "status": "COMPLETE",
+                    "attempts": 1,
+                    "updated_at": 1724875200.0,
+                }
+            ],
             "updated": "2026-08-30T00:00:00Z",
         }
         progress_only = json.loads(json.dumps(baseline))
@@ -1104,9 +1113,15 @@ class TelemetryTests(unittest.TestCase):
         progress_only["updated"] = "2026-08-30T00:01:00Z"
         lifecycle_change = json.loads(json.dumps(baseline))
         lifecycle_change["workers"][0]["state"] = "RETRYING"
+        queue_progress_only = json.loads(json.dumps(baseline))
+        queue_progress_only["queue_activity"][0]["updated_at"] = 1724875260.0
+        queue_lifecycle_change = json.loads(json.dumps(baseline))
+        queue_lifecycle_change["queue_activity"][0]["status"] = "ESCALATED"
 
         self.assertEqual(_public_state_marker(baseline), _public_state_marker(progress_only))
+        self.assertEqual(_public_state_marker(baseline), _public_state_marker(queue_progress_only))
         self.assertNotEqual(_public_state_marker(baseline), _public_state_marker(lifecycle_change))
+        self.assertNotEqual(_public_state_marker(baseline), _public_state_marker(queue_lifecycle_change))
 
     def test_public_upload_builds_one_attributed_commit(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

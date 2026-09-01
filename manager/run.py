@@ -316,6 +316,8 @@ def _public_state_marker(snapshot: Mapping[str, Any]) -> str:
     Metrics and timestamps intentionally do not participate: normal progress is
     published on the configured cadence, while an operational state transition
     becomes visible as soon as the local publisher has produced a safe record.
+    Queue payloads are intentionally excluded; only public-safe task lifecycle
+    metadata can request an immediate upload.
     """
 
     def entries(name: str) -> list[dict[str, str]]:
@@ -331,12 +333,35 @@ def _public_state_marker(snapshot: Mapping[str, Any]) -> str:
             if isinstance(item, Mapping)
         ]
 
+    def queue_entries() -> list[dict[str, str | int]]:
+        source = snapshot.get("queue_activity", [])
+        if not isinstance(source, list):
+            return []
+        entries: list[dict[str, str | int]] = []
+        for item in source:
+            if not isinstance(item, Mapping):
+                continue
+            try:
+                attempts = max(0, int(item.get("attempts", 0)))
+            except (TypeError, ValueError):
+                attempts = 0
+            entries.append(
+                {
+                    "task_id": str(item.get("task_id", "")),
+                    "kind": str(item.get("kind", "")),
+                    "status": str(item.get("status", "UNKNOWN")).upper(),
+                    "attempts": attempts,
+                }
+            )
+        return entries
+
     return json.dumps(
         {
             "status": str(snapshot.get("status", "UNKNOWN")).upper(),
             "workers": entries("workers"),
             "jobs": entries("jobs"),
             "workstreams": entries("workstreams"),
+            "queue_activity": queue_entries(),
         },
         ensure_ascii=True,
         sort_keys=True,
