@@ -28,6 +28,7 @@ from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
 from manager.probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe
 from manager.state_store import StateStore
+from manager import MachineManager, WorkScheduler
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -386,6 +387,55 @@ class SupervisorTests(unittest.TestCase):
                         )
                     finally:
                         supervisor.cancel()
+
+    def test_objective_change_queues_without_mutating_running_job(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            directory = Path(raw)
+            with StateStore(directory / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                manager = MachineManager(actor="test-manager")
+                job = manager.register_job(
+                    synthetic_spec(directory, "run", max_age=0.5),
+                    objective_id="objective-current",
+                    job_id="job-objective-change",
+                    max_restarts=1,
+                )
+                try:
+                    self.assertTrue(manager.start_job(job.job_id))
+                    deadline = time.time() + 3
+                    health = job.supervisor.observe()
+                    while not health.healthy and time.time() < deadline:
+                        time.sleep(0.05)
+                        health = job.supervisor.observe()
+                    self.assertTrue(health.healthy, health.as_dict())
+                    process_before = job.supervisor.process
+
+                    task_id = manager.queue_objective_change(
+                        job.job_id,
+                        scheduler=scheduler,
+                        new_objective_id="objective-next",
+                        task_id="task-objective-change",
+                    )
+                    snapshot = manager.snapshot(objective="Current objective")
+                    claimed = scheduler.claim(limit=1)
+
+                    self.assertEqual(task_id, "task-objective-change")
+                    self.assertEqual(snapshot["status"], "HEALTHY")
+                    self.assertEqual(snapshot["jobs"][0]["objective_id"], "objective-current")
+                    self.assertEqual(snapshot["workers"][0]["state"], "RUNNING")
+                    self.assertIs(job.supervisor.process, process_before)
+                    self.assertEqual(len(claimed), 1)
+                    self.assertEqual(claimed[0].kind, "objective_change")
+                    self.assertEqual(claimed[0].objective_id, "objective-next")
+                    event = [
+                        item
+                        for item in manager.events
+                        if item["event_type"] == "objective_change_queued"
+                    ][-1]
+                    self.assertEqual(event["outcome"], "active_job_preserved")
+                    self.assertEqual(event["new_state"], "RUNNING")
+                finally:
+                    manager.cancel_all()
 
 
 class TelemetryTests(unittest.TestCase):

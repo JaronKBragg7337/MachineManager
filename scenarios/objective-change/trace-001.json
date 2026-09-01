@@ -1,0 +1,37 @@
+{
+  "scenario_id": "objective-change-001",
+  "version": "1.0",
+  "description": "A new objective is queued while the active worker continues its current assignment",
+  "timestamp": "2026-09-01T06:10:07.127Z",
+  "result": "PASS",
+  "score": 1,
+  "action": "QUEUE_OBJECTIVE_CHANGE",
+  "initial_state": {
+    "active_objective": "objective-current",
+    "active_job_state": "RUNNING",
+    "restart_count": 0
+  },
+  "induced_change": {
+    "actor": "evaluation-harness",
+    "requested_objective": "objective-next",
+    "queue_task_kind": "objective_change"
+  },
+  "observations": {
+    "active_objective_preserved": true,
+    "active_job_state_at_request": "RUNNING",
+    "queue_task_claimed": true,
+    "queue_task_completed": true,
+    "worker_continued_running": true,
+    "worker_assignment_preserved": true,
+    "restart_count": 0,
+    "recorded_event_type": "objective_change_queued",
+    "recorded_event_outcome": "active_job_preserved"
+  },
+  "recovery": {
+    "final_state": "RUNNING",
+    "outside_intervention_count": 0
+  },
+  "verification": "A requested objective change is durable and actionable without mutating the healthy job already in flight",
+  "resulting_state": "RUNNING",
+  "intervention_count": 0
+}

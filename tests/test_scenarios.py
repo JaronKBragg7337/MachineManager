@@ -147,6 +147,33 @@ class ScenarioArtifactTests(unittest.TestCase):
         self.assertNotIn("pid", json.dumps(trace).lower())
         self.assertNotIn("pid", json.dumps(evaluation).lower())
 
+    def test_objective_change_artifacts_record_a_sanitized_pass(self) -> None:
+        trace = json.loads(
+            (
+                REPO_ROOT
+                / "scenarios"
+                / "objective-change"
+                / "trace-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        evaluation = json.loads(
+            (
+                REPO_ROOT
+                / "evaluations"
+                / "objective-change-manager-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(trace["result"], "PASS")
+        self.assertTrue(trace["observations"]["active_objective_preserved"])
+        self.assertTrue(trace["observations"]["worker_assignment_preserved"])
+        self.assertTrue(trace["observations"]["queue_task_completed"])
+        self.assertEqual(trace["recovery"]["final_state"], "RUNNING")
+        self.assertEqual(evaluation["result"], "PASS")
+        self.assertEqual(evaluation["ceo_intervention_count"], 0)
+        self.assertEqual(evaluation["manager_observation"]["event_outcome"], "active_job_preserved")
+        self.assertNotIn("pid", json.dumps(trace).lower())
+        self.assertNotIn("pid", json.dumps(evaluation).lower())
+
 
 if __name__ == "__main__":
     unittest.main()

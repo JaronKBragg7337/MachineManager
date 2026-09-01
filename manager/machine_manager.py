@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import time
 from typing import Any
+import uuid
 
-from .supervisor import JobState, WorkerSpec, WorkerSupervisor
+from .supervisor import JobState, WorkerSpec, WorkerSupervisor, utc_now
 
 
 @dataclass
@@ -23,6 +25,7 @@ class MachineManager:
     def __init__(self, *, actor: str = "local-manager") -> None:
         self.actor = actor
         self.jobs: dict[str, ManagedJob] = {}
+        self._events: list[dict[str, Any]] = []
 
     def register_job(
         self,
@@ -64,6 +67,62 @@ class MachineManager:
     def start_all(self) -> dict[str, bool]:
         return {job_id: self.start_job(job_id) for job_id in self.jobs}
 
+    def queue_objective_change(
+        self,
+        job_id: str,
+        *,
+        scheduler: Any,
+        new_objective_id: str,
+        task_id: str | None = None,
+    ) -> str:
+        """Queue a new objective without mutating an active worker assignment.
+
+        A running worker must finish or be explicitly handed off before a new
+        objective can reuse its slot. Keeping the current job unchanged makes
+        the boundary visible and gives the scheduler a durable next action.
+        """
+        if job_id not in self.jobs:
+            raise KeyError(f"unknown job: {job_id}")
+        requested_objective_id = str(new_objective_id).strip()
+        if not requested_objective_id or len(requested_objective_id) > 120:
+            raise ValueError("new_objective_id must be a non-empty compact value")
+
+        job = self.jobs[job_id]
+        if requested_objective_id == job.objective_id:
+            raise ValueError("new objective must differ from the active objective")
+
+        queued_task_id = scheduler.enqueue(
+            kind="objective_change",
+            objective_id=requested_objective_id,
+            payload={
+                "job_id": job_id,
+                "from_objective_id": job.objective_id,
+            },
+            task_id=task_id,
+        )
+        state = job.supervisor.state.value
+        self._events.append(
+            {
+                "timestamp": utc_now(),
+                "event_id": f"evt-objective-change-{uuid.uuid4().hex[:12]}",
+                "objective_id": job.objective_id,
+                "job_id": job_id,
+                "worker_id": job.supervisor.spec.worker_id,
+                "actor": self.actor,
+                "event_type": "objective_change_queued",
+                "previous_state": state,
+                "new_state": state,
+                "metrics": {"active_job_preserved": True},
+                "action": "queue_objective_change",
+                "outcome": "active_job_preserved",
+                "artifact_refs": [f"task:{queued_task_id}"],
+                "error": None,
+                "duration": None,
+            }
+        )
+        self._events = self._events[-500:]
+        return queued_task_id
+
     def tick_job(self, job_id: str, *, auto_recover: bool = True) -> dict[str, Any]:
         supervisor = self.jobs[job_id].supervisor
         health = supervisor.observe()
@@ -91,7 +150,7 @@ class MachineManager:
 
     @property
     def events(self) -> list[dict[str, Any]]:
-        result: list[dict[str, Any]] = []
+        result: list[dict[str, Any]] = list(self._events)
         for job in self.jobs.values():
             result.extend(job.supervisor.events)
         return sorted(result, key=lambda event: event["timestamp"])

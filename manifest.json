@@ -2,7 +2,7 @@
     "suite_version":  "0.1",
     "created":  "2026-08-18T19:27:55.2490419-04:00",
     "description":  "Reference Scenario Suite for Machine Manager evaluation. Grok reference performance is the initial benchmark.",
-    "notes":  "Stalled-worker, malformed/empty local-agent-response, repeated-failure-escalation, resource-pressure, and manager-restart-recovery scenarios are now covered. Objective-change remains pending. Do not change search targets or credentials during reliability tests.",
+    "notes":  "The core healthy-operation, worker-death, stalled-worker, malformed/empty local-agent-response, repeated-failure-escalation, resource-pressure, objective-change, and manager-restart-recovery scenarios are covered. Do not change search targets or credentials during reliability tests.",
     "scenarios":  [
                       {
                           "path":  "scenarios/healthy-operation",
@@ -51,6 +51,13 @@
                           "pass":  true,
                           "version":  "1.0",
                           "id":  "manager-restart-recovery-001",
+                          "score":  1
+                      },
+                      {
+                          "path":  "scenarios/objective-change",
+                          "pass":  true,
+                          "version":  "1.0",
+                          "id":  "objective-change-001",
                           "score":  1
                       }
                   ],
@@ -110,6 +117,14 @@
                            "ceo_intervention_count":  0,
                            "recovery_time_s":  23.697,
                            "path":  "evaluations/manager-restart-recovery-manager-001.json"
+                       },
+                       {
+                           "id":  "objective-change-manager-001",
+                           "reference_id":  "objective-change-001",
+                           "result":  "PASS",
+                           "ceo_intervention_count":  0,
+                           "recovery_time_s":  0.0,
+                           "path":  "evaluations/objective-change-manager-001.json"
                        }
                    ]
 }

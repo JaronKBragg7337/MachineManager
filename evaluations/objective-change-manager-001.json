@@ -1,0 +1,34 @@
+{
+  "evaluation_id": "objective-change-manager-001",
+  "reference_id": "objective-change-001",
+  "version": "1.0",
+  "started_at": "2026-09-01T06:10:07.127Z",
+  "initial_state": {
+    "active_objective": "objective-current",
+    "active_job_state": "RUNNING",
+    "restart_count": 0
+  },
+  "induced_change": {
+    "actor": "evaluation-harness",
+    "requested_objective": "objective-next",
+    "queue_task_kind": "objective_change"
+  },
+  "manager_observation": {
+    "active_objective_preserved": true,
+    "worker_assignment_preserved": true,
+    "worker_continued_running": true,
+    "queue_task_claimed": true,
+    "queue_task_completed": true,
+    "event_type": "objective_change_queued",
+    "event_outcome": "active_job_preserved"
+  },
+  "recovery": {
+    "restart_count": 0,
+    "confirmed_state": "RUNNING",
+    "outside_intervention_count": 0
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The manager queued the new objective and preserved the healthy active assignment until an explicit handoff can occur."
+}
