@@ -1519,7 +1519,7 @@
       const researchTasks = asArray(latest.queue_activity).filter(function (item) {
         return String(item.kind || "").toLowerCase() === "research";
       });
-      const researchEvents = recentEvents(20).filter(function (event) {
+      const researchEvents = recentEvents(200).filter(function (event) {
         const type = String(event.type || "").toLowerCase();
         const actor = String(event.actor || "").toLowerCase();
         return type.indexOf("queue_task_") === 0 && actor.indexOf("research") !== -1;
