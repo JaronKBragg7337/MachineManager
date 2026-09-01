@@ -1018,6 +1018,11 @@
       };
       const basis = String(gpu.activity_basis || "").toLowerCase();
       if (labels[basis]) return labels[basis];
+      const memory = numberValue(gpu.mem_used_mib);
+      const power = numberValue(gpu.power_w);
+      if (memory !== null && memory >= 512 && power !== null && power >= 40) {
+        return "dedicated memory + power";
+      }
       const recentMax = numberValue(gpu.util_pct_recent_max);
       const sampleCount = numberValue(gpu.util_pct_sample_count);
       if (sampleCount !== null && sampleCount >= 2 && recentMax !== null && recentMax >= 15) {
@@ -1232,7 +1237,7 @@
         const value = numberValue(metrics[definition[0]]);
         if (value === null || (definition[0] === "coverage_pct" && value <= 0)) return "";
         if (definition[0] === "util_pct" && gpuEvidenceActive(metrics) && value < 15) {
-          return '<span class="event-metric">' + escapeHtml("GPU ACTIVE (diagnostic raw sample " + compactNumber(value) + "%" + gpuRecentHistoryText(metrics) + "; memory/power confirm work)") + "</span>";
+          return '<span class="event-metric">' + escapeHtml("GPU ACTIVE (diagnostic raw sample " + compactNumber(value) + "%" + gpuRecentHistoryText(metrics) + "; activity confirmed by " + gpuActivityBasisText(metrics) + ")") + "</span>";
         }
         return '<span class="event-metric">' + escapeHtml(definition[2] + " " + compactNumber(value) + definition[1]) + '</span>';
       }).filter(Boolean);

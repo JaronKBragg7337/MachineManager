@@ -67,6 +67,7 @@ vm.runInContext(
     "numericLabel: resourceMeterLabel(\"86\", 86)," +
     "zeroGpuMetric: eventMetricChips({metrics: {util_pct: 0, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
     "zeroGpuMetricWithHistory: eventMetricChips({metrics: {util_pct: 0, util_pct_recent_max: 77, util_pct_sample_count: 3, util_pct_zero_samples: 1, mem_used_mib: 2367, power_w: 80, resource_active: true}})," +
+    "zeroGpuMetricRecentOnly: eventMetricChips({metrics: {util_pct: 0, util_pct_recent_max: 77, util_pct_sample_count: 3, util_pct_zero_samples: 1, mem_used_mib: 0, power_w: 3}})," +
     "queueEvidence: taskEvidenceLabel({message: \"Result summary\", outcome: \"handler_completed\"})," +
     "queueEvidenceFallback: taskEvidenceLabel({outcome: \"handler_completed\"})," +
     "reviewPlan: auditReviewPlan([{category: \"approval_gate\", candidate_count: 2, recommended_test: \"Run a harmless delegated action.\"}])," +
@@ -80,7 +81,7 @@ vm.runInContext(
 const output = executionContext.output;
 assert.strictEqual(output.gpuText, "ACTIVE");
 assert.strictEqual(output.gpuBasis, "dedicated memory + power");
-assert.strictEqual(output.gpuBasisFallback, "resource signals");
+assert.strictEqual(output.gpuBasisFallback, "dedicated memory + power");
 assert.strictEqual(output.gpuRecentBasisFallback, "recent driver utilization");
 assert.match(output.gpuRecentCardFallback, /Confirmed by recent driver utilization; diagnostic driver sample 0%/);
 assert.strictEqual(output.gpuObservation, "Diagnostic 0%; activity confirmed by dedicated memory + power; recent peak 86% over 5 samples; 1 transient zero sample");
@@ -108,9 +109,10 @@ assert.match(output.unavailableCpuCard, /No verified live reading/);
 assert.match(output.unavailableGpuCard, /<div class="resource-value">--<small>%<\/small><\/div>/);
 assert.match(output.unavailableCpuCard, /<div class="resource-value">--<small><\/small><\/div>/);
 assert.strictEqual(output.numericLabel, '<span class="muted">86%</span>');
-assert.match(output.zeroGpuMetric, /GPU ACTIVE \(diagnostic raw sample 0%; memory\/power confirm work\)/);
+assert.match(output.zeroGpuMetric, /GPU ACTIVE \(diagnostic raw sample 0%; activity confirmed by dedicated memory \+ power\)/);
 assert.ok(!output.zeroGpuMetric.includes('GPU ACTIVE (raw 0%)'));
-assert.match(output.zeroGpuMetricWithHistory, /GPU ACTIVE \(diagnostic raw sample 0%; recent peak 77% over 3 samples; 1 transient zero sample; memory\/power confirm work\)/);
+assert.match(output.zeroGpuMetricWithHistory, /GPU ACTIVE \(diagnostic raw sample 0%; recent peak 77% over 3 samples; 1 transient zero sample; activity confirmed by dedicated memory \+ power\)/);
+assert.match(output.zeroGpuMetricRecentOnly, /GPU ACTIVE \(diagnostic raw sample 0%; recent peak 77% over 3 samples; 1 transient zero sample; activity confirmed by recent driver utilization\)/);
 assert.strictEqual(output.queueEvidence, "Result summary");
 assert.strictEqual(output.queueEvidenceFallback, "handler completed");
 assert.match(output.reviewPlan, /approval gate · 2 candidates/);
