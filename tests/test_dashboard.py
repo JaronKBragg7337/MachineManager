@@ -32,6 +32,9 @@ class DashboardContractTests(unittest.TestCase):
             "UNATTENDED SCHEDULE",
             "UNATTENDED WORK CADENCE",
             "manager-owned cadence",
+            "const workEvents = recentEvents(500).filter",
+            "const researchEvents = recentEvents(500).filter",
+            "No separate lifecycle events are retained",
         ):
             self.assertIn(marker, self.dashboard)
 
