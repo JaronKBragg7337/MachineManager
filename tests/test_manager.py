@@ -27,7 +27,7 @@ from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, Outreac
 from manager.capabilities import CapabilityRegistry
 from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
-from manager.probes import CpuUsageProbe, NvidiaSmiProbe, gpu_resource_ok, keyhunt_progress_probe
+from manager.probes import CpuUsageProbe, NvidiaSmiProbe, gpu_activity_basis, gpu_resource_ok, keyhunt_progress_probe
 from manager.state_store import StateStore
 from manager import DispatchOutcome, MachineManager, WorkDispatcher, WorkScheduler
 
@@ -157,6 +157,20 @@ class SupervisorTests(unittest.TestCase):
             gpu_resource_ok(
                 {"util_pct": 0, "power_w": 590, "mem_used_mib": 0}
             )
+        )
+
+    def test_gpu_activity_basis_records_the_signal_that_qualified_work(self) -> None:
+        self.assertEqual(
+            gpu_activity_basis({"util_pct": 0, "power_w": 78, "mem_used_mib": 2367}, True),
+            "dedicated_memory_and_power",
+        )
+        self.assertEqual(
+            gpu_activity_basis({"util_pct": 82, "power_w": 78, "mem_used_mib": 2367}, True),
+            "driver_utilization",
+        )
+        self.assertEqual(
+            gpu_activity_basis({"util_pct": 0, "power_w": 3, "mem_used_mib": 0}, False),
+            "not_confirmed",
         )
 
     def test_expected_image_name_resolves_posix_symlink_target(self) -> None:
@@ -1626,6 +1640,8 @@ class TelemetryTests(unittest.TestCase):
                         "util_pct_zero_samples": 1,
                         "power_w": 70,
                         "resource_active": True,
+                        "activity_state": "ACTIVE",
+                        "activity_basis": "dedicated_memory_and_power",
                         "private_key": "do not publish",
                     },
                     "system": {
@@ -1678,6 +1694,8 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["system"]["cpu_pct_recent_max"], 12.0)
             self.assertEqual(latest["system"]["cpu_pct_sample_count"], 5)
             self.assertTrue(latest["gpu"]["resource_active"])
+            self.assertEqual(latest["gpu"]["activity_state"], "ACTIVE")
+            self.assertEqual(latest["gpu"]["activity_basis"], "dedicated_memory_and_power")
             self.assertEqual(latest["gpu"]["util_pct_recent_max"], 90)
             self.assertEqual(latest["gpu"]["util_pct_zero_samples"], 1)
             self.assertNotIn("private_note", json.dumps(latest))

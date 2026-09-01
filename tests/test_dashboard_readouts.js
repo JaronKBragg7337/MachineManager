@@ -43,8 +43,10 @@ vm.runInContext(
     dashboard.slice(auditStart, auditEnd) +
     "\noutput = {" +
     "gpuText: gpuActivityText(fixture.gpu)," +
+    "gpuBasis: gpuActivityBasisText(fixture.gpu)," +
+    "gpuBasisFallback: gpuActivityBasisText({resource_active: true, mem_used_mib: 2367, power_w: 80})," +
     "gpuObservation: gpuObservationText(fixture.gpu)," +
-    "gpuHighObservation: gpuObservationText(Object.assign({}, fixture.gpu, {util_pct: 70}))," +
+    "gpuHighObservation: gpuObservationText(Object.assign({}, fixture.gpu, {util_pct: 70, activity_basis: \"driver_utilization\"}))," +
     "gpuHighCard: gpuActivityCard(Object.assign({}, fixture.gpu, {util_pct: 70}))," +
     "gpuCard: gpuActivityCard(fixture.gpu)," +
     "cpuText: cpuActivityText(fixture.system, fixture.gpu)," +
@@ -73,10 +75,12 @@ vm.runInContext(
 
 const output = executionContext.output;
 assert.strictEqual(output.gpuText, "ACTIVE");
-assert.strictEqual(output.gpuObservation, "Diagnostic 0%; memory/power active; recent peak 86% over 5 samples; 1 transient zero sample");
-assert.strictEqual(output.gpuHighObservation, "70%; recent peak 86% over 5 samples; 1 transient zero sample");
+assert.strictEqual(output.gpuBasis, "dedicated memory + power");
+assert.strictEqual(output.gpuBasisFallback, "resource signals");
+assert.strictEqual(output.gpuObservation, "Diagnostic 0%; activity confirmed by dedicated memory + power; recent peak 86% over 5 samples; 1 transient zero sample");
+assert.strictEqual(output.gpuHighObservation, "70%; activity confirmed by driver utilization; recent peak 86% over 5 samples; 1 transient zero sample");
 assert.match(output.gpuHighCard, /Current accelerator activity; recent peak 86% over 5 samples/);
-assert.match(output.gpuCard, /Memory \+ power confirm work; diagnostic driver sample 0%/);
+assert.match(output.gpuCard, /Confirmed by dedicated memory \+ power; diagnostic driver sample 0%/);
 assert.strictEqual(output.cpuText, "LOW");
 assert.strictEqual(output.cpuHighText, "5%; recent host peak 9.2% over 5 samples; 2 transient zero samples");
 assert.match(output.cpuHighCard, /Current host activity; recent host peak 9\.2% over 5 samples/);

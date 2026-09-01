@@ -214,6 +214,14 @@ PUBLIC_WORKSTREAM_STATES = {
 }
 PUBLIC_WORKSTREAM_SOURCES = {"static", "agent", "constraint_audit", "worker_profile"}
 PUBLIC_WORKSTREAM_METRICS = {"candidate_count", "files_scanned", "more_pending", "tasks_completed", "capability_count"}
+PUBLIC_GPU_ACTIVITY_STATES = {"ACTIVE", "INACTIVE", "UNKNOWN"}
+PUBLIC_GPU_ACTIVITY_BASES = {
+    "driver_utilization",
+    "dedicated_memory_and_power",
+    "resource_probe",
+    "not_confirmed",
+    "unknown",
+}
 
 
 def _safe_metrics(metrics: Mapping[str, Any] | None) -> dict[str, int | float | bool]:
@@ -692,6 +700,12 @@ class TelemetryPublisher:
                 gpu[target] = number
         if isinstance(gpu_input.get("resource_active"), bool):
             gpu["resource_active"] = gpu_input["resource_active"]
+        activity_state = _text(gpu_input.get("activity_state"), max_len=20).upper()
+        if activity_state in PUBLIC_GPU_ACTIVITY_STATES:
+            gpu["activity_state"] = activity_state
+        activity_basis = _text(gpu_input.get("activity_basis"), max_len=40).lower()
+        if activity_basis in PUBLIC_GPU_ACTIVITY_BASES:
+            gpu["activity_basis"] = activity_basis
 
         system_input = snapshot.get("system") if isinstance(snapshot.get("system"), Mapping) else {}
         system: dict[str, int | float] = {}

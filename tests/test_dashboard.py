@@ -25,6 +25,7 @@ class DashboardContractTests(unittest.TestCase):
             "Processing the current sanitized snapshot",
             "function renderRecurringSchedules(items)",
             "function gpuEvidenceActive(gpu)",
+            "function gpuActivityBasisText(gpu)",
             "function cpuActivityText(system, gpu)",
             "function cpuActivityCard(system, gpu)",
             "function taskKindLabel(value)",
@@ -58,6 +59,7 @@ class DashboardContractTests(unittest.TestCase):
     def test_search_evidence_labels_transient_low_gpu_samples(self) -> None:
         self.assertIn("function gpuObservationText(gpu)", self.dashboard)
         self.assertIn('<span>Driver observation</span>', self.dashboard)
+        self.assertIn('<span>Activity basis</span>', self.dashboard)
         self.assertIn("diagnostic driver sample", self.dashboard)
 
     def test_semantic_resource_states_do_not_render_false_numeric_badges(self) -> None:

@@ -1,6 +1,8 @@
 {
   "gpu": {
     "resource_active": true,
+    "activity_state": "ACTIVE",
+    "activity_basis": "dedicated_memory_and_power",
     "util_pct": 0,
     "util_pct_recent_max": 86,
     "util_pct_recent_avg": 48.4,

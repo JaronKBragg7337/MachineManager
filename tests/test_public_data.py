@@ -78,6 +78,19 @@ class PublicDataContractTests(unittest.TestCase):
                 self.assertLessEqual(gpu[key], 100, f"gpu.{key}")
         if "resource_active" in gpu:
             self.assertIsInstance(gpu["resource_active"], bool)
+        if "activity_state" in gpu:
+            self.assertIn(gpu["activity_state"], {"ACTIVE", "INACTIVE", "UNKNOWN"})
+        if "activity_basis" in gpu:
+            self.assertIn(
+                gpu["activity_basis"],
+                {
+                    "driver_utilization",
+                    "dedicated_memory_and_power",
+                    "resource_probe",
+                    "not_confirmed",
+                    "unknown",
+                },
+            )
 
         system = latest["system"]
         for key in (

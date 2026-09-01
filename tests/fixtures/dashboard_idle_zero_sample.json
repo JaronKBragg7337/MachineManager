@@ -1,6 +1,8 @@
 {
   "gpu": {
     "resource_active": false,
+    "activity_state": "INACTIVE",
+    "activity_basis": "not_confirmed",
     "util_pct": 0,
     "mem_used_mib": 0,
     "mem_total_mib": 8188,

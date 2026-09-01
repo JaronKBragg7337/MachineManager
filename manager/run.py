@@ -18,7 +18,13 @@ from .dispatcher import BackgroundWorkDispatcher, WorkDispatcher
 from .evidence import EvidenceCoordinator
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
-from .probes import CpuUsageProbe, NvidiaSmiProbe, gpu_resource_ok, keyhunt_progress_probe
+from .probes import (
+    CpuUsageProbe,
+    NvidiaSmiProbe,
+    gpu_activity_basis,
+    gpu_resource_ok,
+    keyhunt_progress_probe,
+)
 from .public_upload import GitHubPagesPublisher, PublicUploadError
 from .recurring import RecurringTaskSeeder
 from .research_worker import OllamaResearchHandler, PublicResearchHandler
@@ -840,7 +846,10 @@ def main() -> int:
                 if isinstance(metrics, Mapping) and metrics:
                     snapshot["gpu"] = dict(metrics)
                     if isinstance(health, Mapping) and isinstance(health.get("resource_active"), bool):
-                        snapshot["gpu"]["resource_active"] = health["resource_active"]
+                        resource_active = health["resource_active"]
+                        snapshot["gpu"]["resource_active"] = resource_active
+                        snapshot["gpu"]["activity_state"] = "ACTIVE" if resource_active else "INACTIVE"
+                        snapshot["gpu"]["activity_basis"] = gpu_activity_basis(metrics, resource_active)
                     break
             agents.tick(snapshot, events=store.recent_events(limit=20))
             if evidence is not None:

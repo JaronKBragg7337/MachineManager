@@ -9,7 +9,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 
 def nvidia_smi_probe() -> dict[str, Any]:
@@ -87,6 +87,29 @@ class NvidiaSmiProbe:
         result = dict(metrics)
         result.update(_history_metrics(self._util_history, prefix="util_pct"))
         return result
+
+
+def gpu_activity_basis(metrics: Mapping[str, Any], resource_active: bool) -> str:
+    """Explain which allowlisted signal established the GPU activity state.
+
+    A raw NVIDIA utilization sample can briefly be zero while a CUDA worker
+    still owns dedicated memory and draws active power.  Keeping the basis
+    beside ``resource_active`` lets downstream consumers display the manager's
+    observed evidence instead of independently recreating threshold logic.
+    """
+    if not resource_active:
+        return "not_confirmed"
+    try:
+        if float(metrics.get("util_pct", 0)) >= 15:
+            return "driver_utilization"
+        if (
+            float(metrics.get("mem_used_mib", 0)) >= 512
+            and float(metrics.get("power_w", 0)) >= 40
+        ):
+            return "dedicated_memory_and_power"
+    except (TypeError, ValueError):
+        return "resource_probe"
+    return "resource_probe"
 
 
 class CpuUsageProbe:
