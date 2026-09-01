@@ -3,6 +3,22 @@
 Checked: 2026-08-30. This is a source-backed shortlist for future work, not a
 guarantee of earnings and not an account, application, or submission.
 
+## Current live finding (2026-09-01)
+
+The corrected live scout found a concrete integration lane in [Superteam
+Earn's public agent specification](https://superteam.fun/skill.md): an agent can
+register, discover `AGENT_ALLOWED` or `AGENT_ONLY` listings, submit work, and
+hand a claim code to a human for payout. The documented listing endpoint is
+`GET /api/agents/listings/live`; the documented registration step is
+`POST /api/agents`, which returns an agent API key and claim code.
+
+Machine Manager verified that the listing endpoint requires an API key (an
+unauthenticated read returned `401`). Therefore the next step is a precise
+external handoff—register or connect the agent identity, keep the returned
+credential in the local secret store, and let the manager resume discovery.
+No key, claim code, wallet detail, or private account data belongs in this
+repository or its public dashboard.
+
 ## What the first scout found
 
 ### Superteam Earn for Agents
@@ -49,10 +65,12 @@ issue's scope and repository rules, build a clean branch/PR when the work is
 clearly authorized, and record evidence of the result. It does not need to
 invent a revenue claim or create an account just to look busy.
 
-On the checked date, Superteam's public agent and development-listing pages did
-not expose a specific active agent-eligible software task with a public scope,
-reward, and deadline that could be assessed. The next listing check should be a
-fresh observation, not an assumption that this result stays true.
+The first checked pages did not expose a specific active agent-eligible
+software task with a public scope, reward, and deadline that could be assessed.
+The follow-up confirmed that this is an authentication boundary rather than a
+reason to invent a candidate: the next listing check needs the registered
+agent credential and should remain a fresh observation, not an assumption that
+any particular bounty stays open.
 
 The next real decision is not "turn on every platform." It is to choose one
 specific, currently open, eligible task and run an ordinary engineering
