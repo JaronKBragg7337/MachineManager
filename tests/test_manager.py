@@ -1109,6 +1109,38 @@ class TelemetryTests(unittest.TestCase):
                 finally:
                     coordinator.close()
 
+    def test_agent_registry_restores_completed_count_from_durable_tasks(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                for index in range(3):
+                    task_id = f"completed-agent-review-{index}"
+                    scheduler.enqueue(
+                        kind="agent_review",
+                        objective_id="synthetic-objective",
+                        payload={"agent_id": "ledger-agent"},
+                        task_id=task_id,
+                    )
+                    self.assertTrue(scheduler.start(task_id))
+                    scheduler.complete(task_id)
+
+                coordinator = AgentCoordinator(
+                    [
+                        {
+                            "id": "ledger-agent",
+                            "role": "test",
+                            "provider": "test",
+                            "enabled": True,
+                            "interval_s": 60,
+                        }
+                    ],
+                    scheduler=scheduler,
+                )
+                try:
+                    self.assertEqual(coordinator.snapshot()[0]["tasks_completed"], 3)
+                finally:
+                    coordinator.close()
+
     def test_public_upload_rejects_pid_before_network_access(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             dashboard = Path(raw) / "dashboard"

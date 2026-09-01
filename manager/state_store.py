@@ -538,6 +538,32 @@ class StateStore:
                 return str(row["task_id"])
         return None
 
+    def count_tasks_for_owner(
+        self,
+        *,
+        kind: str,
+        payload_key: str,
+        payload_value: Any,
+        status: str = "COMPLETE",
+    ) -> int:
+        """Count local tasks for one owner without exposing their payloads."""
+        with self._lock:
+            rows = self._connection.execute(
+                """
+                SELECT payload
+                FROM tasks
+                WHERE kind = ? AND status = ?
+                """,
+                (str(kind), str(status)),
+            ).fetchall()
+        expected = str(payload_value)
+        count = 0
+        for row in rows:
+            payload = self._object(row["payload"])
+            if isinstance(payload, Mapping) and str(payload.get(payload_key, "")) == expected:
+                count += 1
+        return count
+
     def task_activity(self, *, limit: int = 20) -> list[dict[str, Any]]:
         """Return recent task metadata without loading private task payloads."""
         limit = max(1, min(int(limit), 100))

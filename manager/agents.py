@@ -191,6 +191,36 @@ class AgentCoordinator:
         self.specs = [AgentSpec.from_mapping(item) for item in raw_specs if isinstance(item, Mapping)]
         self.scheduler = scheduler
         self._last_run: dict[str, float] = {}
+        prior_agents: dict[str, Mapping[str, Any]] = {}
+        if scheduler is not None:
+            try:
+                prior_agents = {
+                    str(item.get("id")): item
+                    for item in scheduler.store.list_agents()
+                    if isinstance(item, Mapping) and item.get("id")
+                }
+            except Exception:
+                # Agent history is additive; a temporary read problem must not
+                # prevent the protected supervisor from starting.
+                prior_agents = {}
+
+        def prior_count(spec: AgentSpec, prior: Mapping[str, Any]) -> int:
+            try:
+                persisted = max(0, int(prior.get("tasks_completed", 0) or 0))
+            except (TypeError, ValueError):
+                persisted = 0
+            if scheduler is None:
+                return persisted
+            try:
+                durable = scheduler.completed_task_count(
+                    kind="agent_review",
+                    payload_key="agent_id",
+                    payload_value=spec.agent_id,
+                )
+            except Exception:
+                durable = 0
+            return max(persisted, durable)
+
         self._statuses: dict[str, dict[str, Any]] = {
             spec.agent_id: {
                 "id": spec.agent_id,
@@ -204,9 +234,9 @@ class AgentCoordinator:
                 "last_duration_s": None,
                 "started_at": None,
                 "elapsed_s": None,
-                "tasks_completed": 0,
-                "last_run": None,
-                "next_run": None,
+                "tasks_completed": prior_count(spec, prior_agents.get(spec.agent_id, {})),
+                "last_run": prior_agents.get(spec.agent_id, {}).get("last_run"),
+                "next_run": prior_agents.get(spec.agent_id, {}).get("next_run"),
             }
             for spec in self.specs
         }

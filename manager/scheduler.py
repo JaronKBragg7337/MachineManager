@@ -84,6 +84,20 @@ class WorkScheduler:
         """Return the local status for one task without loading its payload."""
         return self.store.task_status(task_id)
 
+    def completed_task_count(
+        self,
+        *,
+        kind: str,
+        payload_key: str,
+        payload_value: Any,
+    ) -> int:
+        """Count completed tasks owned by one local coordinator."""
+        return self.store.count_tasks_for_owner(
+            kind=kind,
+            payload_key=payload_key,
+            payload_value=payload_value,
+        )
+
     def start(self, task_id: str) -> bool:
         """Start one task that this runtime just enqueued."""
         return self.store.start_task(task_id)

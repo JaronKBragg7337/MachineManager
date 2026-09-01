@@ -117,6 +117,13 @@ latency); it does not publish private prompts or hidden reasoning. Agent output
 is advisory; the supervisor still owns process control, retry limits,
 escalation, and secrets.
 
+Agent review tasks are coordinator-owned. The generic queue dispatcher reserves
+that task kind so it cannot mistake an in-flight review for unhandled future
+work. If a manager restart leaves a review queued, the coordinator adopts that
+same task instead of creating a duplicate. Completed review counts are rebuilt
+from the durable task ledger on startup, so the public agent registry does not
+reset its history when the manager process restarts.
+
 The public snapshot also includes a bounded recent task ledger. It contains
 only task id, allowlisted kind, objective id, state, attempt count, and a
 sanitized timestamp; task payloads remain local in SQLite.
