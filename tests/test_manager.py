@@ -989,7 +989,7 @@ class TelemetryTests(unittest.TestCase):
                     "worker_profiles": [{"id": "profile-1", "provider": "test", "model": "safe", "model_version": "v1", "state": "READY", "retest_required": False, "private_path": "C:\\Users\\lilli\\private", "capabilities": [{"id": "safe-capability", "status": "TESTED_PASS", "summary": "token=not-for-publication", "private_note": "do not publish"}]}],
                     "constraint_audits": [{"id": "audit-1", "label": "Safe audit", "state": "NEEDS_EVIDENCE_REVIEW", "files_scanned": 10, "candidate_count": 2, "more_pending": True, "categories": {"approval_gate": 2, "unsafe": 99}, "path": "C:\\Users\\lilli\\private", "findings": [{"excerpt": "do not publish"}]}],
                     "autonomy": {"mode": "EXECUTE_AND_REPORT", "developer_tools": True, "private_note": "do not publish"},
-                    "gpu": {"util_pct": 80, "power_w": 70, "private_key": "do not publish"},
+                    "gpu": {"util_pct": 80, "power_w": 70, "resource_active": True, "private_key": "do not publish"},
                     "system": {"cpu_pct": 8.5, "private_key": "do not publish"},
                     "updated": "2026-08-28T20:00:00Z",
                 },
@@ -1017,6 +1017,7 @@ class TelemetryTests(unittest.TestCase):
             self.assertEqual(latest["autonomy"]["mode"], "EXECUTE_AND_REPORT")
             self.assertTrue(latest["autonomy"]["developer_tools"])
             self.assertEqual(latest["system"]["cpu_pct"], 8.5)
+            self.assertTrue(latest["gpu"]["resource_active"])
             self.assertNotIn("private_note", json.dumps(latest))
             self.assertNotIn("private_path", json.dumps(latest))
             self.assertNotIn("findings", json.dumps(latest))

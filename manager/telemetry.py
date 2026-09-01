@@ -487,7 +487,7 @@ class TelemetryPublisher:
         scenarios: Iterable[Mapping[str, Any]] = (),
     ) -> None:
         gpu_input = snapshot.get("gpu") if isinstance(snapshot.get("gpu"), Mapping) else {}
-        gpu: dict[str, int | float] = {}
+        gpu: dict[str, int | float | bool] = {}
         for source, target in (
             ("util_pct", "util_pct"),
             ("mem_used_mib", "mem_used_mib"),
@@ -498,6 +498,8 @@ class TelemetryPublisher:
             number = _number(gpu_input.get(source))
             if number is not None:
                 gpu[target] = number
+        if isinstance(gpu_input.get("resource_active"), bool):
+            gpu["resource_active"] = gpu_input["resource_active"]
 
         system_input = snapshot.get("system") if isinstance(snapshot.get("system"), Mapping) else {}
         system: dict[str, int | float] = {}

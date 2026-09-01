@@ -635,6 +635,8 @@ def main() -> int:
                 metrics = health.get("metrics", {}) if isinstance(health, Mapping) else {}
                 if isinstance(metrics, Mapping) and metrics:
                     snapshot["gpu"] = dict(metrics)
+                    if isinstance(health, Mapping) and isinstance(health.get("resource_active"), bool):
+                        snapshot["gpu"]["resource_active"] = health["resource_active"]
                     break
             agents.tick(snapshot, events=store.recent_events(limit=20))
             if evidence is not None:
