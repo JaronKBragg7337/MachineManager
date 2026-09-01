@@ -26,6 +26,7 @@ from .scheduler import WorkScheduler
 from .state_store import StateStore
 from .supervisor import WorkerSpec
 from .telemetry import TelemetryPublisher, atomic_json_write, utc_now
+from .verification_worker import RepositoryVerificationHandler
 from .workstreams import WorkstreamRegistry
 
 
@@ -594,6 +595,7 @@ def main() -> int:
         if raw_dispatch is None:
             raw_dispatch = {}
         research_handlers: dict[str, Any] = {}
+        verification_handlers: dict[str, Any] = {}
         try:
             if not isinstance(raw_dispatch, Mapping):
                 raise ValueError("config.queue_dispatch must be an object")
@@ -631,6 +633,27 @@ def main() -> int:
                     )
                 else:
                     raise ValueError("research_worker.mode must be ollama or evidence_only")
+            raw_verification = config.get("verification_worker", {})
+            if raw_verification is None:
+                raw_verification = {}
+            if not isinstance(raw_verification, Mapping):
+                raise ValueError("config.verification_worker must be an object")
+            if bool(raw_verification.get("enabled", False)):
+                raw_root = raw_verification.get("root")
+                if not isinstance(raw_root, str) or not raw_root.strip():
+                    raise ValueError("verification_worker.root is required")
+                verification_root = resolve_path(raw_root, base=base)
+                verification_artifact_dir = resolve_path(
+                    str(raw_verification.get("artifact_dir", "var/verification")),
+                    base=base,
+                )
+                if verification_root is None or verification_artifact_dir is None:
+                    raise ValueError("verification_worker paths are required")
+                verification_handlers["verification"] = RepositoryVerificationHandler(
+                    verification_root,
+                    artifact_dir=verification_artifact_dir,
+                    timeout_s=float(raw_verification.get("timeout_s", 120)),
+                )
             if dispatch_enabled:
                 recurring_seeder = RecurringTaskSeeder.from_config(
                     scheduler,
@@ -654,7 +677,7 @@ def main() -> int:
                     }
                 queue_dispatcher = dispatcher_type(
                     scheduler,
-                    research_handlers,
+                    {**research_handlers, **verification_handlers},
                     defer_delay_s=defer_delay_s,
                     max_attempts=max_attempts,
                     actor=str(config.get("actor", "local-manager")),

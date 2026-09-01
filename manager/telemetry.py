@@ -133,6 +133,9 @@ PUBLIC_METRIC_KEYS = {
     "sources_truncated",
     "word_count",
     "summary_available",
+    "checks_run",
+    "tests_run",
+    "passed",
 }
 PUBLIC_QUEUE_KEYS = {
     "QUEUED",

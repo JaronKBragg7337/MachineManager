@@ -144,6 +144,13 @@ queued task instead of creating a duplicate; missed intervals produce one
 bounded catch-up task rather than a burst. Recurring scheduling is active only
 when queue dispatch is enabled.
 
+The optional `verification_worker` connects the `verification` task kind to a
+fixed, shell-free `python -m unittest discover -s tests -q` run in a configured
+repository root. It writes a small local evidence artifact and publishes only
+the test count, pass state, and duration. A timed-out process or failed evidence
+write is retried by the normal bounded dispatcher; a real test failure remains
+visible as `FAILED` instead of being reported as success.
+
 ## Visible work lanes
 
 The optional `workstreams` array is a public-safe ledger for missions beyond

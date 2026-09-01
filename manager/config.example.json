@@ -28,6 +28,12 @@
     "max_source_bytes": 120000,
     "max_sources": 3
   },
+  "verification_worker": {
+    "enabled": false,
+    "root": "..",
+    "artifact_dir": "../var/verification",
+    "timeout_s": 120
+  },
   "recurring_tasks": [
     {
       "id": "machine-manager-capability-research",
@@ -76,6 +82,14 @@
           }
         ]
       }
+    },
+    {
+      "id": "machine-manager-verification",
+      "kind": "verification",
+      "objective_id": "machine-manager-verification",
+      "interval_s": 43200,
+      "enabled": false,
+      "payload": {}
     }
   ],
   "autonomy": {
