@@ -1,0 +1,32 @@
+{
+  "evaluation_id": "malformed-agent-response-manager-001",
+  "reference_id": "malformed-agent-response-001",
+  "version": "1.0",
+  "started_at": "2026-09-01T05:46:05.264Z",
+  "initial_state": {
+    "agent_state": "READY",
+    "supervisor_state": "HEALTHY"
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Supply malformed or unsupported local-agent responses",
+    "case_count": 5
+  },
+  "manager_observation": {
+    "fallback_count": 5,
+    "action": "continue",
+    "event_type": "agent_decision",
+    "event_outcome": "fallback",
+    "error": null
+  },
+  "recovery": {
+    "restart_count": 0,
+    "confirmed_state": "READY",
+    "manager_continued": true,
+    "outside_intervention_count": 0
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The manager contained malformed local-agent output, recorded the fallback, and continued supervision without outside intervention."
+}

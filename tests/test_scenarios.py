@@ -31,6 +31,33 @@ class ScenarioArtifactTests(unittest.TestCase):
         self.assertNotIn("pid", json.dumps(trace).lower())
         self.assertNotIn("pid", json.dumps(evaluation).lower())
 
+    def test_malformed_agent_response_artifacts_record_a_sanitized_pass(self) -> None:
+        trace = json.loads(
+            (
+                REPO_ROOT
+                / "scenarios"
+                / "malformed-agent-response"
+                / "trace-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        evaluation = json.loads(
+            (
+                REPO_ROOT
+                / "evaluations"
+                / "malformed-agent-response-manager-001.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(trace["result"], "PASS")
+        self.assertEqual(trace["observations"]["fallback_cases"], 5)
+        self.assertEqual(trace["observations"]["fallback_action"], "continue")
+        self.assertTrue(trace["observations"]["supervisor_continued"])
+        self.assertEqual(trace["recovery"]["confirmed_agent_state"], "READY")
+        self.assertEqual(evaluation["result"], "PASS")
+        self.assertEqual(evaluation["ceo_intervention_count"], 0)
+        self.assertEqual(evaluation["manager_observation"]["event_outcome"], "fallback")
+        self.assertNotIn("pid", json.dumps(trace).lower())
+        self.assertNotIn("pid", json.dumps(evaluation).lower())
+
 
 if __name__ == "__main__":
     unittest.main()

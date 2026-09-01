@@ -1,0 +1,36 @@
+{
+  "scenario_id": "malformed-agent-response-001",
+  "version": "1.0",
+  "description": "Local agent returns malformed or unsupported output",
+  "timestamp": "2026-09-01T05:46:05.264Z",
+  "result": "PASS",
+  "score": 1,
+  "action": "CONTINUE",
+  "initial_state": {
+    "agent_state": "READY",
+    "supervisor_state": "HEALTHY"
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Return empty, malformed, non-object, and unsupported local-agent payloads",
+    "malformed_or_unsupported_cases": 5,
+    "valid_fenced_cases": 1
+  },
+  "observations": {
+    "fallback_cases": 5,
+    "fallback_action": "continue",
+    "supervisor_continued": true,
+    "recorded_event_type": "agent_decision",
+    "recorded_outcome": "fallback",
+    "recorded_error": null,
+    "valid_fenced_json_accepted": true
+  },
+  "recovery": {
+    "manager_continued": true,
+    "confirmed_agent_state": "READY",
+    "outside_intervention_count": 0
+  },
+  "verification": "Malformed local-agent output is contained, logged, and converted to a manager-controlled continue decision",
+  "resulting_state": "READY",
+  "intervention_count": 0
+}
