@@ -322,6 +322,7 @@
     .event-main { min-width: 0; }
     .event-title { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; color: var(--text); font-size: 11px; font-weight: 800; }
     .event-title .actor { color: var(--cyan); }
+    .event-task { margin-top: 5px; color: var(--muted-2); font: 9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; }
     .event-message { margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
     .event-type { color: var(--muted-2); font: 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
     .event-metrics { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
@@ -1035,6 +1036,7 @@
     }
 
     function eventClass(event) {
+      if (String(event.type || "").toLowerCase() === "queue_task_retry") return "";
       if (event.error || ["FAILED", "FAIL", "ERROR"].includes(upper(event.state))) return "event-error";
       return "";
     }
@@ -1071,8 +1073,10 @@
     }
 
     function eventRow(event) {
-      const status = event.error ? "ERROR" : upper(event.state || "");
-      return '<div class="event-row ' + eventClass(event) + '"><time class="event-time">' + escapeHtml(formatDate(event.ts, true)) + '</time><div class="event-main"><div class="event-title"><span class="actor">' + escapeHtml(event.actor || "system") + '</span><span>·</span><span>' + escapeHtml(event.type || "event") + '</span></div><div class="event-message">' + escapeHtml(event.message || "No public message.") + '</div>' + eventMetricChips(event) + '</div><div class="event-type">' + escapeHtml(status || "EVENT") + '</div></div>';
+      const type = String(event.type || "").toLowerCase();
+      const status = type === "queue_task_retry" ? "RETRYING" : event.error ? "ERROR" : upper(event.state || "");
+      const task = event.task_id ? '<div class="event-task">Task ' + escapeHtml(event.task_id) + '</div>' : "";
+      return '<div class="event-row ' + eventClass(event) + '"><time class="event-time">' + escapeHtml(formatDate(event.ts, true)) + '</time><div class="event-main"><div class="event-title"><span class="actor">' + escapeHtml(event.actor || "system") + '</span><span>·</span><span>' + escapeHtml(event.type || "event") + '</span></div>' + task + '<div class="event-message">' + escapeHtml(event.message || "No public message.") + '</div>' + eventMetricChips(event) + '</div><div class="event-type">' + escapeHtml(status || "EVENT") + '</div></div>';
     }
 
     function recentEvents(limit, filter) {
@@ -1525,7 +1529,7 @@
         const kind = String(event.kind || "").toLowerCase();
         const objectiveId = String(event.objective_id || "").toLowerCase();
         const taskId = String(event.task_id || "").toLowerCase();
-        return type.indexOf("queue_task_") === 0 && (
+        return (type.indexOf("queue_task_") === 0 || type === "recurring_task_scheduled") && (
           kind === "research" ||
           objectiveId.indexOf("research") !== -1 ||
           taskId.indexOf("research") !== -1 ||
