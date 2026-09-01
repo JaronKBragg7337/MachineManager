@@ -36,7 +36,7 @@ class DashboardContractTests(unittest.TestCase):
             "const researchEvents = recentEvents(500).filter",
             "No separate lifecycle events are retained",
             "latest 32 public task records",
-            "kind-balanced window",
+            "kind-balanced window interleaves recent records",
         ):
             self.assertIn(marker, self.dashboard)
 

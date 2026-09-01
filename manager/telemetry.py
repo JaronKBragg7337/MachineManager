@@ -319,21 +319,32 @@ def _safe_queue_activity(activity: Iterable[Mapping[str, Any]] | None) -> list[d
     if len(safe) <= PUBLIC_QUEUE_ACTIVITY_LIMIT:
         return safe
 
-    # Preserve the first (normally newest) record for every visible kind, then
-    # fill the remaining slots in source order. This protects less frequent
-    # lanes even if a caller supplies an unbalanced activity list.
-    required_indices: set[int] = set()
-    seen_kinds: set[str] = set()
-    for index, item in enumerate(safe):
-        if item["kind"] not in seen_kinds:
-            seen_kinds.add(item["kind"])
-            required_indices.add(index)
-    selected_indices = set(required_indices)
-    for index in range(len(safe)):
-        if len(selected_indices) >= PUBLIC_QUEUE_ACTIVITY_LIMIT:
+    # Interleave recent records from each visible kind. This protects
+    # lower-volume lanes even if a caller supplies an unbalanced activity list.
+    buckets: dict[str, list[dict[str, Any]]] = {}
+    kind_order: list[str] = []
+    for item in safe:
+        kind = item["kind"]
+        if kind not in buckets:
+            buckets[kind] = []
+            kind_order.append(kind)
+        buckets[kind].append(item)
+    positions = {kind: 0 for kind in kind_order}
+    balanced: list[dict[str, Any]] = []
+    while len(balanced) < PUBLIC_QUEUE_ACTIVITY_LIMIT:
+        added = False
+        for kind in kind_order:
+            position = positions[kind]
+            if position >= len(buckets[kind]):
+                continue
+            balanced.append(buckets[kind][position])
+            positions[kind] = position + 1
+            added = True
+            if len(balanced) >= PUBLIC_QUEUE_ACTIVITY_LIMIT:
+                break
+        if not added:
             break
-        selected_indices.add(index)
-    return [safe[index] for index in range(len(safe)) if index in selected_indices]
+    return balanced
 
 
 def _safe_recurring(recurring: Iterable[Mapping[str, Any]] | None) -> list[dict[str, Any]]:
