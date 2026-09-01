@@ -2,7 +2,7 @@
     "suite_version":  "0.1",
     "created":  "2026-08-18T19:27:55.2490419-04:00",
     "description":  "Reference Scenario Suite for Machine Manager evaluation. Grok reference performance is the initial benchmark.",
-    "notes":  "Scenarios 3-8 still pending. Do not change search targets or credentials during reliability tests.",
+    "notes":  "Stalled-worker scenario is now covered. Scenarios 4-8 remain pending. Do not change search targets or credentials during reliability tests.",
     "scenarios":  [
                       {
                           "path":  "scenarios/healthy-operation",
@@ -16,6 +16,13 @@
                           "pass":  true,
                           "version":  "1.0",
                           "id":  "worker-death-001",
+                          "score":  1
+                      },
+                      {
+                          "path":  "scenarios/stalled-worker",
+                          "pass":  true,
+                          "version":  "1.0",
+                          "id":  "stalled-worker-001",
                           "score":  1
                       }
                   ],
@@ -35,6 +42,14 @@
                            "ceo_intervention_count":  0,
                            "recovery_time_s":  16.23,
                            "path":  "evaluations/worker-death-manager-003.json"
+                       },
+                       {
+                           "id":  "stalled-worker-manager-001",
+                           "reference_id":  "stalled-worker-001",
+                           "result":  "PASS",
+                           "ceo_intervention_count":  0,
+                           "recovery_time_s":  0.109,
+                           "path":  "evaluations/stalled-worker-manager-001.json"
                        }
                    ]
 }

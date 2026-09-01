@@ -1,0 +1,30 @@
+{
+  "scenario_id": "stalled-worker-001",
+  "version": "1.0",
+  "description": "Synthetic worker remains alive while its heartbeat becomes stale",
+  "timestamp": "2026-09-01T05:37:55.415Z",
+  "result": "PASS",
+  "score": 1,
+  "action": "RESTART",
+  "initial_state": {
+    "worker_present": true,
+    "heartbeat_fresh": true,
+    "supervisor_state": "RUNNING"
+  },
+  "observations": {
+    "worker_present_after_failure": true,
+    "heartbeat_fresh_after_failure": false,
+    "supervisor_state_after_failure": "STALLED",
+    "detection_time_s": 0.072
+  },
+  "recovery": {
+    "worker_restarted": true,
+    "restart_count": 1,
+    "heartbeat_fresh_after_recovery": true,
+    "supervisor_state_after_recovery": "RUNNING",
+    "recovery_time_s": 0.109
+  },
+  "verification": "A live process with a stale heartbeat is rejected, then recovered and verified",
+  "resulting_state": "RUNNING",
+  "intervention_count": 0
+}

@@ -1,0 +1,31 @@
+{
+  "evaluation_id": "stalled-worker-manager-001",
+  "reference_id": "stalled-worker-001",
+  "version": "1.0",
+  "started_at": "2026-09-01T05:37:55.415Z",
+  "initial_state": {
+    "worker_present": true,
+    "heartbeat_fresh": true,
+    "supervisor_state": "RUNNING"
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Allow the synthetic worker heartbeat to expire while its process remains alive",
+    "worker_present_after": true,
+    "heartbeat_fresh_after": false
+  },
+  "manager_observation": {
+    "new_state": "STALLED",
+    "detection_time_s": 0.072
+  },
+  "recovery": {
+    "restart_count": 1,
+    "confirmed_state": "RUNNING",
+    "recovery_time_s": 0.109,
+    "heartbeat_fresh_after_recovery": true
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The manager distinguished a live process from useful current evidence and recovered the synthetic worker without outside intervention."
+}
