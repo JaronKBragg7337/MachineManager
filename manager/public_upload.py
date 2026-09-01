@@ -70,7 +70,7 @@ class GitHubPagesPublisher:
         repository: str,
         branch: str = "main",
         token_env: str = "MACHINE_MANAGER_GITHUB_TOKEN",
-        interval_s: float = 300.0,
+        interval_s: float = 120.0,
         path_prefix: str = "dashboard/data",
         local_repo_dir: Path | None = None,
     ) -> None:
@@ -100,7 +100,7 @@ class GitHubPagesPublisher:
             repository=str(value.get("repository", "MachineManager")),
             branch=str(value.get("branch", "main")),
             token_env=str(value.get("token_env", "MACHINE_MANAGER_GITHUB_TOKEN")),
-            interval_s=float(value.get("interval_s", 300)),
+            interval_s=float(value.get("interval_s", 120)),
             path_prefix=str(value.get("path_prefix", "dashboard/data")),
             local_repo_dir=(
                 Path(str(value["local_repo_dir"]))

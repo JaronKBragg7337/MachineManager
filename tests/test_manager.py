@@ -1464,6 +1464,7 @@ class TelemetryTests(unittest.TestCase):
                 owner="owner",
                 repository="repo",
             )
+            self.assertEqual(publisher.interval_s, 120.0)
             publisher.last_publish_monotonic = 100.0
             with patch.dict(os.environ, {"MACHINE_MANAGER_GITHUB_TOKEN": "test-only"}):
                 with patch.object(publisher, "publish", return_value=True) as publish:

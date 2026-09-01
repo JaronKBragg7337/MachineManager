@@ -209,7 +209,7 @@ Local publication and public publication are separate steps:
 
 1. The local telemetry publisher writes sanitized JSON on every observation.
 2. The GitHub Pages publisher can batch those files into a normal GitHub
-   commit at a configured interval.
+   commit at a configured interval (two minutes by default).
 3. GitHub Pages serves the compact files to anyone without a login.
 4. The dashboard refreshes the public files and marks them stale after five
    minutes without a new snapshot.

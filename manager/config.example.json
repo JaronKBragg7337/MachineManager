@@ -161,7 +161,7 @@
     "branch": "main",
     "path_prefix": "dashboard/data",
     "token_env": "MACHINE_MANAGER_GITHUB_TOKEN",
-    "interval_s": 300
+    "interval_s": 120
   },
   "agents": [
     {
