@@ -24,6 +24,7 @@ from manager.run import (
 )
 from manager.agents import AgentCoordinator, AgentSpec, LocalOllamaAgent, parse_agent_response
 from manager.autonomy import FIRST_CONTACT_DISCLOSURE, OperatingCharter, OutreachBlockedError, OutreachRegistry
+from manager.capabilities import CapabilityRegistry
 from manager.evidence import AuditTarget, ConstraintAuditor, EvidenceCoordinator, WorkerProfile
 from manager.public_upload import GitHubPagesPublisher, PublicUploadError
 from manager.probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe
@@ -56,6 +57,21 @@ def synthetic_spec(directory: Path, mode: str, *, max_age: float = 0.12) -> Work
         heartbeat_max_age_s=max_age,
         startup_grace_s=0,
     )
+
+
+class CapabilityRegistryTests(unittest.TestCase):
+    def test_handler_capabilities_reflect_runtime_registration(self) -> None:
+        registry = CapabilityRegistry.default(
+            queue_dispatch_enabled=True,
+            research_enabled=True,
+            verification_enabled=True,
+            revenue_enabled=False,
+        )
+        capabilities = {item["id"]: item for item in registry.snapshot()}
+        self.assertTrue(capabilities["durable-queue-dispatch"]["enabled"])
+        self.assertTrue(capabilities["public-research-workers"]["enabled"])
+        self.assertTrue(capabilities["repository-verification"]["enabled"])
+        self.assertFalse(capabilities["revenue-discovery"]["enabled"])
 
 
 class SupervisorTests(unittest.TestCase):

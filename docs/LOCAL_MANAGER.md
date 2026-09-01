@@ -133,6 +133,12 @@ redacts and length-limits that note before it is written to the lifecycle event,
 so the public Research and Activity views can show a useful result summary while
 keeping prompts, credentials, local paths, and unrestricted model output local.
 
+The Operations capability list is built from the handlers loaded during startup.
+Research, repository verification, durable queue dispatch, and authenticated
+revenue discovery therefore appear as separate enabled or unavailable surfaces;
+the dashboard does not claim that a worker exists merely because a feature is
+documented for future use.
+
 ## Research worker
 
 The optional `research_worker` configuration connects the durable `research`

@@ -61,11 +61,19 @@ class CapabilityRegistry:
         evidence_ledger_enabled: bool = False,
         constraint_audit_enabled: bool = False,
         workstreams_enabled: bool = False,
+        queue_dispatch_enabled: bool = False,
+        research_enabled: bool = False,
+        verification_enabled: bool = False,
+        revenue_enabled: bool = False,
     ) -> "CapabilityRegistry":
         registry = cls()
         registry.register("process-supervision", "Start, observe, recover, and stop bounded worker processes.")
         registry.register("gpu-monitoring", "Read external GPU activity signals for GPU-bound workers.")
         registry.register("persistent-state", "Store local job state, event history, retry counts, and queued work.")
+        registry.register("durable-queue-dispatch", "Claim and record registered non-protected work items.", enabled=queue_dispatch_enabled)
+        registry.register("public-research-workers", "Fetch configured public sources and retain bounded evidence artifacts.", enabled=research_enabled)
+        registry.register("repository-verification", "Run configured repository checks as durable work.", enabled=verification_enabled)
+        registry.register("revenue-discovery", "Query configured agent-eligible opportunity listings without submitting or claiming work.", enabled=revenue_enabled)
         registry.register("synthetic-workers", "Run deterministic workers for safe reliability evaluation.")
         registry.register("local-ollama-agents", "Ask configured local models for bounded recommendations.", enabled=agents_enabled)
         registry.register("public-telemetry", "Publish an allowlisted, sanitized dashboard snapshot.")

@@ -812,6 +812,10 @@ def main() -> int:
             evidence_ledger_enabled=bool(evidence and evidence.enabled),
             constraint_audit_enabled=bool(evidence and evidence.targets),
             workstreams_enabled=bool(workstreams and workstreams.specs),
+            queue_dispatch_enabled=bool(queue_dispatcher),
+            research_enabled=bool(research_handlers),
+            verification_enabled=bool(verification_handlers),
+            revenue_enabled=bool(revenue_handlers),
         )
         interval = max(0.1, float(config.get("poll_interval_s", 15)))
         objective = str(config.get("objective", primary_objective_id))
