@@ -90,6 +90,13 @@ def _number(value: Any) -> int | float | None:
         return None
 
 
+def _counter(value: Any) -> int | None:
+    number = _number(value)
+    if number is None:
+        return None
+    return max(0, int(number))
+
+
 PUBLIC_METRIC_KEYS = {
     "attempt",
     "restart_count",
@@ -472,27 +479,37 @@ class TelemetryPublisher:
         )
 
     def _workers(self, workers: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
-        return [
-            {
+        result = []
+        for worker in workers:
+            public = {
                 "id": _text(worker.get("id", worker.get("worker_id"))),
                 "type": _text(worker.get("type", worker.get("worker_type"))),
                 "state": _text(worker.get("state"), default="UNKNOWN").upper(),
                 "owner": _text(worker.get("owner"), default="local-manager"),
                 "progress": _safe_progress(worker.get("progress")),
             }
-            for worker in workers
-        ]
+            for key in ("attempt", "restart_count", "max_restarts"):
+                count = _counter(worker.get(key))
+                if count is not None:
+                    public[key] = count
+            result.append(public)
+        return result
 
     def _jobs(self, jobs: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
-        return [
-            {
+        result = []
+        for job in jobs:
+            public = {
                 "id": _text(job.get("id", "")),
                 "objective_id": _text(job.get("objective_id", "")),
                 "state": _text(job.get("state"), default="UNKNOWN").upper(),
                 "progress": _safe_progress(job.get("progress")),
             }
-            for job in jobs
-        ]
+            for key in ("attempt", "restart_count", "max_restarts"):
+                count = _counter(job.get(key))
+                if count is not None:
+                    public[key] = count
+            result.append(public)
+        return result
 
     def _agents(self, agents: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
         return [

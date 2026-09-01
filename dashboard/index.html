@@ -1150,10 +1150,23 @@
       return '<div class="resource-card"><div class="resource-top"><span class="label">' + escapeHtml(label) + '</span>' + resourceMeterLabel(value, percent) + '</div><div class="resource-value">' + escapeHtml(value) + '<small>' + escapeHtml(unit) + '</small></div><div class="resource-hint">' + escapeHtml(hint) + '</div><div class="meter ' + (meterTone || "") + '"><span style="width:' + safePercent + '%"></span></div></div>';
     }
 
+    function runAttemptLabel(item) {
+      const attempt = numberValue(item && item.attempt);
+      return attempt === null ? "--" : String(Math.max(0, Math.round(attempt)));
+    }
+
+    function restartBudgetLabel(item) {
+      const restarts = numberValue(item && item.restart_count);
+      const budget = numberValue(item && item.max_restarts);
+      if (restarts === null && budget === null) return "--";
+      const count = restarts === null ? "--" : String(Math.max(0, Math.round(restarts)));
+      return count + (budget === null ? "" : " / " + String(Math.max(0, Math.round(budget))));
+    }
+
     function renderWorkersTable(workers) {
       if (!workers.length) return '<div class="empty-cell">No workers are included in this snapshot.</div>';
-      return '<div class="table-wrap"><table><thead><tr><th>Worker</th><th>Type</th><th>State</th><th>Owner</th></tr></thead><tbody>' + workers.map(function (worker) {
-        return '<tr><td class="mono">' + escapeHtml(worker.id || "--") + '</td><td>' + escapeHtml(worker.type || "--") + '</td><td>' + badge(worker.state) + '</td><td class="muted">' + escapeHtml(worker.owner || "--") + "</td></tr>";
+      return '<div class="table-wrap"><table><thead><tr><th>Worker</th><th>Type</th><th>State</th><th>Attempt</th><th>Restarts / max</th><th>Owner</th></tr></thead><tbody>' + workers.map(function (worker) {
+        return '<tr><td class="mono">' + escapeHtml(worker.id || "--") + '</td><td>' + escapeHtml(worker.type || "--") + '</td><td>' + badge(worker.state) + '</td><td class="mono">' + escapeHtml(runAttemptLabel(worker)) + '</td><td class="mono">' + escapeHtml(restartBudgetLabel(worker)) + '</td><td class="muted">' + escapeHtml(worker.owner || "--") + "</td></tr>";
       }).join("") + "</tbody></table></div>";
     }
 
@@ -1586,7 +1599,7 @@
       const cards = sets.jobs.length ? sets.jobs.map(function (job) {
         const stateValue = upper(job.state || "UNKNOWN");
         const objective = job.objective || (job.objective_id === (state.latest || {}).objective_id ? (state.latest || {}).objective : "Registered objective");
-        return '<article class="job-card"><div class="job-card-top"><div><p class="eyebrow">Managed job</p><h2>' + escapeHtml(objective || "Unnamed objective") + '</h2><p class="mono">' + escapeHtml(job.id || "--") + '</p></div>' + badge(stateValue) + '</div><div class="job-details"><div class="job-detail"><span>Objective ID</span><strong>' + escapeHtml(job.objective_id || "--") + '</strong></div><div class="job-detail"><span>Execution state</span><strong>' + escapeHtml(stateValue || "UNKNOWN") + '</strong></div><div class="job-detail"><span>Worker coverage</span><strong>' + escapeHtml(String(sets.workers.length)) + ' registered</strong></div></div>' + lifecycle(stateValue) + '<a class="panel-link" href="#/workers">Follow worker signals →</a></article>';
+        return '<article class="job-card"><div class="job-card-top"><div><p class="eyebrow">Managed job</p><h2>' + escapeHtml(objective || "Unnamed objective") + '</h2><p class="mono">' + escapeHtml(job.id || "--") + '</p></div>' + badge(stateValue) + '</div><div class="job-details"><div class="job-detail"><span>Objective ID</span><strong>' + escapeHtml(job.objective_id || "--") + '</strong></div><div class="job-detail"><span>Execution state</span><strong>' + escapeHtml(stateValue || "UNKNOWN") + '</strong></div><div class="job-detail"><span>Worker coverage</span><strong>' + escapeHtml(String(sets.workers.length)) + ' registered</strong></div><div class="job-detail"><span>Worker attempt</span><strong>' + escapeHtml(runAttemptLabel(job)) + '</strong></div><div class="job-detail"><span>Restarts / max</span><strong>' + escapeHtml(restartBudgetLabel(job)) + '</strong></div></div>' + lifecycle(stateValue) + '<a class="panel-link" href="#/workers">Follow worker signals →</a></article>';
       }).join("") : '<div class="error-state"><h2>No active jobs in the public snapshot</h2><p>The registry is ready for multiple objectives, but this published snapshot does not contain a job record.</p></div>';
       return pageHeading("Work registry", "Every objective gets a job", "Jobs are durable records with explicit lifecycle states, bounded recovery paths, and their own evidence trail.", '<a class="btn" href="#/research">Plan a research job <span>→</span></a>') + snapshotStrip() + '<div class="jobs-summary"><div class="state-summary"><strong>' + counts.RUNNING + '</strong><span>Running</span></div><div class="state-summary"><strong>' + counts.QUEUED + '</strong><span>Queued</span></div><div class="state-summary"><strong>' + counts.COMPLETE + '</strong><span>Complete</span></div><div class="state-summary"><strong>' + (counts.STALLED + counts.FAILED) + '</strong><span>Needs attention</span></div><div class="state-summary"><strong>' + sets.jobs.length + '</strong><span>Total jobs</span></div></div><div class="job-stack">' + cards + "</div>";
     }

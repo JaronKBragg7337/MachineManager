@@ -1685,8 +1685,8 @@ class TelemetryTests(unittest.TestCase):
                     "manager_version": "0.2",
                     "status": "HEALTHY",
                     "objective": "synthetic reliability test",
-                    "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234, "progress": {"kind": "reported_progress", "sample_count": 4, "keys_tested": 99, "private_key": "do not publish"}}],
-                    "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "command": "do not publish"}],
+                    "workers": [{"id": "w-1", "type": "SyntheticWorker", "state": "RUNNING", "pid": 1234, "attempt": 4, "restart_count": 1, "max_restarts": 3, "progress": {"kind": "reported_progress", "sample_count": 4, "keys_tested": 99, "private_key": "do not publish"}}],
+                    "jobs": [{"id": "job-1", "objective_id": "obj-1", "state": "RUNNING", "attempt": 4, "restart_count": 1, "max_restarts": 3, "command": "do not publish"}],
                     "agents": [{"id": "agent-1", "role": "evidence-review-specialist", "focus": "Review evidence only.", "provider": "test", "model": "safe", "state": "READY", "last_reason": "healthy", "last_outcome": "fallback", "last_duration_s": 0.4, "last_task_id": "agent-task-agent-1-demo"}],
                     "workstreams": [{"id": "agent-lane", "objective_id": "obj-1", "title": "Agent lane", "lane": "Runtime", "owner": "agent-1", "state": "WAITING", "summary": "Review current evidence.", "next_action": "Record the next bounded result.", "source_kind": "agent", "source_id": "agent-1", "metrics": {"tasks_completed": 3}, "updated": "2026-08-28T20:00:00Z", "private_path": "C:\\Users\\lilli\\private"}],
                     "worker_profiles": [{"id": "profile-1", "provider": "test", "model": "safe", "model_version": "v1", "state": "READY", "retest_required": False, "private_path": "C:\\Users\\lilli\\private", "capabilities": [{"id": "safe-capability", "status": "TESTED_PASS", "summary": "token=not-for-publication", "private_note": "do not publish"}]}],
@@ -1775,6 +1775,12 @@ class TelemetryTests(unittest.TestCase):
             self.assertNotIn("command", encoded)
             self.assertNotIn("pid", encoded)
             self.assertEqual(latest["workers"][0]["progress"]["keys_tested"], 99)
+            self.assertEqual(latest["workers"][0]["attempt"], 4)
+            self.assertEqual(latest["workers"][0]["restart_count"], 1)
+            self.assertEqual(latest["workers"][0]["max_restarts"], 3)
+            self.assertEqual(latest["jobs"][0]["attempt"], 4)
+            self.assertEqual(latest["jobs"][0]["restart_count"], 1)
+            self.assertEqual(latest["jobs"][0]["max_restarts"], 3)
             self.assertNotIn("private_key", json.dumps(latest))
             self.assertEqual(latest["agents"][0]["last_reason"], "healthy")
             self.assertEqual(latest["agents"][0]["last_outcome"], "fallback")

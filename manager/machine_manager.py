@@ -167,6 +167,9 @@ class MachineManager:
                     "state": worker["state"],
                     "owner": self.actor,
                     "pid": worker["pid"],
+                    "attempt": worker.get("attempt", 0),
+                    "restart_count": worker.get("restart_count", 0),
+                    "max_restarts": job.supervisor.max_restarts,
                     "progress": worker.get("progress", {}),
                 }
             )
@@ -175,6 +178,9 @@ class MachineManager:
                     "id": job.job_id,
                     "objective_id": job.objective_id,
                     "state": job.supervisor.state.value,
+                    "attempt": worker.get("attempt", 0),
+                    "restart_count": worker.get("restart_count", 0),
+                    "max_restarts": job.supervisor.max_restarts,
                     "progress": worker.get("progress", {}),
                 }
             )

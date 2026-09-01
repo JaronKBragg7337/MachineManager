@@ -126,6 +126,10 @@ The runner stores local operational state in SQLite:
 - a local manager log records unexpected runtime exceptions for diagnosis;
   it is separate from the sanitized public telemetry files.
 
+The public worker and job projections include the current attempt, restart count,
+and configured restart budget. This makes each bounded recovery try visible on
+the Workers and Work views without exposing a PID or worker command line.
+
 The agents array provides bounded specialist slots. The Ollama adapter sends
 only a sanitized status context, requests bounded non-thinking JSON, disables
 GPU layers by default, and falls back to continue for empty, malformed,
