@@ -22,6 +22,7 @@ from .probes import CpuUsageProbe, gpu_resource_ok, keyhunt_progress_probe, nvid
 from .public_upload import GitHubPagesPublisher, PublicUploadError
 from .recurring import RecurringTaskSeeder
 from .research_worker import OllamaResearchHandler, PublicResearchHandler
+from .revenue_worker import SuperteamOpportunityHandler
 from .scheduler import WorkScheduler
 from .state_store import StateStore
 from .supervisor import WorkerSpec
@@ -596,6 +597,7 @@ def main() -> int:
             raw_dispatch = {}
         research_handlers: dict[str, Any] = {}
         verification_handlers: dict[str, Any] = {}
+        revenue_handlers: dict[str, Any] = {}
         try:
             if not isinstance(raw_dispatch, Mapping):
                 raise ValueError("config.queue_dispatch must be an object")
@@ -654,6 +656,28 @@ def main() -> int:
                     artifact_dir=verification_artifact_dir,
                     timeout_s=float(raw_verification.get("timeout_s", 120)),
                 )
+            raw_superteam = config.get("superteam_worker", {})
+            if raw_superteam is None:
+                raw_superteam = {}
+            if not isinstance(raw_superteam, Mapping):
+                raise ValueError("config.superteam_worker must be an object")
+            if bool(raw_superteam.get("enabled", False)):
+                revenue_artifact_dir = resolve_path(
+                    str(raw_superteam.get("artifact_dir", "var/revenue")),
+                    base=base,
+                )
+                if revenue_artifact_dir is None:
+                    raise ValueError("superteam_worker.artifact_dir is required")
+                revenue_handlers["revenue"] = SuperteamOpportunityHandler(
+                    revenue_artifact_dir,
+                    api_key_env=str(
+                        raw_superteam.get("api_key_env", "SUPERTEAM_AGENT_API_KEY")
+                    ),
+                    base_url=str(raw_superteam.get("base_url", "https://superteam.fun")),
+                    timeout_s=float(raw_superteam.get("timeout_s", 20)),
+                    max_bytes=int(raw_superteam.get("max_bytes", 512000)),
+                    max_listings=int(raw_superteam.get("max_listings", 50)),
+                )
             if dispatch_enabled:
                 recurring_seeder = RecurringTaskSeeder.from_config(
                     scheduler,
@@ -677,7 +701,7 @@ def main() -> int:
                     }
                 queue_dispatcher = dispatcher_type(
                     scheduler,
-                    {**research_handlers, **verification_handlers},
+                    {**research_handlers, **verification_handlers, **revenue_handlers},
                     defer_delay_s=defer_delay_s,
                     max_attempts=max_attempts,
                     actor=str(config.get("actor", "local-manager")),

@@ -136,6 +136,11 @@ PUBLIC_METRIC_KEYS = {
     "checks_run",
     "tests_run",
     "passed",
+    "listings_found",
+    "eligible_listings",
+    "agent_only_listings",
+    "agent_allowed_listings",
+    "authority_required",
 }
 PUBLIC_QUEUE_KEYS = {
     "QUEUED",
@@ -153,6 +158,7 @@ PUBLIC_QUEUE_KIND_KEYS = {
     "verification",
     "outreach",
     "procurement",
+    "revenue",
 }
 PUBLIC_RECURRING_STATES = {
     "DISABLED",

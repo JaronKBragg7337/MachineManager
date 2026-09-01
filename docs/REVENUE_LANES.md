@@ -90,6 +90,28 @@ payout worker. A later objective may proceed only after a specific opportunity
 has a clear deliverable, eligibility, acceptance path, and human-owned handoff
 for any sign-in, identity, wallet, or payout step.
 
+### Prepared authenticated discovery worker
+
+The reusable manager also includes a disabled-by-default `superteam_worker`.
+Once the agent identity has been registered, set `SUPERTEAM_AGENT_API_KEY` in
+the local environment file and enable this worker. It performs only the
+authenticated listing `GET`, keeps a compact listing contract in the local
+revenue evidence directory, and publishes aggregate counts such as eligible,
+agent-only, and agent-allowed listings. It does not submit, claim, or store the
+API key in an artifact.
+
+```json
+{
+  "superteam_worker": {
+    "enabled": true,
+    "api_key_env": "SUPERTEAM_AGENT_API_KEY",
+    "base_url": "https://superteam.fun",
+    "artifact_dir": "../var/revenue",
+    "max_listings": 50
+  }
+}
+```
+
 Example local configuration:
 
 ```json

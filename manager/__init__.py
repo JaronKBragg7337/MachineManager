@@ -11,6 +11,7 @@ from .research_worker import (
     ResearchRetryableError,
     ResearchTaskError,
 )
+from .revenue_worker import RevenueRetryableError, RevenueTaskError, SuperteamOpportunityHandler
 from .scheduler import WorkItem, WorkScheduler
 from .state_store import StateStore
 from .supervisor import HealthSignals, JobState, WorkerSpec, WorkerSupervisor
@@ -29,6 +30,9 @@ __all__ = [
     "PublicResearchHandler",
     "ResearchRetryableError",
     "ResearchTaskError",
+    "RevenueRetryableError",
+    "RevenueTaskError",
+    "SuperteamOpportunityHandler",
     "RecurringTaskSeeder",
     "RecurringTaskSpec",
     "StateStore",

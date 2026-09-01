@@ -34,6 +34,15 @@
     "artifact_dir": "../var/verification",
     "timeout_s": 120
   },
+  "superteam_worker": {
+    "enabled": false,
+    "api_key_env": "SUPERTEAM_AGENT_API_KEY",
+    "base_url": "https://superteam.fun",
+    "artifact_dir": "../var/revenue",
+    "timeout_s": 20,
+    "max_bytes": 512000,
+    "max_listings": 50
+  },
   "recurring_tasks": [
     {
       "id": "machine-manager-capability-research",
