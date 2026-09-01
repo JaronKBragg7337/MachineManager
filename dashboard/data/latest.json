@@ -12,7 +12,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T14:05:54.807Z",
+        "observed_at": "2026-09-01T14:06:15.324Z",
         "reported": true,
         "active": true,
         "healthy": true,
@@ -20,8 +20,8 @@
         "coverage_pct": 0,
         "matches_found": 0,
         "batch_number": 8619,
-        "sample_count": 55,
-        "uptime_s": 918.0,
+        "sample_count": 56,
+        "uptime_s": 938.5,
         "keys_tested": 26439869005824,
         "keys_per_second": 743830000
       }
@@ -35,7 +35,7 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T14:05:54.807Z",
+        "observed_at": "2026-09-01T14:06:15.324Z",
         "reported": true,
         "active": true,
         "healthy": true,
@@ -43,8 +43,8 @@
         "coverage_pct": 0,
         "matches_found": 0,
         "batch_number": 8619,
-        "sample_count": 55,
-        "uptime_s": 918.0,
+        "sample_count": 56,
+        "uptime_s": 938.5,
         "keys_tested": 26439869005824,
         "keys_per_second": 743830000
       }
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
       "last_action": "continue",
-      "last_reason": "System is healthy with no errors or resource constraints detected.",
-      "last_duration_s": 4.781,
-      "started_at": "2026-09-01T14:05:55.705Z",
-      "elapsed_s": 0.0,
-      "tasks_completed": 109,
-      "last_run": "2026-09-01T14:01:09.155Z",
-      "next_run": "2026-09-01T14:06:09.155Z"
+      "last_reason": "System is healthy with no errors or resource constraints requiring intervention.",
+      "last_duration_s": 6.547,
+      "started_at": "",
+      "elapsed_s": null,
+      "tasks_completed": 110,
+      "last_run": "2026-09-01T14:06:16.197Z",
+      "next_run": "2026-09-01T14:11:16.197Z"
     }
   ],
   "capabilities": [
@@ -385,8 +385,7 @@
     "handoff_style": "service-required"
   },
   "queue": {
-    "COMPLETE": 116,
-    "RUNNING": 1
+    "COMPLETE": 117
   },
   "queue_kinds": {
     "agent_review": 110,
@@ -398,9 +397,10 @@
       "task_id": "agent-task-local-manager-brain-2c0b1648ffd4",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "RUNNING",
+      "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T14:05:55.707Z"
+      "updated": "2026-09-01T14:06:16.197Z",
+      "outcome": "task_running"
     },
     {
       "task_id": "recurring-machine-manager-capability-research-000002",
@@ -716,7 +716,7 @@
       "interval_s": 21600.0,
       "sequence": 2,
       "next_run_at": "2026-09-01T19:48:51.437Z",
-      "next_in_s": 20575.72075819969,
+      "next_in_s": 20555.230815410614,
       "last_task_id": "recurring-machine-manager-capability-research-000002",
       "last_status": "COMPLETE"
     },
@@ -728,7 +728,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 65942.22507882118,
+      "next_in_s": 65921.7351360321,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -740,34 +740,34 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 23112.686594963074,
+      "next_in_s": 23092.196652173996,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
-    "util_pct": 78.0,
+    "util_pct": 50.0,
     "util_pct_recent_max": 85.0,
     "util_pct_recent_avg": 73.4,
     "util_pct_sample_count": 5,
     "util_pct_zero_samples": 0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 58.0,
-    "power_w": 78.76,
+    "temp_c": 59.0,
+    "power_w": 78.04,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 7.0,
-    "cpu_pct_recent_max": 7.0,
-    "cpu_pct_recent_avg": 6.2,
+    "cpu_pct": 17.9,
+    "cpu_pct_recent_max": 17.9,
+    "cpu_pct_recent_avg": 8.6,
     "cpu_pct_sample_count": 5,
     "cpu_pct_zero_samples": 0.0
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T14:05:54.807Z",
+    "observed_at": "2026-09-01T14:06:15.324Z",
     "reported": true,
     "active": true,
     "healthy": true,
@@ -775,11 +775,11 @@
     "coverage_pct": 0,
     "matches_found": 0,
     "batch_number": 8619,
-    "sample_count": 55,
-    "uptime_s": 918.0,
+    "sample_count": 56,
+    "uptime_s": 938.5,
     "keys_tested": 26439869005824,
     "keys_per_second": 743830000
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T14:05:55.704Z"
+  "updated": "2026-09-01T14:06:16.196Z"
 }
