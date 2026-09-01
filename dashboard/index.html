@@ -1034,9 +1034,15 @@
       return '<section class="snapshot-strip ' + current.key + '" id="snapshotStrip"><div class="snapshot-copy"><span class="snapshot-icon" data-icon="' + iconName + '"></span><div><strong id="snapshotHeadline">Public snapshot: ' + escapeHtml(current.label) + '</strong><p id="snapshotCopy">' + escapeHtml(current.copy) + ' Captured ' + escapeHtml(formatDate(latest.updated, true)) + '.</p></div></div><div class="snapshot-facts"><div class="snapshot-fact">Telemetry age<strong id="snapshotAge">' + escapeHtml(age === null ? "--" : duration(age)) + '</strong></div><div class="snapshot-fact">Page fetched<strong>' + escapeHtml(loadedText) + '</strong></div><div class="snapshot-fact">Visibility<strong>Read-only</strong></div></div></section>';
     }
 
+    function resourceMeterLabel(value, percent) {
+      const semantic = upper(value);
+      if (percent === null || ["ACTIVE", "LOW", "--"].includes(semantic)) return "";
+      return '<span class="muted">' + escapeHtml(String(Math.round(percent))) + '%</span>';
+    }
+
     function resourceCard(label, value, unit, hint, percent, meterTone) {
       const safePercent = percent === null ? 0 : Math.max(2, Math.min(100, percent));
-      return '<div class="resource-card"><div class="resource-top"><span class="label">' + escapeHtml(label) + '</span>' + (percent === null ? "" : '<span class="muted">' + escapeHtml(String(Math.round(percent))) + '%</span>') + '</div><div class="resource-value">' + escapeHtml(value) + '<small>' + escapeHtml(unit) + '</small></div><div class="resource-hint">' + escapeHtml(hint) + '</div><div class="meter ' + (meterTone || "") + '"><span style="width:' + safePercent + '%"></span></div></div>';
+      return '<div class="resource-card"><div class="resource-top"><span class="label">' + escapeHtml(label) + '</span>' + resourceMeterLabel(value, percent) + '</div><div class="resource-value">' + escapeHtml(value) + '<small>' + escapeHtml(unit) + '</small></div><div class="resource-hint">' + escapeHtml(hint) + '</div><div class="meter ' + (meterTone || "") + '"><span style="width:' + safePercent + '%"></span></div></div>';
     }
 
     function renderWorkersTable(workers) {

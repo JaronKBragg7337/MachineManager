@@ -49,6 +49,11 @@ class DashboardContractTests(unittest.TestCase):
         self.assertIn('+ cpuActivityCard(system, gpu) +', self.dashboard)
         self.assertNotIn('resourceCard("CPU utilization", numberValue(system.cpu_pct) === null ? "--" : String(Math.round(system.cpu_pct))', self.dashboard)
 
+    def test_semantic_resource_states_do_not_render_false_numeric_badges(self) -> None:
+        self.assertIn("function resourceMeterLabel(value, percent)", self.dashboard)
+        self.assertIn('["ACTIVE", "LOW", "--"].includes(semantic)', self.dashboard)
+        self.assertIn("resourceMeterLabel(value, percent)", self.dashboard)
+
 
 if __name__ == "__main__":
     unittest.main()
