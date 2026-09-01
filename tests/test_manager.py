@@ -825,6 +825,34 @@ class TelemetryTests(unittest.TestCase):
                 self.assertNotIn("payload", activity[0])
                 self.assertIsInstance(activity[0]["updated_at"], float)
 
+    def test_dispatcher_leaves_coordinator_owned_agent_reviews_untouched(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                scheduler.enqueue(
+                    kind="agent_review",
+                    objective_id="objective-1",
+                    payload={"agent_id": "agent-1"},
+                    task_id="task-agent-1",
+                    scheduled_at=100,
+                )
+                dispatcher = WorkDispatcher(
+                    scheduler,
+                    {},
+                    reserved_kinds={"agent_review"},
+                )
+
+                self.assertEqual(dispatcher.dispatch(now=100), [])
+                self.assertEqual(scheduler.snapshot(), {"QUEUED": 1})
+                self.assertEqual(
+                    scheduler.find_queued_task(
+                        kind="agent_review",
+                        payload_key="agent_id",
+                        payload_value="agent-1",
+                    ),
+                    "task-agent-1",
+                )
+
     def test_work_dispatcher_completes_defers_and_escalates(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             with StateStore(Path(raw) / "state.sqlite3") as store:
@@ -1030,6 +1058,54 @@ class TelemetryTests(unittest.TestCase):
                         ["agent_task_started", "agent_decision"],
                     )
                     self.assertTrue(coordinator.events[1]["artifact_refs"][0].startswith("task:"))
+                finally:
+                    coordinator.close()
+
+    def test_agent_coordinator_resumes_its_queued_review(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                scheduler.enqueue(
+                    kind="agent_review",
+                    objective_id="synthetic-objective",
+                    payload={"agent_id": "ledger-agent"},
+                    task_id="interrupted-agent-review",
+                )
+                self.assertTrue(scheduler.start("interrupted-agent-review"))
+                self.assertEqual(scheduler.recover_interrupted(), 1)
+                coordinator = AgentCoordinator(
+                    [
+                        {
+                            "id": "ledger-agent",
+                            "role": "test",
+                            "provider": "test",
+                            "enabled": True,
+                            "interval_s": 60,
+                        }
+                    ],
+                    scheduler=scheduler,
+                )
+                try:
+                    with patch("manager.agents.time.monotonic", return_value=1.0):
+                        decisions = coordinator.tick(
+                            {
+                                "status": "HEALTHY",
+                                "objective": "synthetic",
+                                "objective_id": "synthetic-objective",
+                                "workers": [],
+                                "jobs": [],
+                            }
+                        )
+                    self.assertEqual(decisions[0].action, "continue")
+                    self.assertEqual(scheduler.snapshot(), {"COMPLETE": 1})
+                    self.assertEqual(
+                        scheduler.activity_snapshot(limit=1)[0]["task_id"],
+                        "interrupted-agent-review",
+                    )
+                    self.assertEqual(
+                        scheduler.activity_snapshot(limit=1)[0]["attempts"],
+                        2,
+                    )
                 finally:
                     coordinator.close()
 

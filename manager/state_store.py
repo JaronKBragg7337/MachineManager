@@ -458,20 +458,36 @@ class StateStore:
                 ),
             )
 
-    def claim_due_tasks(self, *, limit: int = 10, now: float | None = None) -> list[dict[str, Any]]:
+    def claim_due_tasks(
+        self,
+        *,
+        limit: int = 10,
+        now: float | None = None,
+        exclude_kinds: Iterable[str] = (),
+    ) -> list[dict[str, Any]]:
         limit = max(1, min(int(limit), 100))
         now = time.time() if now is None else float(now)
+        exclude_kinds = tuple(
+            dict.fromkeys(str(kind).strip() for kind in exclude_kinds if str(kind).strip())
+        )
         claimed: list[dict[str, Any]] = []
         with self._lock, self._connection:
+            conditions = ["status = 'QUEUED'", "scheduled_at <= ?"]
+            parameters: list[Any] = [now]
+            if exclude_kinds:
+                placeholders = ",".join("?" for _ in exclude_kinds)
+                conditions.append(f"kind NOT IN ({placeholders})")
+                parameters.extend(exclude_kinds)
+            parameters.append(limit)
             rows = self._connection.execute(
-                """
+                f"""
                 SELECT task_id, kind, objective_id, attempts, payload
                 FROM tasks
-                WHERE status = 'QUEUED' AND scheduled_at <= ?
+                WHERE {' AND '.join(conditions)}
                 ORDER BY scheduled_at, task_id
                 LIMIT ?
                 """,
-                (now, limit),
+                parameters,
             ).fetchall()
             for row in rows:
                 self._connection.execute(
@@ -491,6 +507,36 @@ class StateStore:
                 }
                 claimed.append(item)
         return claimed
+
+    def find_queued_task(
+        self,
+        *,
+        kind: str,
+        payload_key: str,
+        payload_value: Any,
+    ) -> str | None:
+        """Find the oldest queued task owned by one coordinator.
+
+        This is intentionally a local coordination helper. It reads the task
+        payload only to match its owner and never exposes that payload through
+        the public activity projection.
+        """
+        with self._lock:
+            rows = self._connection.execute(
+                """
+                SELECT task_id, payload
+                FROM tasks
+                WHERE kind = ? AND status = 'QUEUED'
+                ORDER BY scheduled_at, task_id
+                """,
+                (str(kind),),
+            ).fetchall()
+        expected = str(payload_value)
+        for row in rows:
+            payload = self._object(row["payload"])
+            if isinstance(payload, Mapping) and str(payload.get(payload_key, "")) == expected:
+                return str(row["task_id"])
+        return None
 
     def task_activity(self, *, limit: int = 20) -> list[dict[str, Any]]:
         """Return recent task metadata without loading private task payloads."""

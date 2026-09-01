@@ -10,7 +10,7 @@ from __future__ import annotations
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 import time
-from typing import Callable, Mapping
+from typing import Callable, Iterable, Mapping
 import uuid
 
 from .scheduler import WorkItem, WorkScheduler
@@ -51,6 +51,7 @@ class WorkDispatcher:
         defer_delay_s: float = 300.0,
         max_attempts: int = 3,
         actor: str = "queue-dispatcher",
+        reserved_kinds: Iterable[str] = (),
     ) -> None:
         if defer_delay_s <= 0:
             raise ValueError("defer_delay_s must be positive")
@@ -61,6 +62,9 @@ class WorkDispatcher:
         self.defer_delay_s = float(defer_delay_s)
         self.max_attempts = int(max_attempts)
         self.actor = str(actor or "queue-dispatcher")[:80]
+        self.reserved_kinds = {
+            str(kind).strip() for kind in reserved_kinds if str(kind).strip()
+        }
 
     def _record(
         self,
@@ -201,7 +205,11 @@ class WorkDispatcher:
         """Dispatch due work and return a compact result for each claimed item."""
         current = time.time() if now is None else float(now)
         results: list[DispatchResult] = []
-        for item in self.scheduler.claim(limit=limit, now=current):
+        for item in self.scheduler.claim(
+            limit=limit,
+            now=current,
+            exclude_kinds=tuple(self.reserved_kinds),
+        ):
             self._record(
                 item,
                 event_type="queue_task_claimed",
@@ -264,6 +272,7 @@ class BackgroundWorkDispatcher(WorkDispatcher):
         actor: str = "queue-dispatcher",
         max_workers: int = 1,
         max_in_flight: int | None = None,
+        reserved_kinds: Iterable[str] = (),
     ) -> None:
         super().__init__(
             scheduler,
@@ -271,6 +280,7 @@ class BackgroundWorkDispatcher(WorkDispatcher):
             defer_delay_s=defer_delay_s,
             max_attempts=max_attempts,
             actor=actor,
+            reserved_kinds=reserved_kinds,
         )
         self.max_workers = int(max_workers)
         if self.max_workers < 1:
@@ -315,7 +325,11 @@ class BackgroundWorkDispatcher(WorkDispatcher):
         available = self.max_in_flight - len(self._pending)
         if available <= 0:
             return results
-        for item in self.scheduler.claim(limit=min(int(limit), available), now=current):
+        for item in self.scheduler.claim(
+            limit=min(int(limit), available),
+            now=current,
+            exclude_kinds=tuple(self.reserved_kinds),
+        ):
             self._record(
                 item,
                 event_type="queue_task_claimed",

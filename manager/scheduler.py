@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 import uuid
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 from .state_store import StateStore
 
@@ -44,7 +44,13 @@ class WorkScheduler:
         )
         return task_id
 
-    def claim(self, *, limit: int = 10, now: float | None = None) -> list[WorkItem]:
+    def claim(
+        self,
+        *,
+        limit: int = 10,
+        now: float | None = None,
+        exclude_kinds: Iterable[str] = (),
+    ) -> list[WorkItem]:
         return [
             WorkItem(
                 task_id=item["task_id"],
@@ -53,8 +59,30 @@ class WorkScheduler:
                 attempts=item["attempts"],
                 payload=item["payload"],
             )
-            for item in self.store.claim_due_tasks(limit=limit, now=now)
+            for item in self.store.claim_due_tasks(
+                limit=limit,
+                now=now,
+                exclude_kinds=exclude_kinds,
+            )
         ]
+
+    def find_queued_task(
+        self,
+        *,
+        kind: str,
+        payload_key: str,
+        payload_value: Any,
+    ) -> str | None:
+        """Find a queued task for a coordinator-owned payload owner."""
+        return self.store.find_queued_task(
+            kind=kind,
+            payload_key=payload_key,
+            payload_value=payload_value,
+        )
+
+    def task_status(self, task_id: str) -> str | None:
+        """Return the local status for one task without loading its payload."""
+        return self.store.task_status(task_id)
 
     def start(self, task_id: str) -> bool:
         """Start one task that this runtime just enqueued."""

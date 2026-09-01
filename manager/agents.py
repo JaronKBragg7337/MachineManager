@@ -244,19 +244,26 @@ class AgentCoordinator:
         """Create a durable task record without making queue failure fatal."""
         if self.scheduler is None:
             return None
-        task_id = f"agent-task-{spec.agent_id}-{uuid.uuid4().hex[:12]}"
+        task_id = self.scheduler.find_queued_task(
+            kind="agent_review",
+            payload_key="agent_id",
+            payload_value=spec.agent_id,
+        )
+        if task_id is None:
+            task_id = f"agent-task-{spec.agent_id}-{uuid.uuid4().hex[:12]}"
         objective_id = _safe_text(
             snapshot.get("objective_id"),
             default="agent-coordination",
             max_len=80,
         )
         try:
-            self.scheduler.enqueue(
-                kind="agent_review",
-                objective_id=objective_id,
-                payload={"agent_id": spec.agent_id},
-                task_id=task_id,
-            )
+            if self.scheduler.task_status(task_id) is None:
+                self.scheduler.enqueue(
+                    kind="agent_review",
+                    objective_id=objective_id,
+                    payload={"agent_id": spec.agent_id},
+                    task_id=task_id,
+                )
             if not self.scheduler.start(task_id):
                 self.scheduler.fail(task_id)
                 return None

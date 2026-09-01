@@ -705,6 +705,7 @@ def main() -> int:
                     defer_delay_s=defer_delay_s,
                     max_attempts=max_attempts,
                     actor=str(config.get("actor", "local-manager")),
+                    reserved_kinds={"agent_review"},
                     **dispatcher_kwargs,
                 )
         except (TypeError, ValueError) as exc:
