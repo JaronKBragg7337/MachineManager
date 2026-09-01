@@ -10,8 +10,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 import time
 from typing import Callable, Mapping
+import uuid
 
 from .scheduler import WorkItem, WorkScheduler
+from .supervisor import utc_now
 
 
 @dataclass(frozen=True)
@@ -45,6 +47,7 @@ class WorkDispatcher:
         *,
         defer_delay_s: float = 300.0,
         max_attempts: int = 3,
+        actor: str = "queue-dispatcher",
     ) -> None:
         if defer_delay_s <= 0:
             raise ValueError("defer_delay_s must be positive")
@@ -54,15 +57,64 @@ class WorkDispatcher:
         self.handlers = dict(handlers or {})
         self.defer_delay_s = float(defer_delay_s)
         self.max_attempts = int(max_attempts)
+        self.actor = str(actor or "queue-dispatcher")[:80]
+
+    def _record(
+        self,
+        item: WorkItem,
+        *,
+        event_type: str,
+        new_state: str,
+        action: str,
+        outcome: str,
+        error: str | None = None,
+        metrics: Mapping[str, int | float | bool] | None = None,
+    ) -> None:
+        """Persist a public-safe lifecycle event for one task attempt."""
+        event_metrics: dict[str, int | float | bool] = {"attempt": item.attempts}
+        event_metrics.update(dict(metrics or {}))
+        self.scheduler.store.append_event(
+            {
+                "timestamp": utc_now(),
+                "event_id": f"evt-queue-task-{uuid.uuid4().hex[:12]}",
+                "objective_id": item.objective_id,
+                "job_id": "task-queue",
+                "worker_id": "",
+                "actor": self.actor,
+                "event_type": event_type,
+                "previous_state": "QUEUED" if event_type == "queue_task_claimed" else "RUNNING",
+                "new_state": new_state,
+                "metrics": event_metrics,
+                "action": action,
+                "outcome": outcome,
+                "artifact_refs": [f"task:{item.task_id}"],
+                "error": error,
+                "duration": None,
+            }
+        )
 
     def dispatch(self, *, limit: int = 10, now: float | None = None) -> list[DispatchResult]:
         """Dispatch due work and return a compact result for each claimed item."""
         current = time.time() if now is None else float(now)
         results: list[DispatchResult] = []
         for item in self.scheduler.claim(limit=limit, now=current):
+            self._record(
+                item,
+                event_type="queue_task_claimed",
+                new_state="RUNNING",
+                action="claim_queue_task",
+                outcome="dispatch_attempt_started",
+            )
             handler = self.handlers.get(item.kind)
             if handler is None:
                 self.scheduler.defer(item.task_id, retry_at=current + self.defer_delay_s)
+                self._record(
+                    item,
+                    event_type="queue_task_deferred",
+                    new_state="QUEUED",
+                    action="defer_unhandled_task",
+                    outcome="no_handler_registered",
+                )
                 results.append(
                     DispatchResult(item.task_id, item.kind, "DEFERRED", item.attempts)
                 )
@@ -75,23 +127,75 @@ class WorkDispatcher:
                     raise ValueError(f"unsupported dispatch outcome: {status}")
                 if status == "COMPLETE":
                     self.scheduler.complete(item.task_id)
+                    self._record(
+                        item,
+                        event_type="queue_task_completed",
+                        new_state="COMPLETE",
+                        action="complete_queue_task",
+                        outcome="handler_completed",
+                    )
                 elif status == "RETRY":
                     retry_after = max(0.1, float(outcome.retry_after_s))
                     if item.attempts >= self.max_attempts:
                         status = "ESCALATED"
                         self.scheduler.escalate(item.task_id)
+                        self._record(
+                            item,
+                            event_type="queue_task_escalated",
+                            new_state="ESCALATED",
+                            action="escalate_queue_task",
+                            outcome="retry_budget_exhausted",
+                        )
                     else:
                         self.scheduler.defer(item.task_id, retry_at=current + retry_after)
+                        self._record(
+                            item,
+                            event_type="queue_task_retry",
+                            new_state="QUEUED",
+                            action="retry_queue_task",
+                            outcome="handler_requested_retry",
+                            metrics={"retry_after_s": retry_after},
+                        )
                 elif status == "FAILED":
                     self.scheduler.fail(item.task_id)
+                    self._record(
+                        item,
+                        event_type="queue_task_failed",
+                        new_state="FAILED",
+                        action="fail_queue_task",
+                        outcome="handler_reported_failure",
+                    )
                 else:
                     self.scheduler.escalate(item.task_id)
-            except Exception:
+                    self._record(
+                        item,
+                        event_type="queue_task_escalated",
+                        new_state="ESCALATED",
+                        action="escalate_queue_task",
+                        outcome="handler_requested_escalation",
+                    )
+            except Exception as error:
                 if item.attempts >= self.max_attempts:
                     status = "ESCALATED"
                     self.scheduler.escalate(item.task_id)
+                    event_type = "queue_task_escalated"
+                    new_state = "ESCALATED"
+                    action = "escalate_queue_task"
+                    outcome = "handler_error_retry_budget_exhausted"
                 else:
                     status = "RETRY"
                     self.scheduler.defer(item.task_id, retry_at=current + self.defer_delay_s)
+                    event_type = "queue_task_retry"
+                    new_state = "QUEUED"
+                    action = "retry_queue_task"
+                    outcome = "handler_error_retry_scheduled"
+                self._record(
+                    item,
+                    event_type=event_type,
+                    new_state=new_state,
+                    action=action,
+                    outcome=outcome,
+                    error=type(error).__name__,
+                )
             results.append(DispatchResult(item.task_id, item.kind, status, item.attempts))
         return results

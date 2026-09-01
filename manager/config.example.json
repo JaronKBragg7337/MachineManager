@@ -8,6 +8,12 @@
   "env_file": "../secrets/manager.env",
   "event_retention": 5000,
   "public_event_limit": 500,
+  "queue_dispatch": {
+    "enabled": false,
+    "limit": 4,
+    "defer_delay_s": 300,
+    "max_attempts": 3
+  },
   "autonomy": {
     "mode": "EXECUTE_AND_REPORT",
     "allow_account_enrollment": true,

@@ -873,6 +873,13 @@ class TelemetryTests(unittest.TestCase):
                 build_escalated = next(result for result in escalated if result.task_id == "task-build-1")
                 self.assertEqual(build_escalated.status, "ESCALATED")
                 self.assertEqual(scheduler.snapshot()["ESCALATED"], 1)
+                event_types = [event["event_type"] for event in store.recent_events(limit=20)]
+                self.assertIn("queue_task_claimed", event_types)
+                self.assertIn("queue_task_deferred", event_types)
+                self.assertIn("queue_task_completed", event_types)
+                self.assertIn("queue_task_retry", event_types)
+                self.assertIn("queue_task_escalated", event_types)
+                self.assertNotIn("handler failed", json.dumps(store.recent_events(limit=20)))
 
     def test_agent_response_falls_back_safely(self) -> None:
         self.assertTrue(parse_agent_response("").fallback)

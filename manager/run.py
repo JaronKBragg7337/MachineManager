@@ -14,6 +14,7 @@ from typing import Any, Mapping
 from .agents import AgentCoordinator
 from .autonomy import OperatingCharter
 from .capabilities import CapabilityRegistry
+from .dispatcher import WorkDispatcher
 from .evidence import EvidenceCoordinator
 from .instance_lock import InstanceAlreadyRunning, InstanceLock
 from .machine_manager import MachineManager
@@ -442,6 +443,8 @@ def main() -> int:
     manager: MachineManager | None = None
     agents: AgentCoordinator | None = None
     scheduler: WorkScheduler | None = None
+    queue_dispatcher: WorkDispatcher | None = None
+    queue_dispatch_limit = 4
     workstreams: WorkstreamRegistry | None = None
     local_publisher: TelemetryPublisher | None = None
     remote_publisher: GitHubPagesPublisher | None = None
@@ -555,6 +558,44 @@ def main() -> int:
                     "duration": None,
                 }
             )
+        raw_dispatch = config.get("queue_dispatch", {})
+        if raw_dispatch is None:
+            raw_dispatch = {}
+        try:
+            if not isinstance(raw_dispatch, Mapping):
+                raise ValueError("config.queue_dispatch must be an object")
+            dispatch_enabled = bool(raw_dispatch.get("enabled", False))
+            queue_dispatch_limit = max(1, min(int(raw_dispatch.get("limit", 4)), 20))
+            defer_delay_s = float(raw_dispatch.get("defer_delay_s", 300))
+            max_attempts = int(raw_dispatch.get("max_attempts", 3))
+            if dispatch_enabled:
+                queue_dispatcher = WorkDispatcher(
+                    scheduler,
+                    defer_delay_s=defer_delay_s,
+                    max_attempts=max_attempts,
+                    actor=str(config.get("actor", "local-manager")),
+                )
+        except (TypeError, ValueError) as exc:
+            store.append_event(
+                {
+                    "timestamp": utc_now(),
+                    "event_id": f"evt-queue-dispatch-config-{time.time_ns()}",
+                    "objective_id": primary_objective_id,
+                    "job_id": "task-queue",
+                    "worker_id": "",
+                    "actor": str(config.get("actor", "local-manager")),
+                    "event_type": "queue_dispatch_configuration_deferred",
+                    "previous_state": "UNKNOWN",
+                    "new_state": "DEFERRED",
+                    "metrics": {},
+                    "action": "load_queue_dispatch_config",
+                    "outcome": "core_supervision_continues",
+                    "artifact_refs": [],
+                    "error": type(exc).__name__,
+                    "duration": None,
+                }
+            )
+            _append_manager_log(manager_log_path, f"Queue dispatch configuration deferred: {type(exc).__name__}")
         agents = AgentCoordinator(agents_raw, scheduler=scheduler)
         try:
             workstreams = WorkstreamRegistry(store, config.get("workstreams", []))
@@ -679,6 +720,15 @@ def main() -> int:
                     store.append_event(event)
             else:
                 snapshot["workstreams"] = []
+            if queue_dispatcher is not None:
+                try:
+                    queue_dispatcher.dispatch(limit=queue_dispatch_limit)
+                except Exception as error:
+                    _record_noncritical_output_failure(
+                        manager_log_path,
+                        output="Queue dispatch",
+                        error=error,
+                    )
             snapshot["queue"] = scheduler.snapshot()
             snapshot["queue_kinds"] = scheduler.kind_snapshot()
             snapshot["queue_activity"] = scheduler.activity_snapshot(limit=20)

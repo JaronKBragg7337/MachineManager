@@ -99,7 +99,9 @@ The runner stores local operational state in SQLite:
   registered handler can complete, retry, fail, or escalate a claimed task;
   unknown task kinds are returned to `QUEUED` with a later schedule rather than
   being lost. The protected KeyHunt assignment is intentionally outside this
-  dispatch path.
+  dispatch path. The runner can enable its empty-registry observation path with
+  `queue_dispatch.enabled`; that path records claims and defers unhandled work
+  until a real worker handler is registered.
 - a singleton lock prevents two managers from supervising the same config;
 - a worker PID lease allows a healthy worker to be adopted after a manager
   restart instead of spawning a duplicate.
