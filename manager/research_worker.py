@@ -21,7 +21,7 @@ from .telemetry import atomic_json_write
 
 
 _SENSITIVE_TEXT = re.compile(
-    r"(?i)(?:[A-Za-z]:[\\/]|/Users/|/home/|\\\\|(?:token|secret|password)\s*[:=](?!\s*\[redacted\]))"
+    r"(?i)(?:(?<![A-Za-z0-9])[A-Za-z]:[\\/]|/Users/|/home/|\\\\|(?:token|secret|password)\s*[:=](?!\s*\[redacted\]))"
 )
 _LOCAL_PATH_TEXT = re.compile(
     r"(?i)(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/][^\s<>\"']+|/Users/[^\s<>\"']+|/home/[^\s<>\"']+|\\\\[^\s<>\"']+)"
