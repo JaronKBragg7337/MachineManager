@@ -194,6 +194,8 @@ class AgentCoordinator:
                 "last_action": "",
                 "last_reason": "",
                 "last_duration_s": None,
+                "started_at": None,
+                "elapsed_s": None,
                 "tasks_completed": 0,
                 "last_run": None,
                 "next_run": None,
@@ -263,6 +265,8 @@ class AgentCoordinator:
         status["last_action"] = decision.action
         status["last_reason"] = decision.reason
         status["last_duration_s"] = duration_s
+        status["started_at"] = None
+        status["elapsed_s"] = None
         status["tasks_completed"] = int(status["tasks_completed"]) + 1
         status["last_run"] = utc_now()
         status["next_run"] = self._next_run(spec.interval_s)
@@ -331,6 +335,12 @@ class AgentCoordinator:
                 continue
             if spec.agent_id in self._pending:
                 status["state"] = "WORKING"
+                started = self._pending_started.get(spec.agent_id)
+                status["elapsed_s"] = (
+                    None
+                    if started is None
+                    else round(max(0.0, time.monotonic() - started), 1)
+                )
                 continue
             last_run = self._last_run.get(spec.agent_id)
             if last_run is not None and now - last_run < spec.interval_s:
@@ -339,6 +349,8 @@ class AgentCoordinator:
 
             status["state"] = "WORKING"
             self._last_run[spec.agent_id] = now
+            status["started_at"] = utc_now()
+            status["elapsed_s"] = 0.0
             if spec.provider == "ollama":
                 future = self._executor.submit(self._run_async, spec, dict(snapshot), event_list)
                 self._pending[spec.agent_id] = future

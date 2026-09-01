@@ -52,6 +52,7 @@ The repository-level Python runtime in [`manager/`](manager/) currently provides
 - Resilient public telemetry: transient dashboard-file locks retry locally, and a persistent telemetry failure defers that snapshot instead of terminating protected work.
 - Synthetic workers and reliability tests for healthy work, live-but-stalled work, crashes, escalation, event contracts, and public-telemetry boundaries.
 - Bounded local specialist slots that can give safe, compact operational advice while the manager retains control of worker lifecycle and retry policy.
+- Public agent views show whether a specialist is currently working, its bounded run timing, completed task count, and next run without publishing prompts or unrestricted reasoning.
 
 The runtime is intentionally standard-library-first and can run without relying on a cloud connector.
 

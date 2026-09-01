@@ -16,6 +16,8 @@ class DashboardContractTests(unittest.TestCase):
             "Cumulative candidate checks",
             'role="img"',
             "counters may reset after a worker restart",
+            "Running for",
+            "Started ",
         ):
             self.assertIn(marker, self.dashboard)
 

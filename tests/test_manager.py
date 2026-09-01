@@ -808,10 +808,17 @@ class TelemetryTests(unittest.TestCase):
         try:
             with patch.object(LocalOllamaAgent, "ask", side_effect=slow_but_successful_ask):
                 self.assertEqual(coordinator.tick(snapshot), [])
+                running = coordinator.snapshot()[0]
+                self.assertEqual(running["state"], "WORKING")
+                self.assertIsNotNone(running["started_at"])
+                self.assertEqual(running["elapsed_s"], 0.0)
                 time.sleep(0.2)
                 decisions = coordinator.tick(snapshot)
             self.assertEqual(decisions[0].action, "continue")
-            self.assertLess(coordinator.snapshot()[0]["last_duration_s"], 0.15)
+            completed = coordinator.snapshot()[0]
+            self.assertLess(completed["last_duration_s"], 0.15)
+            self.assertIsNone(completed["started_at"])
+            self.assertIsNone(completed["elapsed_s"])
         finally:
             coordinator.close()
 

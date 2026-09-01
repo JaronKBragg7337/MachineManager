@@ -313,6 +313,8 @@ class TelemetryPublisher:
                 "last_action": _text(agent.get("last_action"), max_len=40),
                 "last_reason": _text(agent.get("last_reason"), max_len=160),
                 "last_duration_s": _number(agent.get("last_duration_s")),
+                "started_at": _text(agent.get("started_at"), max_len=40),
+                "elapsed_s": _number(agent.get("elapsed_s")),
                 "tasks_completed": _number(agent.get("tasks_completed")) or 0,
                 "last_run": _text(agent.get("last_run"), max_len=40),
                 "next_run": _text(agent.get("next_run"), max_len=40),
