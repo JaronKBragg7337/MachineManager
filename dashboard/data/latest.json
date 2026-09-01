@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T08:00:49.069Z",
+        "observed_at": "2026-09-01T08:01:10.452Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "matches_found": 0,
-        "keys_per_second": 748780000,
-        "hashrate_mkey_s": 748.78,
+        "keys_per_second": 752280000,
+        "hashrate_mkey_s": 752.28,
         "coverage_pct": 0,
-        "uptime_s": 1.1,
-        "keys_tested": 10039251173376,
-        "batch_number": 3271,
-        "sample_count": 1
+        "uptime_s": 22.4,
+        "keys_tested": 10091646418944,
+        "batch_number": 3288,
+        "sample_count": 2
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T08:00:49.069Z",
+        "observed_at": "2026-09-01T08:01:10.452Z",
         "reported": true,
         "active": true,
         "healthy": true,
         "matches_found": 0,
-        "keys_per_second": 748780000,
-        "hashrate_mkey_s": 748.78,
+        "keys_per_second": 752280000,
+        "hashrate_mkey_s": 752.28,
         "coverage_pct": 0,
-        "uptime_s": 1.1,
-        "keys_tested": 10039251173376,
-        "batch_number": 3271,
-        "sample_count": 1
+        "uptime_s": 22.4,
+        "keys_tested": 10091646418944,
+        "batch_number": 3288,
+        "sample_count": 2
       }
     }
   ],
@@ -56,16 +56,16 @@
       "role": "health-review-specialist",
       "provider": "ollama",
       "model": "qwen3.5:4b",
-      "state": "WORKING",
+      "state": "WAITING",
       "enabled": true,
-      "last_action": "",
-      "last_reason": "",
-      "last_duration_s": null,
-      "started_at": "2026-09-01T08:00:50.217Z",
-      "elapsed_s": 0.0,
-      "tasks_completed": 0,
-      "last_run": "",
-      "next_run": ""
+      "last_action": "continue",
+      "last_reason": "System is healthy with normal GPU utilization and no errors detected.",
+      "last_duration_s": 4.422,
+      "started_at": "",
+      "elapsed_s": null,
+      "tasks_completed": 1,
+      "last_run": "2026-09-01T08:01:11.442Z",
+      "next_run": "2026-09-01T08:06:11.442Z"
     }
   ],
   "capabilities": [
@@ -338,8 +338,7 @@
     "handoff_style": "service-required"
   },
   "queue": {
-    "COMPLETE": 24,
-    "RUNNING": 1
+    "COMPLETE": 25
   },
   "queue_kinds": {
     "agent_review": 23,
@@ -350,9 +349,9 @@
       "task_id": "agent-task-local-manager-brain-189426a2f07f",
       "kind": "agent_review",
       "objective_id": "p71",
-      "status": "RUNNING",
+      "status": "COMPLETE",
       "attempts": 1,
-      "updated": "2026-09-01T08:00:50.217Z"
+      "updated": "2026-09-01T08:01:11.442Z"
     },
     {
       "task_id": "recurring-machine-manager-capability-research-000001",
@@ -508,32 +507,32 @@
     }
   ],
   "gpu": {
-    "util_pct": 71.0,
+    "util_pct": 91.0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 60.0,
-    "power_w": 79.07,
+    "temp_c": 64.0,
+    "power_w": 83.55,
     "resource_active": true
   },
   "system": {
-    "cpu_pct": 8.5
+    "cpu_pct": 17.6
   },
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T08:00:49.069Z",
+    "observed_at": "2026-09-01T08:01:10.452Z",
     "reported": true,
     "active": true,
     "healthy": true,
     "matches_found": 0,
-    "keys_per_second": 748780000,
-    "hashrate_mkey_s": 748.78,
+    "keys_per_second": 752280000,
+    "hashrate_mkey_s": 752.28,
     "coverage_pct": 0,
-    "uptime_s": 1.1,
-    "keys_tested": 10039251173376,
-    "batch_number": 3271,
-    "sample_count": 1
+    "uptime_s": 22.4,
+    "keys_tested": 10091646418944,
+    "batch_number": 3288,
+    "sample_count": 2
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T08:00:50.213Z"
+  "updated": "2026-09-01T08:01:11.442Z"
 }
