@@ -12,18 +12,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T15:18:28.419Z",
+        "observed_at": "2026-09-01T15:20:44.231Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 408.6,
-        "hashrate_mkey_s": 749.04,
+        "uptime_s": 544.5,
+        "hashrate_mkey_s": 757.68,
         "matches_found": 0,
-        "keys_per_second": 749040000,
-        "batch_number": 9685,
-        "sample_count": 25,
+        "keys_per_second": 757680000,
+        "batch_number": 9719,
+        "sample_count": 33,
         "coverage_pct": 0,
-        "keys_tested": 29711577120768
+        "keys_tested": 29814354345984
       }
     }
   ],
@@ -35,18 +35,18 @@
       "progress": {
         "kind": "reported_progress",
         "source": "worker_log",
-        "observed_at": "2026-09-01T15:18:28.419Z",
+        "observed_at": "2026-09-01T15:20:44.231Z",
         "reported": true,
         "active": true,
         "healthy": true,
-        "uptime_s": 408.6,
-        "hashrate_mkey_s": 749.04,
+        "uptime_s": 544.5,
+        "hashrate_mkey_s": 757.68,
         "matches_found": 0,
-        "keys_per_second": 749040000,
-        "batch_number": 9685,
-        "sample_count": 25,
+        "keys_per_second": 757680000,
+        "batch_number": 9719,
+        "sample_count": 33,
         "coverage_pct": 0,
-        "keys_tested": 29711577120768
+        "keys_tested": 29814354345984
       }
     }
   ],
@@ -747,7 +747,7 @@
       "interval_s": 21600.0,
       "sequence": 2,
       "next_run_at": "2026-09-01T19:48:51.437Z",
-      "next_in_s": 16222.153282642365,
+      "next_in_s": 16086.219234704971,
       "last_task_id": "recurring-machine-manager-capability-research-000002",
       "last_status": "COMPLETE"
     },
@@ -759,7 +759,7 @@
       "interval_s": 86400.0,
       "sequence": 1,
       "next_run_at": "2026-09-02T08:24:57.941Z",
-      "next_in_s": 61588.657603263855,
+      "next_in_s": 61452.72355532646,
       "last_task_id": "recurring-revenue-lane-scout-000001",
       "last_status": "COMPLETE"
     },
@@ -771,29 +771,29 @@
       "interval_s": 43200.0,
       "sequence": 1,
       "next_run_at": "2026-09-01T20:31:08.402Z",
-      "next_in_s": 18759.119119405746,
+      "next_in_s": 18623.185071468353,
       "last_task_id": "recurring-machine-manager-verification-000001",
       "last_status": "COMPLETE"
     }
   ],
   "gpu": {
     "util_pct": 84.0,
-    "util_pct_recent_max": 88.0,
-    "util_pct_recent_avg": 81.6,
+    "util_pct_recent_max": 84.0,
+    "util_pct_recent_avg": 74.0,
     "util_pct_sample_count": 5,
     "util_pct_zero_samples": 0,
     "mem_used_mib": 2367.0,
     "mem_total_mib": 8188.0,
-    "temp_c": 62.0,
-    "power_w": 82.44,
+    "temp_c": 59.0,
+    "power_w": 81.73,
     "resource_active": true,
     "activity_state": "ACTIVE",
     "activity_basis": "driver_utilization"
   },
   "system": {
-    "cpu_pct": 5.3,
-    "cpu_pct_recent_max": 7.2,
-    "cpu_pct_recent_avg": 6.0,
+    "cpu_pct": 6.3,
+    "cpu_pct_recent_max": 6.3,
+    "cpu_pct_recent_avg": 6.2,
     "cpu_pct_sample_count": 5,
     "cpu_pct_zero_samples": 0.0,
     "load_state": "ACTIVE",
@@ -802,19 +802,19 @@
   "progress": {
     "kind": "reported_progress",
     "source": "worker_log",
-    "observed_at": "2026-09-01T15:18:28.419Z",
+    "observed_at": "2026-09-01T15:20:44.231Z",
     "reported": true,
     "active": true,
     "healthy": true,
-    "uptime_s": 408.6,
-    "hashrate_mkey_s": 749.04,
+    "uptime_s": 544.5,
+    "hashrate_mkey_s": 757.68,
     "matches_found": 0,
-    "keys_per_second": 749040000,
-    "batch_number": 9685,
-    "sample_count": 25,
+    "keys_per_second": 757680000,
+    "batch_number": 9719,
+    "sample_count": 33,
     "coverage_pct": 0,
-    "keys_tested": 29711577120768
+    "keys_tested": 29814354345984
   },
   "notes": "Sanitized public telemetry only. No secrets or raw logs.",
-  "updated": "2026-09-01T15:18:29.275Z"
+  "updated": "2026-09-01T15:20:45.206Z"
 }
