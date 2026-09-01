@@ -1,8 +1,8 @@
 # Reference Scenario: Stalled but Alive Worker (stalled-worker-001)
 
-**Version:** 1.0  
-**Pass:** true  
-**Score:** 1.0  
+**Version:** 1.0
+**Pass:** true
+**Score:** 1.0
 **Timestamp:** 2026-09-01T05:37:55.415Z
 
 ## Description
