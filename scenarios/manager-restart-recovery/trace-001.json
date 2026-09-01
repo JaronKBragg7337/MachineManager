@@ -1,0 +1,35 @@
+{
+  "scenario_id": "manager-restart-recovery-001",
+  "version": "1.0",
+  "description": "The watchdog restores the manager and adopts a protected worker that survived the manager interruption",
+  "timestamp": "2026-09-01T06:01:48.329Z",
+  "result": "PASS",
+  "score": 1,
+  "action": "ADOPT_AND_VERIFY",
+  "initial_state": {
+    "manager_count": 1,
+    "protected_worker_count": 1,
+    "local_status": "HEALTHY",
+    "job_state": "RUNNING"
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Stop only the manager child while leaving the protected worker untouched",
+    "protected_worker_count_immediately_after": 1
+  },
+  "observations": {
+    "manager_count_after": 1,
+    "protected_worker_count_after": 1,
+    "worker_adopted_events_after_restart": 1,
+    "adoption_confirmed": true
+  },
+  "recovery": {
+    "confirmed_status": "HEALTHY",
+    "confirmed_job_state": "RUNNING",
+    "recovery_time_s": 23.697,
+    "outside_intervention_count": 0
+  },
+  "verification": "A manager-only interruption leaves the protected worker running and the watchdog-restored manager adopts and verifies it",
+  "resulting_state": "HEALTHY",
+  "intervention_count": 0
+}

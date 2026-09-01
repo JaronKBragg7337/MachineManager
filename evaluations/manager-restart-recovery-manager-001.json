@@ -1,0 +1,33 @@
+{
+  "evaluation_id": "manager-restart-recovery-manager-001",
+  "reference_id": "manager-restart-recovery-001",
+  "version": "1.0",
+  "started_at": "2026-09-01T06:01:48.329Z",
+  "initial_state": {
+    "manager_count": 1,
+    "protected_worker_count": 1,
+    "local_status": "HEALTHY",
+    "job_state": "RUNNING"
+  },
+  "induced_failure": {
+    "actor": "evaluation-harness",
+    "action": "Stop only the manager child",
+    "protected_worker_count_immediately_after": 1
+  },
+  "manager_observation": {
+    "manager_count_after": 1,
+    "protected_worker_count_after": 1,
+    "adoption_event_count": 1,
+    "adoption_event_type": "worker_adopted"
+  },
+  "recovery": {
+    "confirmed_status": "HEALTHY",
+    "confirmed_job_state": "RUNNING",
+    "recovery_time_s": 23.697,
+    "outside_intervention_count": 0
+  },
+  "ceo_intervention_count": 0,
+  "intervention_count": 0,
+  "result": "PASS",
+  "notes": "The watchdog restored one manager, which adopted the protected worker that remained alive during the manager interruption."
+}
