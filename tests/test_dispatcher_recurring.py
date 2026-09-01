@@ -46,6 +46,51 @@ class BackgroundDispatcherTests(unittest.TestCase):
                 self.assertNotIn("private-value", event["message"])
                 self.assertNotIn(r"C:\Users\lilli", event["message"])
 
+    def test_background_handler_public_message_reaches_lifecycle_event(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            with StateStore(Path(raw) / "state.sqlite3") as store:
+                scheduler = WorkScheduler(store)
+                scheduler.enqueue(
+                    kind="verification",
+                    objective_id="verification-objective",
+                    task_id="task-background-public-message-1",
+                    scheduled_at=100,
+                )
+                dispatcher = BackgroundWorkDispatcher(
+                    scheduler,
+                    {
+                        "verification": lambda _item: DispatchOutcome(
+                            metrics={"tests_run": 12, "passed": True},
+                            public_message=(
+                                "Repository verification passed. token=private-value. "
+                                r"C:\Users\lilli\private.txt"
+                            ),
+                        )
+                    },
+                    max_workers=1,
+                    max_in_flight=1,
+                )
+                try:
+                    dispatcher.dispatch(limit=1, now=100)
+                    completed = []
+                    for _ in range(30):
+                        completed = dispatcher.dispatch(limit=1, now=100)
+                        if completed and completed[0].status == "COMPLETE":
+                            break
+                        time.sleep(0.02)
+                    self.assertEqual(completed[0].status, "COMPLETE")
+                    event = next(
+                        event
+                        for event in store.recent_events(limit=10)
+                        if event["event_type"] == "queue_task_completed"
+                    )
+                    self.assertIn("Repository verification passed.", event["message"])
+                    self.assertIn("token: [redacted]", event["message"])
+                    self.assertNotIn("private-value", event["message"])
+                    self.assertNotIn(r"C:\Users\lilli", event["message"])
+                finally:
+                    dispatcher.close()
+
     def test_background_dispatch_does_not_wait_for_handler(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             with StateStore(Path(raw) / "state.sqlite3") as store:
